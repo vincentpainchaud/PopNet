@@ -1,0 +1,3006 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.1" />
+<title>popnet.systems documentation</title>
+<meta name="description" content="Dynamical systems related to the Wilson--Cowan model …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding-left:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        "SVG": {
+            availableFonts: ["TeX"], 
+            scale: 90,
+            blacker: 0
+        },
+        MMLorHTML: {prefer: "HTML"},
+    });
+    MathJax.Hub.Register.StartupHook("SVG Jax Ready",function () {
+      var VARIANT = MathJax.OutputJax["SVG"].FONTDATA.VARIANT;
+      VARIANT["normal"].fonts.unshift("MathJax_SansSerif");
+      VARIANT["bold"].fonts.unshift("MathJax_SansSerif-bold");
+      VARIANT["italic"].fonts.unshift("MathJax_SansSerif-italic");
+      VARIANT["-tex-mathit"].fonts.unshift("MathJax_SansSerif-italic");
+    });
+    MathJax.Hub.Register.StartupHook("SVG Jax Ready",function () {
+      var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;
+      VARIANT["normal"].fonts.unshift("MathJax_SansSerif");
+      VARIANT["bold"].fonts.unshift("MathJax_SansSerif-bold");
+      VARIANT["italic"].fonts.unshift("MathJax_SansSerif-italic");
+      VARIANT["-tex-mathit"].fonts.unshift("MathJax_SansSerif-italic");
+    });
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_SVG"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<style type="text/css">
+    ul { 
+        list-style-type: square; 
+    }
+    ul.hierarchy {
+        list-style-type: none;
+        padding-left: 2.5em;
+        text-indent: -.8em;
+    }
+    ul.hierarchy > li:before {
+        content: "\21B3 ";
+    }
+    ul.sidebar {
+        border-left: 1px solid silver;
+        margin-left: -.7em;
+    }
+    ol.references { 
+        list-style-type: none; 
+        margin-left: 0px; 
+        padding-left: 2em; 
+        position: relative; 
+    }
+    ol.references > li:before {
+        content: "[" counter(enum, decimal) "]"; 
+        left: 0.4em; 
+        position: absolute; 
+    }
+    ol.references > li { 
+        counter-increment: enum; 
+    }
+</style>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>popnet.systems</code></h1>
+</header>
+<section id="section-intro">
+<p>Dynamical systems related to the Wilson&ndash;Cowan model.</p>
+<p>This modules implements various dynamical systems related to the Wilson&ndash;Cowan
+model. It first implements an abstract base class <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code>, from which
+the several other classes are derived. All classes are listed in the
+<a href="#classes-and-hierarchy">Classes And Hierarchy</a> section below.</p>
+<h2 id="classes-and-hierarchy">Classes And Hierarchy</h2>
+<p>The important classes of the module are summarized below. The indentation
+follows the hierarchy.</p>
+<ul class="hierarchy">
+<li><code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> : An abstract base class to represent a dynamical system.<ul class="hierarchy sidebar">
+<li><code><a title="popnet.systems.WilsonCowanSystem" href="#popnet.systems.WilsonCowanSystem">WilsonCowanSystem</a></code> : The classical Wilson&ndash;Cowan dynamical system.</li>
+<li><code><a title="popnet.systems.MeanFieldSystem" href="#popnet.systems.MeanFieldSystem">MeanFieldSystem</a></code> : The Wilson&ndash;Cowan system with refractory state.</li>
+<li><code><a title="popnet.systems.MixedSystem" href="#popnet.systems.MixedSystem">MixedSystem</a></code> : An extension of the last case where the refractory state
+is weighted.</li>
+<li><code><a title="popnet.systems.TaylorExtendedSystem" href="#popnet.systems.TaylorExtendedSystem">TaylorExtendedSystem</a></code> : An extended Wilson&ndash;Cowan system with refractory
+state and covariances, obtained from a moment closure based on a
+second-order Taylor approximation.</li>
+<li><code><a title="popnet.systems.ExtendedSystem" href="#popnet.systems.ExtendedSystem">ExtendedSystem</a></code> : An extended Wilson&ndash;Cowan system with refractory state
+and covariances, obtained from a moment closure based on the shape of
+sigmoid functions.</li>
+</ul>
+</li>
+</ul>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Dynamical systems related to the Wilson--Cowan model.
+
+This modules implements various dynamical systems related to the Wilson--Cowan
+model. It first implements an abstract base class `DynamicalSystem`, from which
+the several other classes are derived. All classes are listed in the
+[Classes And Hierarchy](#classes-and-hierarchy) section below.
+
+Classes and hierarchy
+---------------------
+
+The important classes of the module are summarized below. The indentation
+follows the hierarchy.
+
+ - `DynamicalSystem` : An abstract base class to represent a dynamical system.
+     - `WilsonCowanSystem` : The classical Wilson--Cowan dynamical system.
+     - `MeanFieldSystem` : The Wilson--Cowan system with refractory state.
+     - `MixedSystem` : An extension of the last case where the refractory state
+       is weighted.
+     - `TaylorExtendedSystem` : An extended Wilson--Cowan system with refractory
+       state and covariances, obtained from a moment closure based on a
+       second-order Taylor approximation.
+     - `ExtendedSystem` : An extended Wilson--Cowan system with refractory state
+       and covariances, obtained from a moment closure based on the shape of
+       sigmoid functions.
+
+&#34;&#34;&#34;
+
+import numpy as np
+from scipy.optimize import root
+from warnings import warn
+
+from .exceptions import *
+from . import _internals
+from . import structures
+from . import graphics
+
+
+class DynamicalSystem:
+    &#34;&#34;&#34;Represent dynamical systems.
+
+    The `DynamicalSystem` class is an abstract base class intended to represent
+    dynamical systems in PopNet. Each subclass must implement a vector field,
+    and the base class has several methods to study this vector field. For
+    example, a method is available to find equilibrium points. A subclass can
+    also implement a jacobian matrix. If this is done, methods are available to
+    find its eigenvalues and eigenvectors.
+
+    Aside from implementing a vector field, a subclass of `DynamicalSystem` must
+    also set the `dim` property at initialization.
+
+    Parameters
+    ----------
+    config : popnet.structures.Configuration
+        A configuration associated with the dynamical system.
+
+    Attributes
+    ----------
+    config : popnet.structures.Configuration
+        Configuration associated with the dynamical system. See
+        `DynamicalSystem.config`.
+    dim : int
+        Dimension of the dynamical system. See `DynamicalSystem.dim`.
+
+    &#34;&#34;&#34;
+
+    def __init__(self, config):
+        self.config = config
+        self._dim = self._get_dimension()
+
+    @property
+    def config(self):
+        &#34;&#34;&#34;Configuration used with the dynamical system.
+
+        Configuration defining all parameters used in the dynamical system. It
+        must be a `popnet.structures.Configuration` instance. It cannot be
+        deleted.
+        &#34;&#34;&#34;
+        return self._config
+
+    @config.setter
+    def config(self, new_value):
+        if not isinstance(new_value, structures.Configuration):
+            raise TypeError(&#39;The configuration used with a dynamical system &#39;
+                            &#39;must be a Configuration instance.&#39;)
+        self._config = new_value
+
+    @property
+    def dim(self):
+        &#34;&#34;&#34;Dimension of the dynamical system.
+
+        Dimension of the dynamical system. It is set at initialization, and it
+        cannot be reset nor deleted afterwards.
+        &#34;&#34;&#34;
+        return self._dim
+
+    def find_equilibrium_near(self, state, verbose=True, method=&#39;hybr&#39;):
+        &#34;&#34;&#34;Find an equilibrium point near at a given state.
+
+        Find an equilibrium point of the dynamical system near the given state.
+        This method uses the [`root`](https://tinyurl.com/scipy-optimize-root)
+        function from SciPy&#39;s `optimize` module.
+
+        Parameters
+        ----------
+        state : array_like
+            The initial guess for the equilibrium point.
+        verbose : bool, optional
+            If `True`, a warning will be issued if the optimizer fails and no
+            equilibrium point is found. Defaults to `True`.
+        method : str, optional
+            The solver used to find the find fixed point. It should be one of
+            the accepted values for the corresponding argument of `root`.
+            Defaults to `&#39;hybr&#39;`.
+
+        Returns
+        -------
+        array_like
+            The equilibrium point found, or `None` if the optimization failed.
+
+        Warns
+        -----
+        popnet.exceptions.PopNetWarning
+            If `verbose` is `True` and the optimizer did not succeed.
+        &#34;&#34;&#34;
+        try:
+            self.jac(state)
+        except NotImplementError:
+            jac = None
+        else:
+            jac = self.jac
+        sol = root(self.vector_field, state, jac=jac)
+        if not sol.success:
+            if verbose:
+                warn(&#39;The optimizer did not succeed.&#39;, categoy=PopNetWarning,
+                     stacklevel=2)
+            return None
+        return sol.x
+
+    def get_eigs_at(self, state):
+        &#34;&#34;&#34;Get eigenvalues and eigenvectors of the jacobian matrix.
+
+        Get the eigenvalues and eigenvectors of the jacobian matrix
+        corresponding to the linearization of the dynamical system, evaluated
+        at the given state. If eigenvectors are not needed, `get_eigenvals_at`
+        should be used instead.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the jacobian matrix should be evaluated.
+
+        Returns
+        -------
+        array
+            The eigenvalues, repeated according to their multiplicities, and
+            sorted from largest to lowest real part.
+        array
+            The associated eigenvectors.
+
+        Raises
+        ------
+        NotImplementedError
+            If the jacobian matrix for this system is not implemented.
+        numpy.LinAlgError
+            If the eigenvalue computation does not converge.
+        &#34;&#34;&#34;
+        eigenvals, eigenvects = np.linalg.eig(self.jac(state))
+        argsort = np.argsort(eigenvals)[::-1]
+        eigenvals = eigenvals[argsort]
+        eigenvects = eigenvects[argsort]
+        return eigenvals, eigenvects
+
+    def get_eigenvals_at(self, state):
+        &#34;&#34;&#34;Get eigenvalues of the jacobian matrix at a given state.
+
+        Get the eigenvalues of the jacobian matrix corresponding to the
+        linearization of the dynamical system, evaluated at the given state.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the jacobian matrix should be evaluated.
+
+        Returns
+        -------
+        array
+            The eigenvalues, repeated according to their multiplicities, and
+            sorted from largest to lowest real part.
+
+        Raises
+        ------
+        NotImplementedError
+            If the jacobian matrix for this system is not implemented.
+        numpy.LinAlgError
+            If the eigenvalue computation does not converge.
+        &#34;&#34;&#34;
+        eigenvals = np.linalg.eigvals(self.jac(state))
+        eigenvals = np.sort(eigenvals)[::-1]
+        return eigenvals
+
+    def get_phase_plane(self, axes, fixed_axes=0., values=None, name=None):
+        &#34;&#34;&#34;Get a phase plane.
+
+        Get a phase plane with given independant variables to draw it later. For
+        this method to be available, the dynamical system must has at least two
+        dimensions.
+
+        Parameters
+        ----------
+        axes : tuple of int
+            Axes indicating the independant variables which will be the phase
+            plane&#39;s axes.
+        fixed_axes : array_like or float, optional
+            Determines the values of the remaining axes other than those chosen
+            with `axes`. If it is a float, all other axes will be set to this
+            value. If it is an array, its length should be the dimension of the
+            dynamical system minus two, and in that case every axis is fixed at
+            the value given by `fixed_axes`, in the order of the system,
+            skipping the axes chosen by `axes`. It is ignored is the dynamical
+            system is two-dimensional. Defaults to 0.
+        name : str, optional
+            A name associated with the phase plane. Defaults to `None`, in which
+            case it is replaced with `&#39;Phase plane&#39;`.
+
+        Returns
+        -------
+        popnet.graphics.PhasePlane
+            A phase plane to be drawn.
+
+        Raises
+        ------
+        popnet.exceptions.PopNetError
+            If the dynamical system has only one dimension.
+        &#34;&#34;&#34;
+        if (n := self.dim - 2) &lt; 0:
+            raise PopNetError(&#39;Can\&#39;t draw a phase plane for a dynamical system&#39;
+                              &#39; of only one dimension.&#39;)
+        if n == 0:
+            fix = None
+        else:
+            fix = fixed_axes
+        return graphics.PhasePlane(self, axes=axes, fixed_axes=fix, name=name)
+
+    def jac(self, state):
+        &#34;&#34;&#34;Get the jacobian matrix evaluated at a given state.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the jacobian matrix should be evaluated.
+
+        Returns
+        -------
+        array
+            The jacobian matrix evaluated at the state.
+
+        Raises
+        ------
+        NotImplementedError
+            If the jacobian matrix for this system is not implemented.
+        &#34;&#34;&#34;
+        raise NotImplementedError(&#39;No jacobian matrix implemented for this &#39;
+                                  &#39;system.&#39;)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Get the vector field evaluated at a given state.
+
+        Get the vector field corresponding to the dynamical system evaluated
+        at a given state.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the vector field should be evaluated.
+
+        Returns
+        -------
+        array
+            The vector field evaluated at the state.
+        &#34;&#34;&#34;
+        raise NotImplementedError(&#39;A dynamical system must implement a vector &#39;
+                                  &#39;field.&#39;)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        raise NotImplementedError(&#39;A dynamical system must give its dimension.&#39;)
+
+
+class WilsonCowanSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class for an equivalent to the original
+    Wilson--Cowan model, without refractory state or correlations. For *p*
+    populations, a state of this system has the form
+    \\[
+        (A_1, ..., A_p),
+    \\]
+    where \\(A_J\\) is the expectation of the activity of the *J*th population,
+    in the order given by the list of populations in the configuration&#39;s
+    network.
+
+    The jacobian matrix is implemented for this system.
+
+    &#34;&#34;&#34;
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        A = state
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((p, p))
+        for J, popJ in enumerate(self.config.network.populations):
+            rJ = 1 + popJ.beta / popJ.gamma
+            SJ = 1 - rJ * A[J]
+            j[J,J] = (- popJ.beta - popJ.alpha * rJ * popJ.F(B[J])
+                        + popJ.alpha * SJ * popJ.dF(B[J])
+                            * self.config.network.c[J,J])
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha * SJ * popJ.dF(B[J])
+                                * self.config.network.c[J,K])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the Wilson--Cowan model. 
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        A = state
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(p)
+        for J, popJ in enumerate(self.config.network.populations):
+            SJ = 1 - (1 + popJ.beta / popJ.gamma) * A[J]
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * SJ
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        return len(self.config.network.populations)
+
+
+class MixedSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the &#39;mixed&#39; Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class to study the transition between the
+    classical Wilson--Cowan model and its extension with refractory state. This
+    class can be seen as a combination of the `WilsonCowanSystem` and
+    `MeanFieldSystem` classes. Covariances are not considered in this case. For
+    *p* populations, a state of this system has the form
+    \\[
+        (A_1, ..., A_p, R_1, ..., R_p),
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network.
+
+    The jacobian matrix is implemented for this system.
+
+    In this case the system has an additional data attribute `epsilon`, which
+    is a `float` and should have a value between 0 and 1. It defines how much
+    the refractory state is considered. See `MixedSystem.epsilon` for details.
+
+    &#34;&#34;&#34;
+
+    def __init__(self, config, epsilon=1, **kwargs):
+        self.epsilon = epsilon
+        super().__init__(config, **kwargs)
+
+    @property
+    def epsilon(self):
+        &#34;&#34;&#34;Transition parameter for the refractory state.
+
+        Float parameter with value between 0 and 1 that determines &#39;how much&#39;
+        the refractory state is considered.
+
+        - When `epsilon` is 1 the refractory state is fully considered, and the
+        vector field is the same as that of the `MeanFieldSystem` class.
+        - When `epsilon` has a value between 0 and 1, the derivative of the
+        refractory state&#39;s components is multiply by `1/epsilon`, so these
+        components converge towards their equilibrium solutions faster than
+        they would normally.
+        - The case where `epsilon` is zero would be the case where the
+        refractory state is set to its equilibrium solution and the vector
+        field is that of Wilson--Cowan&#39;s model. However, for this case, the
+        `WilsonCowanSystem` class should be used instead.
+
+        This property cannot be deleted.
+        &#34;&#34;&#34;
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, new_value):
+        try:
+            new_value = float(new_value)
+        except Exception:
+            raise TypeError(&#39;\&#39;epsilon\&#39; should be a float.&#39;)
+        if not 0 &lt; new_value &lt;= 1:
+            if new_value == 0:
+                msg = (&#39;\&#39;epsilon\&#39; can\&#39;t be equal to zero. For this case, use&#39;
+                       &#39; the \&#39;WilsonCowanSystem\&#39; class instead.&#39;)
+            else:
+                msg = &#39;\&#39;epsilon\&#39; has to be between zero and one.&#39;
+            raise ValueError(msg)
+        self._epsilon = new_value
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field.
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((2*p, 2*p))
+        for J, popJ in enumerate(self.config.network.populations):
+            j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                        * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+            j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+            j[J+p,J] = popJ.beta / self.epsilon
+            j[J+p,J+p] = - popJ.gamma / self.epsilon
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                                * self.config.network.c[J,K] * S[J])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the &#39;mixed&#39; Wilson--Cowan model. 
+
+        See `DynamicalSystem.vector_field`.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p :]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(2*p)
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+            f[J+p] = 1/self.epsilon * (- popJ.gamma * R[J] + popJ.beta * A[J])
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        return 2 * len(self.config.network.populations)
+
+
+class MeanFieldSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the Wilson--Cowan model with refractory state.
+
+    Specializes the `DynamicalSystem` class for the Wilson--Cowan model with
+    refractory state explicitely included. Covariances are not considered in
+    this case. For *p* populations, a state of this system has the form
+    \\[
+        (A_1, ..., A_p, R_1, ..., R_p),
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network.
+
+    The jacobian matrix is implemented for this system.
+
+    &#34;&#34;&#34;
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((2*p, 2*p))
+        for J, popJ in enumerate(self.config.network.populations):
+            j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                        * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+            j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+            j[J+p,J] = popJ.beta
+            j[J+p,J+p] = - popJ.gamma
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                                * self.config.network.c[J,K] * S[J])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the Wilson--Cowan model with refractory state. 
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p :]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(2*p)
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+            f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        return 2 * len(self.config.network.populations)
+
+
+class TaylorExtendedSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the extended Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class for the extended Wilson--Cowan
+    model obtained from the closure that uses a second-order Taylor
+    approximation. Here the refractory state and the covariances between
+    fractions of populations are included. For *p* populations, a state of this
+    system has the form
+    \\[
+        (\\begin{aligned}[t]
+            &amp; A_1, A_2, ..., A_p, \\\\
+            &amp; R_1, R_2, ..., R_p, \\\\
+            &amp; \\mathrm{C}_{AA}^{11}, \\mathrm{C}_{AA}^{12}, ..., 
+                \\mathrm{C}_{AA}^{1p}, \\mathrm{C}_{AA}^{22}, ..., 
+                \\mathrm{C}_{AA}^{2p}, \\mathrm{C}_{AA}^{33}, ..., 
+                \\mathrm{C}_{AA}^{3p}, ..., \\mathrm{C}_{AA}^{pp}, \\\\
+            &amp; \\mathrm{C}_{RR}^{11}, \\mathrm{C}_{RR}^{12}, ..., 
+                \\mathrm{C}_{RR}^{1p}, \\mathrm{C}_{RR}^{22}, ..., 
+                \\mathrm{C}_{RR}^{2p}, \\mathrm{C}_{RR}^{33}, ..., 
+                \\mathrm{C}_{RR}^{3p}, ..., \\mathrm{C}_{RR}^{pp}, \\\\
+            &amp; \\mathrm{C}_{AR}^{11}, \\mathrm{C}_{AR}^{12}, ..., 
+                \\mathrm{C}_{AR}^{1p}, \\mathrm{C}_{AR}^{21}, ...,
+                \\mathrm{C}_{AR}^{2p}, ..., \\mathrm{C}_{AR}^{p1}, 
+                \\mathrm{C}_{AR}^{p2}, ..., \\mathrm{C}_{AR}^{pp})
+        \\end{aligned}
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network, and
+    \\(\\mathrm{C}_{XY}^{JK}\\) is the covariance between the fractions
+    \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
+    variables associated with active or refractory fractions.
+
+    In this system, the jacobian matrix is implemented only for the case where
+    the network has only one population.
+
+    Notes
+    -----
+    The case where the network has only one population is actually handled in a
+    separate (private) class `_TaylorExtendedSystemOne`, which uses a simpler
+    implementation of the vector field and implements the jacobian matrix. The
+    class constructor of `TaylorExtendedSystem` will automatically instantiate
+    a `_TaylorExtendedSystemOne` instance when the network has only one
+    population.
+
+    This is considered to be an implementation detail. Only the class
+    `TaylorExtendedSystem` should be called by a user.
+
+    &#34;&#34;&#34;
+
+    def __new__(cls, config, **kwargs):
+        if not isinstance(config, structures.Configuration):
+            raise TypeError(&#39;The configuration used with a \&#39;DynamicalSystem\&#39; &#39;
+                            &#39;instance should be a \&#39;Configuration\&#39; instance.&#39;)
+        if len(config.network.populations) == 1:
+            return super().__new__(_TaylorExtendedSystemOne)
+        return super().__new__(cls)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        CAA = _internals._unflat_scalar_triangle(
+                state[2*p : 2*p + round(p*(p+1)/2)])
+        CRR = _internals._unflat_scalar_triangle(
+                state[2*p + round(p*(p+1)/2) : 2*p+p*(p+1)])
+        CAR = (state[2*p + p*(p+1) :]).reshape((p,p))
+        CAS = - CAA - CAR
+        CSR = - CRR - CAR
+        B = self.config.Q.copy()
+        VarB = np.zeros(p)
+        CAB = np.zeros((p,p))
+        CRB = np.zeros((p,p))
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+            for L in range(p):
+                VarB[J] += (self.config.network.c[J,K] 
+                            * self.config.network.c[J,L] * CAA[K,L])
+                CAB[J,K] += self.config.network.c[K,L] * CAA[J,L]
+                CRB[J,K] += self.config.network.c[K,L] * CAR[L,J]
+        f = np.zeros(self.dim)
+        dCAA = np.zeros((p,p))
+        dCRR = np.zeros((p,p))
+        dCAR = np.zeros((p,p))
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = (- popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+                    - popJ.alpha*popJ.dF(B[J]) * (CAB[J,J] + CRB[J,J])
+                    + popJ.alpha/2*popJ.ddF(B[J]) * S[J] * VarB[J])
+            f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+            for K, popK in enumerate(self.config.network.populations):
+                dCAA[J,K] = (- (popJ.beta + popK.beta) * CAA[J,K]
+                                + popJ.alpha*popJ.F(B[J]) * CAS[K,J]
+                                + popK.alpha*popK.F(B[K]) * CAS[J,K]
+                                + popJ.alpha*popJ.dF(B[J]) * S[J] * CAB[K,J]
+                                + popK.alpha*popK.dF(B[K]) * S[K] * CAB[J,K])
+                dCRR[J,K] = (- (popJ.gamma + popK.gamma) * CRR[J,K]
+                                + popJ.beta * CAR[J,K] + popK.beta * CAR[K,J])
+                dCAR[J,K] = (- (popJ.beta + popK.gamma) * CAR[J,K]
+                                + popK.beta * CAA[J,K]
+                                + popJ.alpha*popJ.F(B[J]) * CSR[J,K]
+                                + popJ.alpha*popJ.dF(B[J]) * S[J] * CRB[K,J])
+        f[2*p : 2*p + round(p*(p+1)/2)] = dCAA[np.triu_indices(p)]
+        f[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)] = dCRR[np.triu_indices(p)]
+        f[2*p + p*(p+1) :] = dCAR.flatten()
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        return p * (2*p + 3)
+
+
+class _TaylorExtendedSystemOne(TaylorExtendedSystem):
+    &#34;&#34;&#34;Special case of `TaylorExtendedSystem` for one population.
+
+    Special case of `TaylorExtendedSystem` to use when the network has a single
+    population. It is different from this class only in that it uses a simpler
+    implementation of the vector field, and its implements the jacobian matrix.
+
+    &#34;&#34;&#34;
+
+    def __init__(self, config, **kwargs):
+        super().__init__(config, **kwargs)
+        self._pop = self.config.network.populations[0]
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        A, R, CAA, CRR, CAR = state[0], state[1], state[2], state[3], state[4]
+        S = 1 - A - R
+        c = self.config.network.c[0,0]
+        B = c * A + self.config.Q[0]
+        F = self._pop.F(B)
+        dF = self._pop.dF(B)
+        ddF = self._pop.ddF(B)
+        dddF = self._pop.dddF(B)
+        j = np.zeros((5,5))
+        j[0,0] = (-self._pop.beta - self._pop.alpha*F 
+                    + self._pop.alpha*dF * c * S 
+                    - self._pop.alpha*ddF * c**2 * (CAA + CAR) 
+                    + self._pop.alpha/2 * (-ddF + S*dddF*c) * c**2 * CAA )
+        j[0,1] = (-self._pop.alpha*F 
+                    - self._pop.alpha/2*ddF * c**2*CAA )
+        j[0,2] = (-self._pop.alpha/2*ddF * c**2
+                    - self._pop.alpha*dF * c )
+        j[0,3] = 0
+        j[0,4] = -self._pop.alpha*dF * c
+        j[1,0] = self._pop.beta
+        j[1,1] = -self._pop.gamma
+        j[1,2] = j[1,3] = j[1,4] = 0
+        j[2,0] = (-2*self._pop.alpha*dF*c * CAA 
+                    - 2*self._pop.alpha*dF*c * CAR 
+                    + 2*self._pop.alpha * (-dF + ddF*c*S) * c * CAA )
+        j[2,1] = -2*self._pop.alpha*dF * c * CAA
+        j[2,2] = (-2 * (self._pop.beta + self._pop.alpha*F) 
+                    + 2*self._pop.alpha*dF * c * S )
+        j[2,3] = 0
+        j[2,4] = -2*self._pop.alpha*F
+        j[3,0] = j[3,1] = j[3,2] = 0
+        j[3,3] = -2*self._pop.gamma
+        j[3,4] = 2*self._pop.beta
+        j[4,0] = (-self._pop.alpha*dF * c * CAR 
+                    - self._pop.alpha*dF * c * CRR 
+                    + self._pop.alpha * (-dF + ddF*c*S) * c * CAR )
+        j[4,1] = -self._pop.alpha*dF*c * CAR
+        j[4,2] = self._pop.beta
+        j[4,3] = -self._pop.alpha*F
+        j[4,4] = (-(self._pop.beta + self._pop.gamma + self._pop.alpha*F) 
+                    + self._pop.alpha*dF* c * S )
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A, R, CAA, CRR, CAR = state[0], state[1], state[2], state[3], state[4]
+        S = 1 - A - R
+        c = self.config.network.c[0,0]
+        B = c * A + self.config.Q[0]
+        F = self._pop.F(B)
+        dF = self._pop.dF(B)
+        ddF = self._pop.ddF(B)
+        f = [0, 0, 0, 0, 0]
+        f[0] = (- self._pop.beta*A + self._pop.alpha*F * S 
+                - self._pop.alpha*dF * c * (CAA + CAR)
+                + self._pop.alpha/2*ddF * c**2 * S * CAA )
+        f[1] = - self._pop.gamma*R + self._pop.beta*A
+        f[2] = (- 2*(self._pop.beta + self._pop.alpha*F) * CAA 
+                - 2*self._pop.alpha*F*CAR 
+                + 2*self._pop.alpha*dF * c* S * CAA )
+        f[3] = - 2*self._pop.gamma*CRR + 2*self._pop.beta*CAR
+        f[4] = (- (self._pop.beta + self._pop.gamma 
+                + self._pop.alpha*F) * CAR + self._pop.beta*CAA 
+                - self._pop.alpha*F*CRR 
+                + self._pop.alpha*dF * c * S * CAR )
+        return np.array(f, float)
+
+
+class ExtendedSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the extended Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class for the extended Wilson--Cowan
+    model, obtained from the closure based on sigmoid functions. Here the
+    refractory state and the covariances between fractions of populations are
+    included. For *p* populations, a state of this system has the form
+    \\[
+        (\\begin{aligned}[t]
+            &amp; A_1, A_2, ..., A_p, \\\\
+            &amp; R_1, R_2, ..., R_p, \\\\
+            &amp; \\mathrm{C}_{AA}^{11}, \\mathrm{C}_{AA}^{12}, ..., 
+                \\mathrm{C}_{AA}^{1p}, \\mathrm{C}_{AA}^{22}, ..., 
+                \\mathrm{C}_{AA}^{2p}, \\mathrm{C}_{AA}^{33}, ..., 
+                \\mathrm{C}_{AA}^{3p}, ..., \\mathrm{C}_{AA}^{pp}, \\\\
+            &amp; \\mathrm{C}_{RR}^{11}, \\mathrm{C}_{RR}^{12}, ..., 
+                \\mathrm{C}_{RR}^{1p}, \\mathrm{C}_{RR}^{22}, ..., 
+                \\mathrm{C}_{RR}^{2p}, \\mathrm{C}_{RR}^{33}, ..., 
+                \\mathrm{C}_{RR}^{3p}, ..., \\mathrm{C}_{RR}^{pp}, \\\\
+            &amp; \\mathrm{C}_{AR}^{11}, \\mathrm{C}_{AR}^{12}, ..., 
+                \\mathrm{C}_{AR}^{1p}, \\mathrm{C}_{AR}^{21}, ...,
+                \\mathrm{C}_{AR}^{2p}, ..., \\mathrm{C}_{AR}^{p1}, 
+                \\mathrm{C}_{AR}^{p2}, ..., \\mathrm{C}_{AR}^{pp})
+        \\end{aligned}
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network, and
+    \\(\\mathrm{C}_{XY}^{JK}\\) is the covariance between the fractions
+    \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
+    variables associated with active or refractory fractions.
+
+    The jacobian matrix is not implemented in this system.
+
+    &#34;&#34;&#34;
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        CAA = _internals._unflat_scalar_triangle(
+                    state[2*p : 2*p + round(p*(p+1)/2)])
+        CRR = _internals._unflat_scalar_triangle(
+                    state[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)])
+        CAR = (state[2*p + p*(p+1) :]).reshape((p,p))
+        CAS = - CAA - CAR
+        CRS = - CRR - CAR.transpose()
+        B = self.config.Q.copy()
+        VarB = np.zeros(p)
+        CAB = np.zeros((p,p))
+        CRB = np.zeros((p,p))
+        CSB = np.zeros((p,p))
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+            for L in range(p):
+                VarB[J] += (self.config.network.c[J,K] 
+                            * self.config.network.c[J,L] * CAA[K,L])
+                CAB[J,K] += self.config.network.c[K,L] * CAA[J,L]
+                CRB[J,K] += self.config.network.c[K,L] * CAR[L,J]
+                CSB[J,K] += self.config.network.c[K,L] * CAS[L,J]
+        f = np.zeros(self.dim)
+        dCAA = np.zeros((p,p))
+        dCRR = np.zeros((p,p))
+        dCAR = np.zeros((p,p))
+        for J, popJ in enumerate(self.config.network.populations):
+            SG = np.where(S[J] == 0, 0,
+                          S[J] * popJ.G(B[J] + CSB[J,J]/S[J], VarB[J]))
+            f[J] = (- popJ.beta * A[J] + popJ.alpha * SG)
+            f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+            for K, popK in enumerate(self.config.network.populations):
+                if J &lt;= K:
+                    dCAA[J,K] = (- (popJ.beta + popK.beta) * CAA[J,K]
+                                    + popJ.alpha * popJ.H(A[K], S[J], B[J],
+                                        CAS[K,J], CAB[K,J], CSB[J,J], VarB[J])
+                                    + popK.alpha * popK.H(A[J], S[K], B[K],
+                                        CAS[J,K], CAB[J,K], CSB[K,K], VarB[K]))
+                    dCRR[J,K] = (- (popJ.gamma + popK.gamma) * CRR[J,K]
+                                  + popJ.beta * CAR[J,K] + popK.beta * CAR[K,J])
+                dCAR[J,K] = (- (popJ.beta + popK.gamma) * CAR[J,K]
+                                + popK.beta * CAA[J,K]
+                                + popJ.alpha * popJ.H(R[K], S[J], B[J],
+                                    CRS[K,J], CRB[K,J], CSB[J,J], VarB[J]))
+        f[2*p : 2*p + round(p*(p+1)/2)] = dCAA[np.triu_indices(p)]
+        f[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)] = dCRR[np.triu_indices(p)]
+        f[2*p + p*(p+1) :] = dCAR.flatten()
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        return p * (2*p + 3)
+
+
+SYSTEM_CLASSES = {&#39;mean-field&#39;: MeanFieldSystem,
+                  &#39;wilson-cowan&#39;: WilsonCowanSystem,
+                  &#39;mixed&#39;: MixedSystem,
+                  &#39;taylor&#39;: TaylorExtendedSystem,
+                  &#39;extended&#39;: ExtendedSystem}
+&#34;&#34;&#34;Mapping between keywords and `DynamicalSystem` subclasses.&#34;&#34;&#34;
+
+
+def get_system(config, system_name, **kwargs):
+    &#34;&#34;&#34;Define a dynamical system from a configuration.
+
+    Define a dynamical system from the parameters in the given configuration.
+    The system can be chosen from a given list of systems related to the
+    Wilson--Cowan model.
+
+    Parameters
+    ----------
+    config : popnet.structures.Configuration
+        Configuration associated with the dynamical system.
+    system_name : str
+        Decides which type of dynamical system to return. The following values
+        are accepted.
+
+         - `&#39;mean-field&#39;`: the Wilson--Cowan&#39;s model with refractory state.
+         - `&#39;wilson-cowan&#39;`: an equivalent to the original Wilson--Cowan model.
+         - `&#39;mixed&#39;`: the mean field one, but with an additional parameter
+           multiplying the refractory states&#39; derivates.
+         - `&#39;taylor&#39;`: the extended Wilson--Cowan model with the closure
+           resulting from a second-order Taylor approximation.
+         - `&#39;extended&#39;`: the extended Wilson--Cowan model with the closure
+           based on sigmoid functions.
+
+    **kwargs
+        Keywords arguments passed to the class constructor.
+
+    Returns
+    -------
+    DynamicalSystem
+        Dynamical system initialized according to the given configuration. It
+        will always be a *subclass* of `DynamicalSystem`, which will depend on
+        the chosen system.
+
+    Raises
+    ------
+    popnet.exceptions.PopNetError
+        If `system_name` is given a non-valid value.
+    TypeError
+        If `config` is not a `popnet.structures.Configuration` instance.
+    &#34;&#34;&#34;
+    if system_name not in SYSTEM_CLASSES:
+        raise PopNetError(f&#39;Unknown dynamical system {system_name}. Valid &#39;
+                          f&#39;values are {tuple(SYSTEM_CLASSES.keys())}.&#39;)
+    return SYSTEM_CLASSES[system_name](config, **kwargs)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="popnet.systems.SYSTEM_CLASSES"><code class="name">var <span class="ident">SYSTEM_CLASSES</span></code></dt>
+<dd>
+<div class="desc"><p>Mapping between keywords and <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> subclasses.</p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="popnet.systems.get_system"><code class="name flex">
+<span>def <span class="ident">get_system</span></span>(<span>config, system_name, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Define a dynamical system from a configuration.</p>
+<p>Define a dynamical system from the parameters in the given configuration.
+The system can be chosen from a given list of systems related to the
+Wilson&ndash;Cowan model.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
+<dd>Configuration associated with the dynamical system.</dd>
+<dt><strong><code>system_name</code></strong> :&ensp;<code>str</code></dt>
+<dd>
+<p>Decides which type of dynamical system to return. The following values
+are accepted.</p>
+<ul>
+<li><code>'mean-field'</code>: the Wilson&ndash;Cowan's model with refractory state.</li>
+<li><code>'wilson-cowan'</code>: an equivalent to the original Wilson&ndash;Cowan model.</li>
+<li><code>'mixed'</code>: the mean field one, but with an additional parameter
+multiplying the refractory states' derivates.</li>
+<li><code>'taylor'</code>: the extended Wilson&ndash;Cowan model with the closure
+resulting from a second-order Taylor approximation.</li>
+<li><code>'extended'</code>: the extended Wilson&ndash;Cowan model with the closure
+based on sigmoid functions.</li>
+</ul>
+</dd>
+<dt><strong><code>**kwargs</code></strong></dt>
+<dd>Keywords arguments passed to the class constructor.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code></dt>
+<dd>Dynamical system initialized according to the given configuration. It
+will always be a <em>subclass</em> of <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code>, which will depend on
+the chosen system.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="popnet.exceptions.PopNetError" href="exceptions.html#popnet.exceptions.PopNetError">PopNetError</a></code></dt>
+<dd>If <code>system_name</code> is given a non-valid value.</dd>
+<dt><code>TypeError</code></dt>
+<dd>If <code>config</code> is not a <code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code> instance.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_system(config, system_name, **kwargs):
+    &#34;&#34;&#34;Define a dynamical system from a configuration.
+
+    Define a dynamical system from the parameters in the given configuration.
+    The system can be chosen from a given list of systems related to the
+    Wilson--Cowan model.
+
+    Parameters
+    ----------
+    config : popnet.structures.Configuration
+        Configuration associated with the dynamical system.
+    system_name : str
+        Decides which type of dynamical system to return. The following values
+        are accepted.
+
+         - `&#39;mean-field&#39;`: the Wilson--Cowan&#39;s model with refractory state.
+         - `&#39;wilson-cowan&#39;`: an equivalent to the original Wilson--Cowan model.
+         - `&#39;mixed&#39;`: the mean field one, but with an additional parameter
+           multiplying the refractory states&#39; derivates.
+         - `&#39;taylor&#39;`: the extended Wilson--Cowan model with the closure
+           resulting from a second-order Taylor approximation.
+         - `&#39;extended&#39;`: the extended Wilson--Cowan model with the closure
+           based on sigmoid functions.
+
+    **kwargs
+        Keywords arguments passed to the class constructor.
+
+    Returns
+    -------
+    DynamicalSystem
+        Dynamical system initialized according to the given configuration. It
+        will always be a *subclass* of `DynamicalSystem`, which will depend on
+        the chosen system.
+
+    Raises
+    ------
+    popnet.exceptions.PopNetError
+        If `system_name` is given a non-valid value.
+    TypeError
+        If `config` is not a `popnet.structures.Configuration` instance.
+    &#34;&#34;&#34;
+    if system_name not in SYSTEM_CLASSES:
+        raise PopNetError(f&#39;Unknown dynamical system {system_name}. Valid &#39;
+                          f&#39;values are {tuple(SYSTEM_CLASSES.keys())}.&#39;)
+    return SYSTEM_CLASSES[system_name](config, **kwargs)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="popnet.systems.DynamicalSystem"><code class="flex name class">
+<span>class <span class="ident">DynamicalSystem</span></span>
+<span>(</span><span>config)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represent dynamical systems.</p>
+<p>The <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> class is an abstract base class intended to represent
+dynamical systems in PopNet. Each subclass must implement a vector field,
+and the base class has several methods to study this vector field. For
+example, a method is available to find equilibrium points. A subclass can
+also implement a jacobian matrix. If this is done, methods are available to
+find its eigenvalues and eigenvectors.</p>
+<p>Aside from implementing a vector field, a subclass of <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> must
+also set the <code>dim</code> property at initialization.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
+<dd>A configuration associated with the dynamical system.</dd>
+</dl>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
+<dd>Configuration associated with the dynamical system. See
+<code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">DynamicalSystem.config</a></code>.</dd>
+<dt><strong><code>dim</code></strong> :&ensp;<code>int</code></dt>
+<dd>Dimension of the dynamical system. See <code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">DynamicalSystem.dim</a></code>.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class DynamicalSystem:
+    &#34;&#34;&#34;Represent dynamical systems.
+
+    The `DynamicalSystem` class is an abstract base class intended to represent
+    dynamical systems in PopNet. Each subclass must implement a vector field,
+    and the base class has several methods to study this vector field. For
+    example, a method is available to find equilibrium points. A subclass can
+    also implement a jacobian matrix. If this is done, methods are available to
+    find its eigenvalues and eigenvectors.
+
+    Aside from implementing a vector field, a subclass of `DynamicalSystem` must
+    also set the `dim` property at initialization.
+
+    Parameters
+    ----------
+    config : popnet.structures.Configuration
+        A configuration associated with the dynamical system.
+
+    Attributes
+    ----------
+    config : popnet.structures.Configuration
+        Configuration associated with the dynamical system. See
+        `DynamicalSystem.config`.
+    dim : int
+        Dimension of the dynamical system. See `DynamicalSystem.dim`.
+
+    &#34;&#34;&#34;
+
+    def __init__(self, config):
+        self.config = config
+        self._dim = self._get_dimension()
+
+    @property
+    def config(self):
+        &#34;&#34;&#34;Configuration used with the dynamical system.
+
+        Configuration defining all parameters used in the dynamical system. It
+        must be a `popnet.structures.Configuration` instance. It cannot be
+        deleted.
+        &#34;&#34;&#34;
+        return self._config
+
+    @config.setter
+    def config(self, new_value):
+        if not isinstance(new_value, structures.Configuration):
+            raise TypeError(&#39;The configuration used with a dynamical system &#39;
+                            &#39;must be a Configuration instance.&#39;)
+        self._config = new_value
+
+    @property
+    def dim(self):
+        &#34;&#34;&#34;Dimension of the dynamical system.
+
+        Dimension of the dynamical system. It is set at initialization, and it
+        cannot be reset nor deleted afterwards.
+        &#34;&#34;&#34;
+        return self._dim
+
+    def find_equilibrium_near(self, state, verbose=True, method=&#39;hybr&#39;):
+        &#34;&#34;&#34;Find an equilibrium point near at a given state.
+
+        Find an equilibrium point of the dynamical system near the given state.
+        This method uses the [`root`](https://tinyurl.com/scipy-optimize-root)
+        function from SciPy&#39;s `optimize` module.
+
+        Parameters
+        ----------
+        state : array_like
+            The initial guess for the equilibrium point.
+        verbose : bool, optional
+            If `True`, a warning will be issued if the optimizer fails and no
+            equilibrium point is found. Defaults to `True`.
+        method : str, optional
+            The solver used to find the find fixed point. It should be one of
+            the accepted values for the corresponding argument of `root`.
+            Defaults to `&#39;hybr&#39;`.
+
+        Returns
+        -------
+        array_like
+            The equilibrium point found, or `None` if the optimization failed.
+
+        Warns
+        -----
+        popnet.exceptions.PopNetWarning
+            If `verbose` is `True` and the optimizer did not succeed.
+        &#34;&#34;&#34;
+        try:
+            self.jac(state)
+        except NotImplementError:
+            jac = None
+        else:
+            jac = self.jac
+        sol = root(self.vector_field, state, jac=jac)
+        if not sol.success:
+            if verbose:
+                warn(&#39;The optimizer did not succeed.&#39;, categoy=PopNetWarning,
+                     stacklevel=2)
+            return None
+        return sol.x
+
+    def get_eigs_at(self, state):
+        &#34;&#34;&#34;Get eigenvalues and eigenvectors of the jacobian matrix.
+
+        Get the eigenvalues and eigenvectors of the jacobian matrix
+        corresponding to the linearization of the dynamical system, evaluated
+        at the given state. If eigenvectors are not needed, `get_eigenvals_at`
+        should be used instead.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the jacobian matrix should be evaluated.
+
+        Returns
+        -------
+        array
+            The eigenvalues, repeated according to their multiplicities, and
+            sorted from largest to lowest real part.
+        array
+            The associated eigenvectors.
+
+        Raises
+        ------
+        NotImplementedError
+            If the jacobian matrix for this system is not implemented.
+        numpy.LinAlgError
+            If the eigenvalue computation does not converge.
+        &#34;&#34;&#34;
+        eigenvals, eigenvects = np.linalg.eig(self.jac(state))
+        argsort = np.argsort(eigenvals)[::-1]
+        eigenvals = eigenvals[argsort]
+        eigenvects = eigenvects[argsort]
+        return eigenvals, eigenvects
+
+    def get_eigenvals_at(self, state):
+        &#34;&#34;&#34;Get eigenvalues of the jacobian matrix at a given state.
+
+        Get the eigenvalues of the jacobian matrix corresponding to the
+        linearization of the dynamical system, evaluated at the given state.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the jacobian matrix should be evaluated.
+
+        Returns
+        -------
+        array
+            The eigenvalues, repeated according to their multiplicities, and
+            sorted from largest to lowest real part.
+
+        Raises
+        ------
+        NotImplementedError
+            If the jacobian matrix for this system is not implemented.
+        numpy.LinAlgError
+            If the eigenvalue computation does not converge.
+        &#34;&#34;&#34;
+        eigenvals = np.linalg.eigvals(self.jac(state))
+        eigenvals = np.sort(eigenvals)[::-1]
+        return eigenvals
+
+    def get_phase_plane(self, axes, fixed_axes=0., values=None, name=None):
+        &#34;&#34;&#34;Get a phase plane.
+
+        Get a phase plane with given independant variables to draw it later. For
+        this method to be available, the dynamical system must has at least two
+        dimensions.
+
+        Parameters
+        ----------
+        axes : tuple of int
+            Axes indicating the independant variables which will be the phase
+            plane&#39;s axes.
+        fixed_axes : array_like or float, optional
+            Determines the values of the remaining axes other than those chosen
+            with `axes`. If it is a float, all other axes will be set to this
+            value. If it is an array, its length should be the dimension of the
+            dynamical system minus two, and in that case every axis is fixed at
+            the value given by `fixed_axes`, in the order of the system,
+            skipping the axes chosen by `axes`. It is ignored is the dynamical
+            system is two-dimensional. Defaults to 0.
+        name : str, optional
+            A name associated with the phase plane. Defaults to `None`, in which
+            case it is replaced with `&#39;Phase plane&#39;`.
+
+        Returns
+        -------
+        popnet.graphics.PhasePlane
+            A phase plane to be drawn.
+
+        Raises
+        ------
+        popnet.exceptions.PopNetError
+            If the dynamical system has only one dimension.
+        &#34;&#34;&#34;
+        if (n := self.dim - 2) &lt; 0:
+            raise PopNetError(&#39;Can\&#39;t draw a phase plane for a dynamical system&#39;
+                              &#39; of only one dimension.&#39;)
+        if n == 0:
+            fix = None
+        else:
+            fix = fixed_axes
+        return graphics.PhasePlane(self, axes=axes, fixed_axes=fix, name=name)
+
+    def jac(self, state):
+        &#34;&#34;&#34;Get the jacobian matrix evaluated at a given state.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the jacobian matrix should be evaluated.
+
+        Returns
+        -------
+        array
+            The jacobian matrix evaluated at the state.
+
+        Raises
+        ------
+        NotImplementedError
+            If the jacobian matrix for this system is not implemented.
+        &#34;&#34;&#34;
+        raise NotImplementedError(&#39;No jacobian matrix implemented for this &#39;
+                                  &#39;system.&#39;)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Get the vector field evaluated at a given state.
+
+        Get the vector field corresponding to the dynamical system evaluated
+        at a given state.
+
+        Parameters
+        ----------
+        state : array_like
+            The state at which the vector field should be evaluated.
+
+        Returns
+        -------
+        array
+            The vector field evaluated at the state.
+        &#34;&#34;&#34;
+        raise NotImplementedError(&#39;A dynamical system must implement a vector &#39;
+                                  &#39;field.&#39;)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        raise NotImplementedError(&#39;A dynamical system must give its dimension.&#39;)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="popnet.systems.ExtendedSystem" href="#popnet.systems.ExtendedSystem">ExtendedSystem</a></li>
+<li><a title="popnet.systems.MeanFieldSystem" href="#popnet.systems.MeanFieldSystem">MeanFieldSystem</a></li>
+<li><a title="popnet.systems.MixedSystem" href="#popnet.systems.MixedSystem">MixedSystem</a></li>
+<li><a title="popnet.systems.TaylorExtendedSystem" href="#popnet.systems.TaylorExtendedSystem">TaylorExtendedSystem</a></li>
+<li><a title="popnet.systems.WilsonCowanSystem" href="#popnet.systems.WilsonCowanSystem">WilsonCowanSystem</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="popnet.systems.DynamicalSystem.config"><code class="name">var <span class="ident">config</span></code></dt>
+<dd>
+<div class="desc"><p>Configuration used with the dynamical system.</p>
+<p>Configuration defining all parameters used in the dynamical system. It
+must be a <code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code> instance. It cannot be
+deleted.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def config(self):
+    &#34;&#34;&#34;Configuration used with the dynamical system.
+
+    Configuration defining all parameters used in the dynamical system. It
+    must be a `popnet.structures.Configuration` instance. It cannot be
+    deleted.
+    &#34;&#34;&#34;
+    return self._config</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.DynamicalSystem.dim"><code class="name">var <span class="ident">dim</span></code></dt>
+<dd>
+<div class="desc"><p>Dimension of the dynamical system.</p>
+<p>Dimension of the dynamical system. It is set at initialization, and it
+cannot be reset nor deleted afterwards.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def dim(self):
+    &#34;&#34;&#34;Dimension of the dynamical system.
+
+    Dimension of the dynamical system. It is set at initialization, and it
+    cannot be reset nor deleted afterwards.
+    &#34;&#34;&#34;
+    return self._dim</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="popnet.systems.DynamicalSystem.find_equilibrium_near"><code class="name flex">
+<span>def <span class="ident">find_equilibrium_near</span></span>(<span>self, state, verbose=True, method='hybr')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find an equilibrium point near at a given state.</p>
+<p>Find an equilibrium point of the dynamical system near the given state.
+This method uses the <a href="https://tinyurl.com/scipy-optimize-root"><code>root</code></a>
+function from SciPy's <code>optimize</code> module.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>The initial guess for the equilibrium point.</dd>
+<dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, a warning will be issued if the optimizer fails and no
+equilibrium point is found. Defaults to <code>True</code>.</dd>
+<dt><strong><code>method</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The solver used to find the find fixed point. It should be one of
+the accepted values for the corresponding argument of <code>root</code>.
+Defaults to <code>'hybr'</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>array_like</code></dt>
+<dd>The equilibrium point found, or <code>None</code> if the optimization failed.</dd>
+</dl>
+<h2 id="warns">Warns</h2>
+<dl>
+<dt><code><a title="popnet.exceptions.PopNetWarning" href="exceptions.html#popnet.exceptions.PopNetWarning">PopNetWarning</a></code></dt>
+<dd>If <code>verbose</code> is <code>True</code> and the optimizer did not succeed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_equilibrium_near(self, state, verbose=True, method=&#39;hybr&#39;):
+    &#34;&#34;&#34;Find an equilibrium point near at a given state.
+
+    Find an equilibrium point of the dynamical system near the given state.
+    This method uses the [`root`](https://tinyurl.com/scipy-optimize-root)
+    function from SciPy&#39;s `optimize` module.
+
+    Parameters
+    ----------
+    state : array_like
+        The initial guess for the equilibrium point.
+    verbose : bool, optional
+        If `True`, a warning will be issued if the optimizer fails and no
+        equilibrium point is found. Defaults to `True`.
+    method : str, optional
+        The solver used to find the find fixed point. It should be one of
+        the accepted values for the corresponding argument of `root`.
+        Defaults to `&#39;hybr&#39;`.
+
+    Returns
+    -------
+    array_like
+        The equilibrium point found, or `None` if the optimization failed.
+
+    Warns
+    -----
+    popnet.exceptions.PopNetWarning
+        If `verbose` is `True` and the optimizer did not succeed.
+    &#34;&#34;&#34;
+    try:
+        self.jac(state)
+    except NotImplementError:
+        jac = None
+    else:
+        jac = self.jac
+    sol = root(self.vector_field, state, jac=jac)
+    if not sol.success:
+        if verbose:
+            warn(&#39;The optimizer did not succeed.&#39;, categoy=PopNetWarning,
+                 stacklevel=2)
+        return None
+    return sol.x</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.DynamicalSystem.get_eigenvals_at"><code class="name flex">
+<span>def <span class="ident">get_eigenvals_at</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get eigenvalues of the jacobian matrix at a given state.</p>
+<p>Get the eigenvalues of the jacobian matrix corresponding to the
+linearization of the dynamical system, evaluated at the given state.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>The state at which the jacobian matrix should be evaluated.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>array</code></dt>
+<dd>The eigenvalues, repeated according to their multiplicities, and
+sorted from largest to lowest real part.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotImplementedError</code></dt>
+<dd>If the jacobian matrix for this system is not implemented.</dd>
+<dt><code>numpy.LinAlgError</code></dt>
+<dd>If the eigenvalue computation does not converge.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_eigenvals_at(self, state):
+    &#34;&#34;&#34;Get eigenvalues of the jacobian matrix at a given state.
+
+    Get the eigenvalues of the jacobian matrix corresponding to the
+    linearization of the dynamical system, evaluated at the given state.
+
+    Parameters
+    ----------
+    state : array_like
+        The state at which the jacobian matrix should be evaluated.
+
+    Returns
+    -------
+    array
+        The eigenvalues, repeated according to their multiplicities, and
+        sorted from largest to lowest real part.
+
+    Raises
+    ------
+    NotImplementedError
+        If the jacobian matrix for this system is not implemented.
+    numpy.LinAlgError
+        If the eigenvalue computation does not converge.
+    &#34;&#34;&#34;
+    eigenvals = np.linalg.eigvals(self.jac(state))
+    eigenvals = np.sort(eigenvals)[::-1]
+    return eigenvals</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.DynamicalSystem.get_eigs_at"><code class="name flex">
+<span>def <span class="ident">get_eigs_at</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get eigenvalues and eigenvectors of the jacobian matrix.</p>
+<p>Get the eigenvalues and eigenvectors of the jacobian matrix
+corresponding to the linearization of the dynamical system, evaluated
+at the given state. If eigenvectors are not needed, <code>get_eigenvals_at</code>
+should be used instead.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>The state at which the jacobian matrix should be evaluated.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>array</code></dt>
+<dd>The eigenvalues, repeated according to their multiplicities, and
+sorted from largest to lowest real part.</dd>
+<dt><code>array</code></dt>
+<dd>The associated eigenvectors.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotImplementedError</code></dt>
+<dd>If the jacobian matrix for this system is not implemented.</dd>
+<dt><code>numpy.LinAlgError</code></dt>
+<dd>If the eigenvalue computation does not converge.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_eigs_at(self, state):
+    &#34;&#34;&#34;Get eigenvalues and eigenvectors of the jacobian matrix.
+
+    Get the eigenvalues and eigenvectors of the jacobian matrix
+    corresponding to the linearization of the dynamical system, evaluated
+    at the given state. If eigenvectors are not needed, `get_eigenvals_at`
+    should be used instead.
+
+    Parameters
+    ----------
+    state : array_like
+        The state at which the jacobian matrix should be evaluated.
+
+    Returns
+    -------
+    array
+        The eigenvalues, repeated according to their multiplicities, and
+        sorted from largest to lowest real part.
+    array
+        The associated eigenvectors.
+
+    Raises
+    ------
+    NotImplementedError
+        If the jacobian matrix for this system is not implemented.
+    numpy.LinAlgError
+        If the eigenvalue computation does not converge.
+    &#34;&#34;&#34;
+    eigenvals, eigenvects = np.linalg.eig(self.jac(state))
+    argsort = np.argsort(eigenvals)[::-1]
+    eigenvals = eigenvals[argsort]
+    eigenvects = eigenvects[argsort]
+    return eigenvals, eigenvects</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.DynamicalSystem.get_phase_plane"><code class="name flex">
+<span>def <span class="ident">get_phase_plane</span></span>(<span>self, axes, fixed_axes=0.0, values=None, name=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get a phase plane.</p>
+<p>Get a phase plane with given independant variables to draw it later. For
+this method to be available, the dynamical system must has at least two
+dimensions.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>axes</code></strong> :&ensp;<code>tuple</code> of <code>int</code></dt>
+<dd>Axes indicating the independant variables which will be the phase
+plane's axes.</dd>
+<dt><strong><code>fixed_axes</code></strong> :&ensp;<code>array_like</code> or <code>float</code>, optional</dt>
+<dd>Determines the values of the remaining axes other than those chosen
+with <code>axes</code>. If it is a float, all other axes will be set to this
+value. If it is an array, its length should be the dimension of the
+dynamical system minus two, and in that case every axis is fixed at
+the value given by <code>fixed_axes</code>, in the order of the system,
+skipping the axes chosen by <code>axes</code>. It is ignored is the dynamical
+system is two-dimensional. Defaults to 0.</dd>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>A name associated with the phase plane. Defaults to <code>None</code>, in which
+case it is replaced with <code>'Phase plane'</code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code><a title="popnet.graphics.PhasePlane" href="graphics.html#popnet.graphics.PhasePlane">PhasePlane</a></code></dt>
+<dd>A phase plane to be drawn.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code><a title="popnet.exceptions.PopNetError" href="exceptions.html#popnet.exceptions.PopNetError">PopNetError</a></code></dt>
+<dd>If the dynamical system has only one dimension.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_phase_plane(self, axes, fixed_axes=0., values=None, name=None):
+    &#34;&#34;&#34;Get a phase plane.
+
+    Get a phase plane with given independant variables to draw it later. For
+    this method to be available, the dynamical system must has at least two
+    dimensions.
+
+    Parameters
+    ----------
+    axes : tuple of int
+        Axes indicating the independant variables which will be the phase
+        plane&#39;s axes.
+    fixed_axes : array_like or float, optional
+        Determines the values of the remaining axes other than those chosen
+        with `axes`. If it is a float, all other axes will be set to this
+        value. If it is an array, its length should be the dimension of the
+        dynamical system minus two, and in that case every axis is fixed at
+        the value given by `fixed_axes`, in the order of the system,
+        skipping the axes chosen by `axes`. It is ignored is the dynamical
+        system is two-dimensional. Defaults to 0.
+    name : str, optional
+        A name associated with the phase plane. Defaults to `None`, in which
+        case it is replaced with `&#39;Phase plane&#39;`.
+
+    Returns
+    -------
+    popnet.graphics.PhasePlane
+        A phase plane to be drawn.
+
+    Raises
+    ------
+    popnet.exceptions.PopNetError
+        If the dynamical system has only one dimension.
+    &#34;&#34;&#34;
+    if (n := self.dim - 2) &lt; 0:
+        raise PopNetError(&#39;Can\&#39;t draw a phase plane for a dynamical system&#39;
+                          &#39; of only one dimension.&#39;)
+    if n == 0:
+        fix = None
+    else:
+        fix = fixed_axes
+    return graphics.PhasePlane(self, axes=axes, fixed_axes=fix, name=name)</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.DynamicalSystem.jac"><code class="name flex">
+<span>def <span class="ident">jac</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the jacobian matrix evaluated at a given state.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>The state at which the jacobian matrix should be evaluated.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>array</code></dt>
+<dd>The jacobian matrix evaluated at the state.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>NotImplementedError</code></dt>
+<dd>If the jacobian matrix for this system is not implemented.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def jac(self, state):
+    &#34;&#34;&#34;Get the jacobian matrix evaluated at a given state.
+
+    Parameters
+    ----------
+    state : array_like
+        The state at which the jacobian matrix should be evaluated.
+
+    Returns
+    -------
+    array
+        The jacobian matrix evaluated at the state.
+
+    Raises
+    ------
+    NotImplementedError
+        If the jacobian matrix for this system is not implemented.
+    &#34;&#34;&#34;
+    raise NotImplementedError(&#39;No jacobian matrix implemented for this &#39;
+                              &#39;system.&#39;)</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.DynamicalSystem.vector_field"><code class="name flex">
+<span>def <span class="ident">vector_field</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the vector field evaluated at a given state.</p>
+<p>Get the vector field corresponding to the dynamical system evaluated
+at a given state.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>The state at which the vector field should be evaluated.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>array</code></dt>
+<dd>The vector field evaluated at the state.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vector_field(self, state):
+    &#34;&#34;&#34;Get the vector field evaluated at a given state.
+
+    Get the vector field corresponding to the dynamical system evaluated
+    at a given state.
+
+    Parameters
+    ----------
+    state : array_like
+        The state at which the vector field should be evaluated.
+
+    Returns
+    -------
+    array
+        The vector field evaluated at the state.
+    &#34;&#34;&#34;
+    raise NotImplementedError(&#39;A dynamical system must implement a vector &#39;
+                              &#39;field.&#39;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="popnet.systems.ExtendedSystem"><code class="flex name class">
+<span>class <span class="ident">ExtendedSystem</span></span>
+<span>(</span><span>config)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dynamical system for the extended Wilson&ndash;Cowan model.</p>
+<p>Specializes the <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> class for the extended Wilson&ndash;Cowan
+model, obtained from the closure based on sigmoid functions. Here the
+refractory state and the covariances between fractions of populations are
+included. For <em>p</em> populations, a state of this system has the form
+<span><span class="MathJax_Preview">
+(\begin{aligned}[t]
+&amp; A_1, A_2, ..., A_p, \\
+&amp; R_1, R_2, ..., R_p, \\
+&amp; \mathrm{C}_{AA}^{11}, \mathrm{C}_{AA}^{12}, ...,
+\mathrm{C}_{AA}^{1p}, \mathrm{C}_{AA}^{22}, ...,
+\mathrm{C}_{AA}^{2p}, \mathrm{C}_{AA}^{33}, ...,
+\mathrm{C}_{AA}^{3p}, ..., \mathrm{C}_{AA}^{pp}, \\
+&amp; \mathrm{C}_{RR}^{11}, \mathrm{C}_{RR}^{12}, ...,
+\mathrm{C}_{RR}^{1p}, \mathrm{C}_{RR}^{22}, ...,
+\mathrm{C}_{RR}^{2p}, \mathrm{C}_{RR}^{33}, ...,
+\mathrm{C}_{RR}^{3p}, ..., \mathrm{C}_{RR}^{pp}, \\
+&amp; \mathrm{C}_{AR}^{11}, \mathrm{C}_{AR}^{12}, ...,
+\mathrm{C}_{AR}^{1p}, \mathrm{C}_{AR}^{21}, ...,
+\mathrm{C}_{AR}^{2p}, ..., \mathrm{C}_{AR}^{p1},
+\mathrm{C}_{AR}^{p2}, ..., \mathrm{C}_{AR}^{pp})
+\end{aligned}
+</span><script type="math/tex; mode=display">
+(\begin{aligned}[t]
+& A_1, A_2, ..., A_p, \\
+& R_1, R_2, ..., R_p, \\
+& \mathrm{C}_{AA}^{11}, \mathrm{C}_{AA}^{12}, ...,
+\mathrm{C}_{AA}^{1p}, \mathrm{C}_{AA}^{22}, ...,
+\mathrm{C}_{AA}^{2p}, \mathrm{C}_{AA}^{33}, ...,
+\mathrm{C}_{AA}^{3p}, ..., \mathrm{C}_{AA}^{pp}, \\
+& \mathrm{C}_{RR}^{11}, \mathrm{C}_{RR}^{12}, ...,
+\mathrm{C}_{RR}^{1p}, \mathrm{C}_{RR}^{22}, ...,
+\mathrm{C}_{RR}^{2p}, \mathrm{C}_{RR}^{33}, ...,
+\mathrm{C}_{RR}^{3p}, ..., \mathrm{C}_{RR}^{pp}, \\
+& \mathrm{C}_{AR}^{11}, \mathrm{C}_{AR}^{12}, ...,
+\mathrm{C}_{AR}^{1p}, \mathrm{C}_{AR}^{21}, ...,
+\mathrm{C}_{AR}^{2p}, ..., \mathrm{C}_{AR}^{p1},
+\mathrm{C}_{AR}^{p2}, ..., \mathrm{C}_{AR}^{pp})
+\end{aligned}
+</script></span>
+where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> and <span><span class="MathJax_Preview">R_J</span><script type="math/tex">R_J</script></span> are respectively the expectations of the
+active and refractory fractions of the <em>J</em>th population, in the order given
+by the list of populations in the configuration's network, and
+<span><span class="MathJax_Preview">\mathrm{C}_{XY}^{JK}</span><script type="math/tex">\mathrm{C}_{XY}^{JK}</script></span> is the covariance between the fractions
+<span><span class="MathJax_Preview">X_J</span><script type="math/tex">X_J</script></span> and <span><span class="MathJax_Preview">Y_K</span><script type="math/tex">Y_K</script></span>, where <span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> and <span><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> stand for random
+variables associated with active or refractory fractions.</p>
+<p>The jacobian matrix is not implemented in this system.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ExtendedSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the extended Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class for the extended Wilson--Cowan
+    model, obtained from the closure based on sigmoid functions. Here the
+    refractory state and the covariances between fractions of populations are
+    included. For *p* populations, a state of this system has the form
+    \\[
+        (\\begin{aligned}[t]
+            &amp; A_1, A_2, ..., A_p, \\\\
+            &amp; R_1, R_2, ..., R_p, \\\\
+            &amp; \\mathrm{C}_{AA}^{11}, \\mathrm{C}_{AA}^{12}, ..., 
+                \\mathrm{C}_{AA}^{1p}, \\mathrm{C}_{AA}^{22}, ..., 
+                \\mathrm{C}_{AA}^{2p}, \\mathrm{C}_{AA}^{33}, ..., 
+                \\mathrm{C}_{AA}^{3p}, ..., \\mathrm{C}_{AA}^{pp}, \\\\
+            &amp; \\mathrm{C}_{RR}^{11}, \\mathrm{C}_{RR}^{12}, ..., 
+                \\mathrm{C}_{RR}^{1p}, \\mathrm{C}_{RR}^{22}, ..., 
+                \\mathrm{C}_{RR}^{2p}, \\mathrm{C}_{RR}^{33}, ..., 
+                \\mathrm{C}_{RR}^{3p}, ..., \\mathrm{C}_{RR}^{pp}, \\\\
+            &amp; \\mathrm{C}_{AR}^{11}, \\mathrm{C}_{AR}^{12}, ..., 
+                \\mathrm{C}_{AR}^{1p}, \\mathrm{C}_{AR}^{21}, ...,
+                \\mathrm{C}_{AR}^{2p}, ..., \\mathrm{C}_{AR}^{p1}, 
+                \\mathrm{C}_{AR}^{p2}, ..., \\mathrm{C}_{AR}^{pp})
+        \\end{aligned}
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network, and
+    \\(\\mathrm{C}_{XY}^{JK}\\) is the covariance between the fractions
+    \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
+    variables associated with active or refractory fractions.
+
+    The jacobian matrix is not implemented in this system.
+
+    &#34;&#34;&#34;
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        CAA = _internals._unflat_scalar_triangle(
+                    state[2*p : 2*p + round(p*(p+1)/2)])
+        CRR = _internals._unflat_scalar_triangle(
+                    state[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)])
+        CAR = (state[2*p + p*(p+1) :]).reshape((p,p))
+        CAS = - CAA - CAR
+        CRS = - CRR - CAR.transpose()
+        B = self.config.Q.copy()
+        VarB = np.zeros(p)
+        CAB = np.zeros((p,p))
+        CRB = np.zeros((p,p))
+        CSB = np.zeros((p,p))
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+            for L in range(p):
+                VarB[J] += (self.config.network.c[J,K] 
+                            * self.config.network.c[J,L] * CAA[K,L])
+                CAB[J,K] += self.config.network.c[K,L] * CAA[J,L]
+                CRB[J,K] += self.config.network.c[K,L] * CAR[L,J]
+                CSB[J,K] += self.config.network.c[K,L] * CAS[L,J]
+        f = np.zeros(self.dim)
+        dCAA = np.zeros((p,p))
+        dCRR = np.zeros((p,p))
+        dCAR = np.zeros((p,p))
+        for J, popJ in enumerate(self.config.network.populations):
+            SG = np.where(S[J] == 0, 0,
+                          S[J] * popJ.G(B[J] + CSB[J,J]/S[J], VarB[J]))
+            f[J] = (- popJ.beta * A[J] + popJ.alpha * SG)
+            f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+            for K, popK in enumerate(self.config.network.populations):
+                if J &lt;= K:
+                    dCAA[J,K] = (- (popJ.beta + popK.beta) * CAA[J,K]
+                                    + popJ.alpha * popJ.H(A[K], S[J], B[J],
+                                        CAS[K,J], CAB[K,J], CSB[J,J], VarB[J])
+                                    + popK.alpha * popK.H(A[J], S[K], B[K],
+                                        CAS[J,K], CAB[J,K], CSB[K,K], VarB[K]))
+                    dCRR[J,K] = (- (popJ.gamma + popK.gamma) * CRR[J,K]
+                                  + popJ.beta * CAR[J,K] + popK.beta * CAR[K,J])
+                dCAR[J,K] = (- (popJ.beta + popK.gamma) * CAR[J,K]
+                                + popK.beta * CAA[J,K]
+                                + popJ.alpha * popJ.H(R[K], S[J], B[J],
+                                    CRS[K,J], CRB[K,J], CSB[J,J], VarB[J]))
+        f[2*p : 2*p + round(p*(p+1)/2)] = dCAA[np.triu_indices(p)]
+        f[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)] = dCRR[np.triu_indices(p)]
+        f[2*p + p*(p+1) :] = dCAR.flatten()
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        return p * (2*p + 3)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="popnet.systems.ExtendedSystem.vector_field"><code class="name flex">
+<span>def <span class="ident">vector_field</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vector field of the extended Wilson&ndash;Cowan model.</p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popnet.systems.DynamicalSystem.vector_field">DynamicalSystem.vector_field()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vector_field(self, state):
+    &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+    See `DynamicalSystem.vector_field` for details.
+    &#34;&#34;&#34;
+    A = state[: (p := len(self.config.network.populations))]
+    R = state[p : 2*p]
+    S = 1 - A - R
+    CAA = _internals._unflat_scalar_triangle(
+                state[2*p : 2*p + round(p*(p+1)/2)])
+    CRR = _internals._unflat_scalar_triangle(
+                state[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)])
+    CAR = (state[2*p + p*(p+1) :]).reshape((p,p))
+    CAS = - CAA - CAR
+    CRS = - CRR - CAR.transpose()
+    B = self.config.Q.copy()
+    VarB = np.zeros(p)
+    CAB = np.zeros((p,p))
+    CRB = np.zeros((p,p))
+    CSB = np.zeros((p,p))
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+        for L in range(p):
+            VarB[J] += (self.config.network.c[J,K] 
+                        * self.config.network.c[J,L] * CAA[K,L])
+            CAB[J,K] += self.config.network.c[K,L] * CAA[J,L]
+            CRB[J,K] += self.config.network.c[K,L] * CAR[L,J]
+            CSB[J,K] += self.config.network.c[K,L] * CAS[L,J]
+    f = np.zeros(self.dim)
+    dCAA = np.zeros((p,p))
+    dCRR = np.zeros((p,p))
+    dCAR = np.zeros((p,p))
+    for J, popJ in enumerate(self.config.network.populations):
+        SG = np.where(S[J] == 0, 0,
+                      S[J] * popJ.G(B[J] + CSB[J,J]/S[J], VarB[J]))
+        f[J] = (- popJ.beta * A[J] + popJ.alpha * SG)
+        f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+        for K, popK in enumerate(self.config.network.populations):
+            if J &lt;= K:
+                dCAA[J,K] = (- (popJ.beta + popK.beta) * CAA[J,K]
+                                + popJ.alpha * popJ.H(A[K], S[J], B[J],
+                                    CAS[K,J], CAB[K,J], CSB[J,J], VarB[J])
+                                + popK.alpha * popK.H(A[J], S[K], B[K],
+                                    CAS[J,K], CAB[J,K], CSB[K,K], VarB[K]))
+                dCRR[J,K] = (- (popJ.gamma + popK.gamma) * CRR[J,K]
+                              + popJ.beta * CAR[J,K] + popK.beta * CAR[K,J])
+            dCAR[J,K] = (- (popJ.beta + popK.gamma) * CAR[J,K]
+                            + popK.beta * CAA[J,K]
+                            + popJ.alpha * popJ.H(R[K], S[J], B[J],
+                                CRS[K,J], CRB[K,J], CSB[J,J], VarB[J]))
+    f[2*p : 2*p + round(p*(p+1)/2)] = dCAA[np.triu_indices(p)]
+    f[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)] = dCRR[np.triu_indices(p)]
+    f[2*p + p*(p+1) :] = dCAR.flatten()
+    return np.array(f, float)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></b></code>:
+<ul class="hlist">
+<li><code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">config</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">dim</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.find_equilibrium_near" href="#popnet.systems.DynamicalSystem.find_equilibrium_near">find_equilibrium_near</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">get_eigenvals_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigs_at" href="#popnet.systems.DynamicalSystem.get_eigs_at">get_eigs_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_phase_plane" href="#popnet.systems.DynamicalSystem.get_phase_plane">get_phase_plane</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.jac" href="#popnet.systems.DynamicalSystem.jac">jac</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="popnet.systems.MeanFieldSystem"><code class="flex name class">
+<span>class <span class="ident">MeanFieldSystem</span></span>
+<span>(</span><span>config)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dynamical system for the Wilson&ndash;Cowan model with refractory state.</p>
+<p>Specializes the <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> class for the Wilson&ndash;Cowan model with
+refractory state explicitely included. Covariances are not considered in
+this case. For <em>p</em> populations, a state of this system has the form
+<span><span class="MathJax_Preview">
+(A_1, ..., A_p, R_1, ..., R_p),
+</span><script type="math/tex; mode=display">
+(A_1, ..., A_p, R_1, ..., R_p),
+</script></span>
+where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> and <span><span class="MathJax_Preview">R_J</span><script type="math/tex">R_J</script></span> are respectively the expectations of the
+active and refractory fractions of the <em>J</em>th population, in the order given
+by the list of populations in the configuration's network.</p>
+<p>The jacobian matrix is implemented for this system.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MeanFieldSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the Wilson--Cowan model with refractory state.
+
+    Specializes the `DynamicalSystem` class for the Wilson--Cowan model with
+    refractory state explicitely included. Covariances are not considered in
+    this case. For *p* populations, a state of this system has the form
+    \\[
+        (A_1, ..., A_p, R_1, ..., R_p),
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network.
+
+    The jacobian matrix is implemented for this system.
+
+    &#34;&#34;&#34;
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((2*p, 2*p))
+        for J, popJ in enumerate(self.config.network.populations):
+            j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                        * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+            j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+            j[J+p,J] = popJ.beta
+            j[J+p,J+p] = - popJ.gamma
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                                * self.config.network.c[J,K] * S[J])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the Wilson--Cowan model with refractory state. 
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p :]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(2*p)
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+            f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        return 2 * len(self.config.network.populations)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="popnet.systems.MeanFieldSystem.jac"><code class="name flex">
+<span>def <span class="ident">jac</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Jacobian matrix of the vector field. </p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.jac" href="#popnet.systems.DynamicalSystem.jac">DynamicalSystem.jac()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def jac(self, state):
+    &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+    See `DynamicalSystem.jac` for details.
+    &#34;&#34;&#34;
+    A = state[: (p := len(self.config.network.populations))]
+    R = state[p : 2*p]
+    S = 1 - A - R
+    B = self.config.Q.copy()
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+    j = np.zeros((2*p, 2*p))
+    for J, popJ in enumerate(self.config.network.populations):
+        j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                    * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+        j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+        j[J+p,J] = popJ.beta
+        j[J+p,J+p] = - popJ.gamma
+        for K, popK in enumerate(self.config.network.populations):
+            if K != J:
+                j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                            * self.config.network.c[J,K] * S[J])
+    return np.array(j, float)</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.MeanFieldSystem.vector_field"><code class="name flex">
+<span>def <span class="ident">vector_field</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vector field of the Wilson&ndash;Cowan model with refractory state. </p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popnet.systems.DynamicalSystem.vector_field">DynamicalSystem.vector_field()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vector_field(self, state):
+    &#34;&#34;&#34;Vector field of the Wilson--Cowan model with refractory state. 
+
+    See `DynamicalSystem.vector_field` for details.
+    &#34;&#34;&#34;
+    A = state[: (p := len(self.config.network.populations))]
+    R = state[p :]
+    S = 1 - A - R
+    B = self.config.Q.copy()
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+    f = np.zeros(2*p)
+    for J, popJ in enumerate(self.config.network.populations):
+        f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+        f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+    return np.array(f, float)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></b></code>:
+<ul class="hlist">
+<li><code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">config</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">dim</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.find_equilibrium_near" href="#popnet.systems.DynamicalSystem.find_equilibrium_near">find_equilibrium_near</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">get_eigenvals_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigs_at" href="#popnet.systems.DynamicalSystem.get_eigs_at">get_eigs_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_phase_plane" href="#popnet.systems.DynamicalSystem.get_phase_plane">get_phase_plane</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="popnet.systems.MixedSystem"><code class="flex name class">
+<span>class <span class="ident">MixedSystem</span></span>
+<span>(</span><span>config, epsilon=1, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dynamical system for the 'mixed' Wilson&ndash;Cowan model.</p>
+<p>Specializes the <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> class to study the transition between the
+classical Wilson&ndash;Cowan model and its extension with refractory state. This
+class can be seen as a combination of the <code><a title="popnet.systems.WilsonCowanSystem" href="#popnet.systems.WilsonCowanSystem">WilsonCowanSystem</a></code> and
+<code><a title="popnet.systems.MeanFieldSystem" href="#popnet.systems.MeanFieldSystem">MeanFieldSystem</a></code> classes. Covariances are not considered in this case. For
+<em>p</em> populations, a state of this system has the form
+<span><span class="MathJax_Preview">
+(A_1, ..., A_p, R_1, ..., R_p),
+</span><script type="math/tex; mode=display">
+(A_1, ..., A_p, R_1, ..., R_p),
+</script></span>
+where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> and <span><span class="MathJax_Preview">R_J</span><script type="math/tex">R_J</script></span> are respectively the expectations of the
+active and refractory fractions of the <em>J</em>th population, in the order given
+by the list of populations in the configuration's network.</p>
+<p>The jacobian matrix is implemented for this system.</p>
+<p>In this case the system has an additional data attribute <code>epsilon</code>, which
+is a <code>float</code> and should have a value between 0 and 1. It defines how much
+the refractory state is considered. See <code><a title="popnet.systems.MixedSystem.epsilon" href="#popnet.systems.MixedSystem.epsilon">MixedSystem.epsilon</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class MixedSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the &#39;mixed&#39; Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class to study the transition between the
+    classical Wilson--Cowan model and its extension with refractory state. This
+    class can be seen as a combination of the `WilsonCowanSystem` and
+    `MeanFieldSystem` classes. Covariances are not considered in this case. For
+    *p* populations, a state of this system has the form
+    \\[
+        (A_1, ..., A_p, R_1, ..., R_p),
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network.
+
+    The jacobian matrix is implemented for this system.
+
+    In this case the system has an additional data attribute `epsilon`, which
+    is a `float` and should have a value between 0 and 1. It defines how much
+    the refractory state is considered. See `MixedSystem.epsilon` for details.
+
+    &#34;&#34;&#34;
+
+    def __init__(self, config, epsilon=1, **kwargs):
+        self.epsilon = epsilon
+        super().__init__(config, **kwargs)
+
+    @property
+    def epsilon(self):
+        &#34;&#34;&#34;Transition parameter for the refractory state.
+
+        Float parameter with value between 0 and 1 that determines &#39;how much&#39;
+        the refractory state is considered.
+
+        - When `epsilon` is 1 the refractory state is fully considered, and the
+        vector field is the same as that of the `MeanFieldSystem` class.
+        - When `epsilon` has a value between 0 and 1, the derivative of the
+        refractory state&#39;s components is multiply by `1/epsilon`, so these
+        components converge towards their equilibrium solutions faster than
+        they would normally.
+        - The case where `epsilon` is zero would be the case where the
+        refractory state is set to its equilibrium solution and the vector
+        field is that of Wilson--Cowan&#39;s model. However, for this case, the
+        `WilsonCowanSystem` class should be used instead.
+
+        This property cannot be deleted.
+        &#34;&#34;&#34;
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, new_value):
+        try:
+            new_value = float(new_value)
+        except Exception:
+            raise TypeError(&#39;\&#39;epsilon\&#39; should be a float.&#39;)
+        if not 0 &lt; new_value &lt;= 1:
+            if new_value == 0:
+                msg = (&#39;\&#39;epsilon\&#39; can\&#39;t be equal to zero. For this case, use&#39;
+                       &#39; the \&#39;WilsonCowanSystem\&#39; class instead.&#39;)
+            else:
+                msg = &#39;\&#39;epsilon\&#39; has to be between zero and one.&#39;
+            raise ValueError(msg)
+        self._epsilon = new_value
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field.
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((2*p, 2*p))
+        for J, popJ in enumerate(self.config.network.populations):
+            j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                        * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+            j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+            j[J+p,J] = popJ.beta / self.epsilon
+            j[J+p,J+p] = - popJ.gamma / self.epsilon
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                                * self.config.network.c[J,K] * S[J])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the &#39;mixed&#39; Wilson--Cowan model. 
+
+        See `DynamicalSystem.vector_field`.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p :]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(2*p)
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+            f[J+p] = 1/self.epsilon * (- popJ.gamma * R[J] + popJ.beta * A[J])
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        return 2 * len(self.config.network.populations)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="popnet.systems.MixedSystem.epsilon"><code class="name">var <span class="ident">epsilon</span></code></dt>
+<dd>
+<div class="desc"><p>Transition parameter for the refractory state.</p>
+<p>Float parameter with value between 0 and 1 that determines 'how much'
+the refractory state is considered.</p>
+<ul>
+<li>When <code>epsilon</code> is 1 the refractory state is fully considered, and the
+vector field is the same as that of the <code><a title="popnet.systems.MeanFieldSystem" href="#popnet.systems.MeanFieldSystem">MeanFieldSystem</a></code> class.</li>
+<li>When <code>epsilon</code> has a value between 0 and 1, the derivative of the
+refractory state's components is multiply by <code>1/epsilon</code>, so these
+components converge towards their equilibrium solutions faster than
+they would normally.</li>
+<li>The case where <code>epsilon</code> is zero would be the case where the
+refractory state is set to its equilibrium solution and the vector
+field is that of Wilson&ndash;Cowan's model. However, for this case, the
+<code><a title="popnet.systems.WilsonCowanSystem" href="#popnet.systems.WilsonCowanSystem">WilsonCowanSystem</a></code> class should be used instead.</li>
+</ul>
+<p>This property cannot be deleted.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def epsilon(self):
+    &#34;&#34;&#34;Transition parameter for the refractory state.
+
+    Float parameter with value between 0 and 1 that determines &#39;how much&#39;
+    the refractory state is considered.
+
+    - When `epsilon` is 1 the refractory state is fully considered, and the
+    vector field is the same as that of the `MeanFieldSystem` class.
+    - When `epsilon` has a value between 0 and 1, the derivative of the
+    refractory state&#39;s components is multiply by `1/epsilon`, so these
+    components converge towards their equilibrium solutions faster than
+    they would normally.
+    - The case where `epsilon` is zero would be the case where the
+    refractory state is set to its equilibrium solution and the vector
+    field is that of Wilson--Cowan&#39;s model. However, for this case, the
+    `WilsonCowanSystem` class should be used instead.
+
+    This property cannot be deleted.
+    &#34;&#34;&#34;
+    return self._epsilon</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="popnet.systems.MixedSystem.jac"><code class="name flex">
+<span>def <span class="ident">jac</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Jacobian matrix of the vector field.</p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.jac" href="#popnet.systems.DynamicalSystem.jac">DynamicalSystem.jac()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def jac(self, state):
+    &#34;&#34;&#34;Jacobian matrix of the vector field.
+
+    See `DynamicalSystem.jac` for details.
+    &#34;&#34;&#34;
+    A = state[: (p := len(self.config.network.populations))]
+    R = state[p : 2*p]
+    S = 1 - A - R
+    B = self.config.Q.copy()
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+    j = np.zeros((2*p, 2*p))
+    for J, popJ in enumerate(self.config.network.populations):
+        j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                    * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+        j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+        j[J+p,J] = popJ.beta / self.epsilon
+        j[J+p,J+p] = - popJ.gamma / self.epsilon
+        for K, popK in enumerate(self.config.network.populations):
+            if K != J:
+                j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                            * self.config.network.c[J,K] * S[J])
+    return np.array(j, float)</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.MixedSystem.vector_field"><code class="name flex">
+<span>def <span class="ident">vector_field</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vector field of the 'mixed' Wilson&ndash;Cowan model. </p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popnet.systems.DynamicalSystem.vector_field">DynamicalSystem.vector_field()</a></code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vector_field(self, state):
+    &#34;&#34;&#34;Vector field of the &#39;mixed&#39; Wilson--Cowan model. 
+
+    See `DynamicalSystem.vector_field`.
+    &#34;&#34;&#34;
+    A = state[: (p := len(self.config.network.populations))]
+    R = state[p :]
+    S = 1 - A - R
+    B = self.config.Q.copy()
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+    f = np.zeros(2*p)
+    for J, popJ in enumerate(self.config.network.populations):
+        f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+        f[J+p] = 1/self.epsilon * (- popJ.gamma * R[J] + popJ.beta * A[J])
+    return np.array(f, float)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></b></code>:
+<ul class="hlist">
+<li><code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">config</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">dim</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.find_equilibrium_near" href="#popnet.systems.DynamicalSystem.find_equilibrium_near">find_equilibrium_near</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">get_eigenvals_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigs_at" href="#popnet.systems.DynamicalSystem.get_eigs_at">get_eigs_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_phase_plane" href="#popnet.systems.DynamicalSystem.get_phase_plane">get_phase_plane</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="popnet.systems.TaylorExtendedSystem"><code class="flex name class">
+<span>class <span class="ident">TaylorExtendedSystem</span></span>
+<span>(</span><span>config)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dynamical system for the extended Wilson&ndash;Cowan model.</p>
+<p>Specializes the <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> class for the extended Wilson&ndash;Cowan
+model obtained from the closure that uses a second-order Taylor
+approximation. Here the refractory state and the covariances between
+fractions of populations are included. For <em>p</em> populations, a state of this
+system has the form
+<span><span class="MathJax_Preview">
+(\begin{aligned}[t]
+&amp; A_1, A_2, ..., A_p, \\
+&amp; R_1, R_2, ..., R_p, \\
+&amp; \mathrm{C}_{AA}^{11}, \mathrm{C}_{AA}^{12}, ...,
+\mathrm{C}_{AA}^{1p}, \mathrm{C}_{AA}^{22}, ...,
+\mathrm{C}_{AA}^{2p}, \mathrm{C}_{AA}^{33}, ...,
+\mathrm{C}_{AA}^{3p}, ..., \mathrm{C}_{AA}^{pp}, \\
+&amp; \mathrm{C}_{RR}^{11}, \mathrm{C}_{RR}^{12}, ...,
+\mathrm{C}_{RR}^{1p}, \mathrm{C}_{RR}^{22}, ...,
+\mathrm{C}_{RR}^{2p}, \mathrm{C}_{RR}^{33}, ...,
+\mathrm{C}_{RR}^{3p}, ..., \mathrm{C}_{RR}^{pp}, \\
+&amp; \mathrm{C}_{AR}^{11}, \mathrm{C}_{AR}^{12}, ...,
+\mathrm{C}_{AR}^{1p}, \mathrm{C}_{AR}^{21}, ...,
+\mathrm{C}_{AR}^{2p}, ..., \mathrm{C}_{AR}^{p1},
+\mathrm{C}_{AR}^{p2}, ..., \mathrm{C}_{AR}^{pp})
+\end{aligned}
+</span><script type="math/tex; mode=display">
+(\begin{aligned}[t]
+& A_1, A_2, ..., A_p, \\
+& R_1, R_2, ..., R_p, \\
+& \mathrm{C}_{AA}^{11}, \mathrm{C}_{AA}^{12}, ...,
+\mathrm{C}_{AA}^{1p}, \mathrm{C}_{AA}^{22}, ...,
+\mathrm{C}_{AA}^{2p}, \mathrm{C}_{AA}^{33}, ...,
+\mathrm{C}_{AA}^{3p}, ..., \mathrm{C}_{AA}^{pp}, \\
+& \mathrm{C}_{RR}^{11}, \mathrm{C}_{RR}^{12}, ...,
+\mathrm{C}_{RR}^{1p}, \mathrm{C}_{RR}^{22}, ...,
+\mathrm{C}_{RR}^{2p}, \mathrm{C}_{RR}^{33}, ...,
+\mathrm{C}_{RR}^{3p}, ..., \mathrm{C}_{RR}^{pp}, \\
+& \mathrm{C}_{AR}^{11}, \mathrm{C}_{AR}^{12}, ...,
+\mathrm{C}_{AR}^{1p}, \mathrm{C}_{AR}^{21}, ...,
+\mathrm{C}_{AR}^{2p}, ..., \mathrm{C}_{AR}^{p1},
+\mathrm{C}_{AR}^{p2}, ..., \mathrm{C}_{AR}^{pp})
+\end{aligned}
+</script></span>
+where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> and <span><span class="MathJax_Preview">R_J</span><script type="math/tex">R_J</script></span> are respectively the expectations of the
+active and refractory fractions of the <em>J</em>th population, in the order given
+by the list of populations in the configuration's network, and
+<span><span class="MathJax_Preview">\mathrm{C}_{XY}^{JK}</span><script type="math/tex">\mathrm{C}_{XY}^{JK}</script></span> is the covariance between the fractions
+<span><span class="MathJax_Preview">X_J</span><script type="math/tex">X_J</script></span> and <span><span class="MathJax_Preview">Y_K</span><script type="math/tex">Y_K</script></span>, where <span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> and <span><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> stand for random
+variables associated with active or refractory fractions.</p>
+<p>In this system, the jacobian matrix is implemented only for the case where
+the network has only one population.</p>
+<h2 id="notes">Notes</h2>
+<p>The case where the network has only one population is actually handled in a
+separate (private) class <code>_TaylorExtendedSystemOne</code>, which uses a simpler
+implementation of the vector field and implements the jacobian matrix. The
+class constructor of <code><a title="popnet.systems.TaylorExtendedSystem" href="#popnet.systems.TaylorExtendedSystem">TaylorExtendedSystem</a></code> will automatically instantiate
+a <code>_TaylorExtendedSystemOne</code> instance when the network has only one
+population.</p>
+<p>This is considered to be an implementation detail. Only the class
+<code><a title="popnet.systems.TaylorExtendedSystem" href="#popnet.systems.TaylorExtendedSystem">TaylorExtendedSystem</a></code> should be called by a user.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TaylorExtendedSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the extended Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class for the extended Wilson--Cowan
+    model obtained from the closure that uses a second-order Taylor
+    approximation. Here the refractory state and the covariances between
+    fractions of populations are included. For *p* populations, a state of this
+    system has the form
+    \\[
+        (\\begin{aligned}[t]
+            &amp; A_1, A_2, ..., A_p, \\\\
+            &amp; R_1, R_2, ..., R_p, \\\\
+            &amp; \\mathrm{C}_{AA}^{11}, \\mathrm{C}_{AA}^{12}, ..., 
+                \\mathrm{C}_{AA}^{1p}, \\mathrm{C}_{AA}^{22}, ..., 
+                \\mathrm{C}_{AA}^{2p}, \\mathrm{C}_{AA}^{33}, ..., 
+                \\mathrm{C}_{AA}^{3p}, ..., \\mathrm{C}_{AA}^{pp}, \\\\
+            &amp; \\mathrm{C}_{RR}^{11}, \\mathrm{C}_{RR}^{12}, ..., 
+                \\mathrm{C}_{RR}^{1p}, \\mathrm{C}_{RR}^{22}, ..., 
+                \\mathrm{C}_{RR}^{2p}, \\mathrm{C}_{RR}^{33}, ..., 
+                \\mathrm{C}_{RR}^{3p}, ..., \\mathrm{C}_{RR}^{pp}, \\\\
+            &amp; \\mathrm{C}_{AR}^{11}, \\mathrm{C}_{AR}^{12}, ..., 
+                \\mathrm{C}_{AR}^{1p}, \\mathrm{C}_{AR}^{21}, ...,
+                \\mathrm{C}_{AR}^{2p}, ..., \\mathrm{C}_{AR}^{p1}, 
+                \\mathrm{C}_{AR}^{p2}, ..., \\mathrm{C}_{AR}^{pp})
+        \\end{aligned}
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration&#39;s network, and
+    \\(\\mathrm{C}_{XY}^{JK}\\) is the covariance between the fractions
+    \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
+    variables associated with active or refractory fractions.
+
+    In this system, the jacobian matrix is implemented only for the case where
+    the network has only one population.
+
+    Notes
+    -----
+    The case where the network has only one population is actually handled in a
+    separate (private) class `_TaylorExtendedSystemOne`, which uses a simpler
+    implementation of the vector field and implements the jacobian matrix. The
+    class constructor of `TaylorExtendedSystem` will automatically instantiate
+    a `_TaylorExtendedSystemOne` instance when the network has only one
+    population.
+
+    This is considered to be an implementation detail. Only the class
+    `TaylorExtendedSystem` should be called by a user.
+
+    &#34;&#34;&#34;
+
+    def __new__(cls, config, **kwargs):
+        if not isinstance(config, structures.Configuration):
+            raise TypeError(&#39;The configuration used with a \&#39;DynamicalSystem\&#39; &#39;
+                            &#39;instance should be a \&#39;Configuration\&#39; instance.&#39;)
+        if len(config.network.populations) == 1:
+            return super().__new__(_TaylorExtendedSystemOne)
+        return super().__new__(cls)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        CAA = _internals._unflat_scalar_triangle(
+                state[2*p : 2*p + round(p*(p+1)/2)])
+        CRR = _internals._unflat_scalar_triangle(
+                state[2*p + round(p*(p+1)/2) : 2*p+p*(p+1)])
+        CAR = (state[2*p + p*(p+1) :]).reshape((p,p))
+        CAS = - CAA - CAR
+        CSR = - CRR - CAR
+        B = self.config.Q.copy()
+        VarB = np.zeros(p)
+        CAB = np.zeros((p,p))
+        CRB = np.zeros((p,p))
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+            for L in range(p):
+                VarB[J] += (self.config.network.c[J,K] 
+                            * self.config.network.c[J,L] * CAA[K,L])
+                CAB[J,K] += self.config.network.c[K,L] * CAA[J,L]
+                CRB[J,K] += self.config.network.c[K,L] * CAR[L,J]
+        f = np.zeros(self.dim)
+        dCAA = np.zeros((p,p))
+        dCRR = np.zeros((p,p))
+        dCAR = np.zeros((p,p))
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = (- popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+                    - popJ.alpha*popJ.dF(B[J]) * (CAB[J,J] + CRB[J,J])
+                    + popJ.alpha/2*popJ.ddF(B[J]) * S[J] * VarB[J])
+            f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+            for K, popK in enumerate(self.config.network.populations):
+                dCAA[J,K] = (- (popJ.beta + popK.beta) * CAA[J,K]
+                                + popJ.alpha*popJ.F(B[J]) * CAS[K,J]
+                                + popK.alpha*popK.F(B[K]) * CAS[J,K]
+                                + popJ.alpha*popJ.dF(B[J]) * S[J] * CAB[K,J]
+                                + popK.alpha*popK.dF(B[K]) * S[K] * CAB[J,K])
+                dCRR[J,K] = (- (popJ.gamma + popK.gamma) * CRR[J,K]
+                                + popJ.beta * CAR[J,K] + popK.beta * CAR[K,J])
+                dCAR[J,K] = (- (popJ.beta + popK.gamma) * CAR[J,K]
+                                + popK.beta * CAA[J,K]
+                                + popJ.alpha*popJ.F(B[J]) * CSR[J,K]
+                                + popJ.alpha*popJ.dF(B[J]) * S[J] * CRB[K,J])
+        f[2*p : 2*p + round(p*(p+1)/2)] = dCAA[np.triu_indices(p)]
+        f[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)] = dCRR[np.triu_indices(p)]
+        f[2*p + p*(p+1) :] = dCAR.flatten()
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        return p * (2*p + 3)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li>popnet.systems._TaylorExtendedSystemOne</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="popnet.systems.TaylorExtendedSystem.vector_field"><code class="name flex">
+<span>def <span class="ident">vector_field</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vector field of the extended Wilson&ndash;Cowan model.</p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popnet.systems.DynamicalSystem.vector_field">DynamicalSystem.vector_field()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vector_field(self, state):
+    &#34;&#34;&#34;Vector field of the extended Wilson--Cowan model.
+
+    See `DynamicalSystem.vector_field` for details.
+    &#34;&#34;&#34;
+    A = state[: (p := len(self.config.network.populations))]
+    R = state[p : 2*p]
+    S = 1 - A - R
+    CAA = _internals._unflat_scalar_triangle(
+            state[2*p : 2*p + round(p*(p+1)/2)])
+    CRR = _internals._unflat_scalar_triangle(
+            state[2*p + round(p*(p+1)/2) : 2*p+p*(p+1)])
+    CAR = (state[2*p + p*(p+1) :]).reshape((p,p))
+    CAS = - CAA - CAR
+    CSR = - CRR - CAR
+    B = self.config.Q.copy()
+    VarB = np.zeros(p)
+    CAB = np.zeros((p,p))
+    CRB = np.zeros((p,p))
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+        for L in range(p):
+            VarB[J] += (self.config.network.c[J,K] 
+                        * self.config.network.c[J,L] * CAA[K,L])
+            CAB[J,K] += self.config.network.c[K,L] * CAA[J,L]
+            CRB[J,K] += self.config.network.c[K,L] * CAR[L,J]
+    f = np.zeros(self.dim)
+    dCAA = np.zeros((p,p))
+    dCRR = np.zeros((p,p))
+    dCAR = np.zeros((p,p))
+    for J, popJ in enumerate(self.config.network.populations):
+        f[J] = (- popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+                - popJ.alpha*popJ.dF(B[J]) * (CAB[J,J] + CRB[J,J])
+                + popJ.alpha/2*popJ.ddF(B[J]) * S[J] * VarB[J])
+        f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+        for K, popK in enumerate(self.config.network.populations):
+            dCAA[J,K] = (- (popJ.beta + popK.beta) * CAA[J,K]
+                            + popJ.alpha*popJ.F(B[J]) * CAS[K,J]
+                            + popK.alpha*popK.F(B[K]) * CAS[J,K]
+                            + popJ.alpha*popJ.dF(B[J]) * S[J] * CAB[K,J]
+                            + popK.alpha*popK.dF(B[K]) * S[K] * CAB[J,K])
+            dCRR[J,K] = (- (popJ.gamma + popK.gamma) * CRR[J,K]
+                            + popJ.beta * CAR[J,K] + popK.beta * CAR[K,J])
+            dCAR[J,K] = (- (popJ.beta + popK.gamma) * CAR[J,K]
+                            + popK.beta * CAA[J,K]
+                            + popJ.alpha*popJ.F(B[J]) * CSR[J,K]
+                            + popJ.alpha*popJ.dF(B[J]) * S[J] * CRB[K,J])
+    f[2*p : 2*p + round(p*(p+1)/2)] = dCAA[np.triu_indices(p)]
+    f[2*p + round(p*(p+1)/2) : 2*p + p*(p+1)] = dCRR[np.triu_indices(p)]
+    f[2*p + p*(p+1) :] = dCAR.flatten()
+    return np.array(f, float)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></b></code>:
+<ul class="hlist">
+<li><code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">config</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">dim</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.find_equilibrium_near" href="#popnet.systems.DynamicalSystem.find_equilibrium_near">find_equilibrium_near</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">get_eigenvals_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigs_at" href="#popnet.systems.DynamicalSystem.get_eigs_at">get_eigs_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_phase_plane" href="#popnet.systems.DynamicalSystem.get_phase_plane">get_phase_plane</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.jac" href="#popnet.systems.DynamicalSystem.jac">jac</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="popnet.systems.WilsonCowanSystem"><code class="flex name class">
+<span>class <span class="ident">WilsonCowanSystem</span></span>
+<span>(</span><span>config)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Dynamical system for the Wilson&ndash;Cowan model.</p>
+<p>Specializes the <code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> class for an equivalent to the original
+Wilson&ndash;Cowan model, without refractory state or correlations. For <em>p</em>
+populations, a state of this system has the form
+<span><span class="MathJax_Preview">
+(A_1, ..., A_p),
+</span><script type="math/tex; mode=display">
+(A_1, ..., A_p),
+</script></span>
+where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> is the expectation of the activity of the <em>J</em>th population,
+in the order given by the list of populations in the configuration's
+network.</p>
+<p>The jacobian matrix is implemented for this system.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class WilsonCowanSystem(DynamicalSystem):
+    &#34;&#34;&#34;Dynamical system for the Wilson--Cowan model.
+
+    Specializes the `DynamicalSystem` class for an equivalent to the original
+    Wilson--Cowan model, without refractory state or correlations. For *p*
+    populations, a state of this system has the form
+    \\[
+        (A_1, ..., A_p),
+    \\]
+    where \\(A_J\\) is the expectation of the activity of the *J*th population,
+    in the order given by the list of populations in the configuration&#39;s
+    network.
+
+    The jacobian matrix is implemented for this system.
+
+    &#34;&#34;&#34;
+
+    def jac(self, state):
+        &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+        See `DynamicalSystem.jac` for details.
+        &#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        A = state
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((p, p))
+        for J, popJ in enumerate(self.config.network.populations):
+            rJ = 1 + popJ.beta / popJ.gamma
+            SJ = 1 - rJ * A[J]
+            j[J,J] = (- popJ.beta - popJ.alpha * rJ * popJ.F(B[J])
+                        + popJ.alpha * SJ * popJ.dF(B[J])
+                            * self.config.network.c[J,J])
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha * SJ * popJ.dF(B[J])
+                                * self.config.network.c[J,K])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        &#34;&#34;&#34;Vector field of the Wilson--Cowan model. 
+
+        See `DynamicalSystem.vector_field` for details.
+        &#34;&#34;&#34;
+        p = len(self.config.network.populations)
+        A = state
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(p)
+        for J, popJ in enumerate(self.config.network.populations):
+            SJ = 1 - (1 + popJ.beta / popJ.gamma) * A[J]
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * SJ
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        &#34;&#34;&#34;Get the dimension of the dynamical system.&#34;&#34;&#34;
+        return len(self.config.network.populations)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="popnet.systems.WilsonCowanSystem.jac"><code class="name flex">
+<span>def <span class="ident">jac</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Jacobian matrix of the vector field. </p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.jac" href="#popnet.systems.DynamicalSystem.jac">DynamicalSystem.jac()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def jac(self, state):
+    &#34;&#34;&#34;Jacobian matrix of the vector field. 
+
+    See `DynamicalSystem.jac` for details.
+    &#34;&#34;&#34;
+    p = len(self.config.network.populations)
+    A = state
+    B = self.config.Q.copy()
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+    j = np.zeros((p, p))
+    for J, popJ in enumerate(self.config.network.populations):
+        rJ = 1 + popJ.beta / popJ.gamma
+        SJ = 1 - rJ * A[J]
+        j[J,J] = (- popJ.beta - popJ.alpha * rJ * popJ.F(B[J])
+                    + popJ.alpha * SJ * popJ.dF(B[J])
+                        * self.config.network.c[J,J])
+        for K, popK in enumerate(self.config.network.populations):
+            if K != J:
+                j[J,K] = (popJ.alpha * SJ * popJ.dF(B[J])
+                            * self.config.network.c[J,K])
+    return np.array(j, float)</code></pre>
+</details>
+</dd>
+<dt id="popnet.systems.WilsonCowanSystem.vector_field"><code class="name flex">
+<span>def <span class="ident">vector_field</span></span>(<span>self, state)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Vector field of the Wilson&ndash;Cowan model. </p>
+<p>See <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popnet.systems.DynamicalSystem.vector_field">DynamicalSystem.vector_field()</a></code> for details.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def vector_field(self, state):
+    &#34;&#34;&#34;Vector field of the Wilson--Cowan model. 
+
+    See `DynamicalSystem.vector_field` for details.
+    &#34;&#34;&#34;
+    p = len(self.config.network.populations)
+    A = state
+    B = self.config.Q.copy()
+    for J, K in np.ndindex((p,p)):
+        B[J] += self.config.network.c[J,K] * A[K]
+    f = np.zeros(p)
+    for J, popJ in enumerate(self.config.network.populations):
+        SJ = 1 - (1 + popJ.beta / popJ.gamma) * A[J]
+        f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * SJ
+    return np.array(f, float)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></b></code>:
+<ul class="hlist">
+<li><code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">config</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">dim</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.find_equilibrium_near" href="#popnet.systems.DynamicalSystem.find_equilibrium_near">find_equilibrium_near</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">get_eigenvals_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigs_at" href="#popnet.systems.DynamicalSystem.get_eigs_at">get_eigs_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_phase_plane" href="#popnet.systems.DynamicalSystem.get_phase_plane">get_phase_plane</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#classes-and-hierarchy">Classes and hierarchy</a></li>
+</ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="popnet" href="index.html">popnet</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="popnet.systems.SYSTEM_CLASSES" href="#popnet.systems.SYSTEM_CLASSES">SYSTEM_CLASSES</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="popnet.systems.get_system" href="#popnet.systems.get_system">get_system</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="popnet.systems.DynamicalSystem" href="#popnet.systems.DynamicalSystem">DynamicalSystem</a></code></h4>
+<ul class="">
+<li><code><a title="popnet.systems.DynamicalSystem.config" href="#popnet.systems.DynamicalSystem.config">config</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.dim" href="#popnet.systems.DynamicalSystem.dim">dim</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.find_equilibrium_near" href="#popnet.systems.DynamicalSystem.find_equilibrium_near">find_equilibrium_near</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">get_eigenvals_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_eigs_at" href="#popnet.systems.DynamicalSystem.get_eigs_at">get_eigs_at</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.get_phase_plane" href="#popnet.systems.DynamicalSystem.get_phase_plane">get_phase_plane</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.jac" href="#popnet.systems.DynamicalSystem.jac">jac</a></code></li>
+<li><code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popnet.systems.DynamicalSystem.vector_field">vector_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="popnet.systems.ExtendedSystem" href="#popnet.systems.ExtendedSystem">ExtendedSystem</a></code></h4>
+<ul class="">
+<li><code><a title="popnet.systems.ExtendedSystem.vector_field" href="#popnet.systems.ExtendedSystem.vector_field">vector_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="popnet.systems.MeanFieldSystem" href="#popnet.systems.MeanFieldSystem">MeanFieldSystem</a></code></h4>
+<ul class="">
+<li><code><a title="popnet.systems.MeanFieldSystem.jac" href="#popnet.systems.MeanFieldSystem.jac">jac</a></code></li>
+<li><code><a title="popnet.systems.MeanFieldSystem.vector_field" href="#popnet.systems.MeanFieldSystem.vector_field">vector_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="popnet.systems.MixedSystem" href="#popnet.systems.MixedSystem">MixedSystem</a></code></h4>
+<ul class="">
+<li><code><a title="popnet.systems.MixedSystem.epsilon" href="#popnet.systems.MixedSystem.epsilon">epsilon</a></code></li>
+<li><code><a title="popnet.systems.MixedSystem.jac" href="#popnet.systems.MixedSystem.jac">jac</a></code></li>
+<li><code><a title="popnet.systems.MixedSystem.vector_field" href="#popnet.systems.MixedSystem.vector_field">vector_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="popnet.systems.TaylorExtendedSystem" href="#popnet.systems.TaylorExtendedSystem">TaylorExtendedSystem</a></code></h4>
+<ul class="">
+<li><code><a title="popnet.systems.TaylorExtendedSystem.vector_field" href="#popnet.systems.TaylorExtendedSystem.vector_field">vector_field</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="popnet.systems.WilsonCowanSystem" href="#popnet.systems.WilsonCowanSystem">WilsonCowanSystem</a></code></h4>
+<ul class="">
+<li><code><a title="popnet.systems.WilsonCowanSystem.jac" href="#popnet.systems.WilsonCowanSystem.jac">jac</a></code></li>
+<li><code><a title="popnet.systems.WilsonCowanSystem.vector_field" href="#popnet.systems.WilsonCowanSystem.vector_field">vector_field</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+</footer>
+</body>
+</html>
