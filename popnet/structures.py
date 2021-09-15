@@ -1451,21 +1451,21 @@ class Configuration:
         self._iterations = int(new_number_of_iterations)
         self._delta = (self.final_time - self.initial_time) / self.iterations
 
-    def add_random_uniform_perturbation(self, R, indices=None):
+    def add_random_uniform_perturbation(self, R, axes=None):
         """Add a random perturbation to the initial state.
 
         Add a random perturbation to the initial state, taken from a uniform
         distribution on an *N*--sphere of radius `R`. The dimension *N* is the
-        nunmber of components perturbated, described by `indices`. 
+        number of components perturbated as given by `axes`. 
 
         Parameters
         ----------
         R : float
             Norm of the perturbation. Corresponds to the radius of the
             *N*--sphere in which the perturbation is randomly taken.
-        indices : list or tuple of ints, optional
-            Indices giving the components to change in the initial state.
-            Defaults to `None`, in which case every component is changed. 
+        axes : list or tuple of ints, optional
+            Axes to change in the initial state. Defaults to `None`, in which
+            case every component is changed. 
 
         Notes
         -----
@@ -1480,12 +1480,12 @@ class Configuration:
             *N*-dimensional spheres.” *Commun. ACM* **2**, 19--20 (1959).
             doi:[10.1145/377939.377946](https://doi.org/10.1145/377939.377946).
         """
-        if indices is None:
-            indices = np.arange(len(self.initial_state))
-        ball = np.random.default_rng().normal(size=len(indices))
+        if axes is None:
+            axes = np.arange(len(self.initial_state))
+        ball = np.random.default_rng().normal(size=len(axes))
         ball = R * ball / np.linalg.norm(ball)
         perturbation = np.zeros(len(self.initial_state))
-        perturbation[np.array(indices)] = ball
+        perturbation[np.array(axes)] = ball
         self.initial_state = self.initial_state + perturbation
 
     def add_to_initial_state(self, perturbation):

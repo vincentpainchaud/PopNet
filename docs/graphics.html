@@ -262,8 +262,8 @@ class Graphics:
                  font_family=&#39;serif&#39;, usetex=False, preamble=None, **kwargs):
         &#34;&#34;&#34;Activate a figure.
         
-        Create a Matplotlib figure to plot diagrams, and set the `fig` and
-        `ax` attributes to refer to the [`matplotlib.figure.Figure`](
+        Create a Matplotlib figure to plot diagrams, and set `Graphics.fig` and
+        `Graphics.ax` to refer to the [`matplotlib.figure.Figure`](
         https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html)
         and [`matplotlib.axes.Axes`](
         https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
@@ -1368,10 +1368,11 @@ class Result(Graphics):
         expectations : bool, optional
             Decides whether expectations (or averages) are plotted on the
             figure. Valid in `ExtendedSolution`, `Statistics` and `Spectrum`.
-            Defaults to `True`.
+            Defaults to `True` whenever it is valid.
         variances : bool, optional
             Decides whether variances are plotted on the figure. Valid in
-            `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults to `True`.
+            `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults to `True`
+            whenever it is valid.
         covariances : bool, optional
             Decides whether non-symmetric covariances are plotted on the figure.
             Valid in `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults
@@ -1411,8 +1412,8 @@ class Result(Graphics):
         &#34;&#34;&#34;Setup a figure.
 
         Setup the figure `Result.fig`. Allows to set an automatic label to the
-        horizontal axis based on the `x_units` class variable, and to set
-        limits to both axes.
+        horizontal axis based on `Result.x_units`, and to set limits to both
+        axes.
 
         Parameters
         ----------
@@ -3590,8 +3591,8 @@ is replaced with <code><a title="popnet.graphics.Graphics.default_name" href="#p
                  font_family=&#39;serif&#39;, usetex=False, preamble=None, **kwargs):
         &#34;&#34;&#34;Activate a figure.
         
-        Create a Matplotlib figure to plot diagrams, and set the `fig` and
-        `ax` attributes to refer to the [`matplotlib.figure.Figure`](
+        Create a Matplotlib figure to plot diagrams, and set `Graphics.fig` and
+        `Graphics.ax` to refer to the [`matplotlib.figure.Figure`](
         https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html)
         and [`matplotlib.axes.Axes`](
         https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
@@ -3829,8 +3830,8 @@ def name(self):
 </code></dt>
 <dd>
 <div class="desc"><p>Activate a figure.</p>
-<p>Create a Matplotlib figure to plot diagrams, and set the <code>fig</code> and
-<code>ax</code> attributes to refer to the <a href="https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html"><code>matplotlib.figure.Figure</code></a>
+<p>Create a Matplotlib figure to plot diagrams, and set <code><a title="popnet.graphics.Graphics.fig" href="#popnet.graphics.Graphics.fig">Graphics.fig</a></code> and
+<code><a title="popnet.graphics.Graphics.ax" href="#popnet.graphics.Graphics.ax">Graphics.ax</a></code> to refer to the <a href="https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html"><code>matplotlib.figure.Figure</code></a>
 and <a href="https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes"><code>matplotlib.axes.Axes</code></a>
 objects corresponding to this figure. The figure is initialized with
 the default formatting defined by <code><a title="popnet.graphics.figure" href="#popnet.graphics.figure">figure()</a></code>: in fact, if <code>graphic</code> is a
@@ -3871,8 +3872,8 @@ added.</dd>
              font_family=&#39;serif&#39;, usetex=False, preamble=None, **kwargs):
     &#34;&#34;&#34;Activate a figure.
     
-    Create a Matplotlib figure to plot diagrams, and set the `fig` and
-    `ax` attributes to refer to the [`matplotlib.figure.Figure`](
+    Create a Matplotlib figure to plot diagrams, and set `Graphics.fig` and
+    `Graphics.ax` to refer to the [`matplotlib.figure.Figure`](
     https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html)
     and [`matplotlib.axes.Axes`](
     https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
@@ -5570,10 +5571,11 @@ suffixed with 'One', and rather instantiates this class if it exists.</p></div>
         expectations : bool, optional
             Decides whether expectations (or averages) are plotted on the
             figure. Valid in `ExtendedSolution`, `Statistics` and `Spectrum`.
-            Defaults to `True`.
+            Defaults to `True` whenever it is valid.
         variances : bool, optional
             Decides whether variances are plotted on the figure. Valid in
-            `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults to `True`.
+            `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults to `True`
+            whenever it is valid.
         covariances : bool, optional
             Decides whether non-symmetric covariances are plotted on the figure.
             Valid in `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults
@@ -5613,8 +5615,8 @@ suffixed with 'One', and rather instantiates this class if it exists.</p></div>
         &#34;&#34;&#34;Setup a figure.
 
         Setup the figure `Result.fig`. Allows to set an automatic label to the
-        horizontal axis based on the `x_units` class variable, and to set
-        limits to both axes.
+        horizontal axis based on `Result.x_units`, and to set limits to both
+        axes.
 
         Parameters
         ----------
@@ -6445,10 +6447,11 @@ the <a href="#other-parameters">Other Parameters</a> section below.</dd>
 <dt><strong><code>expectations</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Decides whether expectations (or averages) are plotted on the
 figure. Valid in <code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code>, <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> and <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code>.
-Defaults to <code>True</code>.</dd>
+Defaults to <code>True</code> whenever it is valid.</dd>
 <dt><strong><code>variances</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Decides whether variances are plotted on the figure. Valid in
-<code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code>, <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> and <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code>. Defaults to <code>True</code>.</dd>
+<code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code>, <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> and <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code>. Defaults to <code>True</code>
+whenever it is valid.</dd>
 <dt><strong><code>covariances</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>Decides whether non-symmetric covariances are plotted on the figure.
 Valid in <code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code>, <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> and <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code>. Defaults
@@ -6493,10 +6496,11 @@ Valid in <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Stat
     expectations : bool, optional
         Decides whether expectations (or averages) are plotted on the
         figure. Valid in `ExtendedSolution`, `Statistics` and `Spectrum`.
-        Defaults to `True`.
+        Defaults to `True` whenever it is valid.
     variances : bool, optional
         Decides whether variances are plotted on the figure. Valid in
-        `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults to `True`.
+        `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults to `True`
+        whenever it is valid.
     covariances : bool, optional
         Decides whether non-symmetric covariances are plotted on the figure.
         Valid in `ExtendedSolution`, `Statistics` and `Spectrum`. Defaults
@@ -6561,8 +6565,8 @@ case it is replaced with <code><a title="popnet.graphics.Spectrum" href="#popnet
 <dd>
 <div class="desc"><p>Setup a figure.</p>
 <p>Setup the figure <code><a title="popnet.graphics.Result.fig" href="#popnet.graphics.Graphics.fig">Result.fig</a></code>. Allows to set an automatic label to the
-horizontal axis based on the <code>x_units</code> class variable, and to set
-limits to both axes.</p>
+horizontal axis based on <code><a title="popnet.graphics.Result.x_units" href="#popnet.graphics.Result.x_units">Result.x_units</a></code>, and to set limits to both
+axes.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>set_xlabel</code></strong> :&ensp;<code>bool</code>, optional</dt>
@@ -6600,8 +6604,8 @@ Defaults to <code>'fractions'</code>.</dd>
     &#34;&#34;&#34;Setup a figure.
 
     Setup the figure `Result.fig`. Allows to set an automatic label to the
-    horizontal axis based on the `x_units` class variable, and to set
-    limits to both axes.
+    horizontal axis based on `Result.x_units`, and to set limits to both
+    axes.
 
     Parameters
     ----------
