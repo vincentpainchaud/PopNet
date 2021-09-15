@@ -1994,10 +1994,10 @@ class Statistics(Result):
     components. Other changes are implementation details.
 
     The parameters at initialization are the same as in the base class, except
-    that `Statistics.states` is now expected to be an three-dimensional array of
-    *samples* of trajectories of the stochastic process, with time along the
-    first axis, state variables along the second, and different simulations
-    along the third. Note that this is the format of samples handled by
+    that `states` is now expected to be an three-dimensional array of *samples*
+    of trajectories of the stochastic process, with time along the first axis,
+    state variables along the second, and different simulations along the third.
+    Note that this is the format of samples handled by
     `popnet.executors.ChainSimulator`.
 
     Warns
