@@ -153,9 +153,9 @@ from . import graphics
 class Executor:
     &#34;&#34;&#34;Execute numerical experiments on a network.
 
-    The `Executor` class is meant to perform numerical experiments to study the
-    dynamics of a network split into populations. These experiments are intended
-    to be carried out by subclasses of `Executor`.
+    `Executor` is meant to perform numerical experiments to study the dynamics
+    of a network split into populations. These experiments are intended to be
+    carried out by subclasses of `Executor`.
 
      - To perform simulations of the stochastic process which rules the
        evolution of the network, use `Simulator`.
@@ -357,9 +357,9 @@ class Executor:
 class Integrator(Executor):
     &#34;&#34;&#34;Numerical integrator for ODEs related to Wilson--Cowan&#39;s model.
 
-    The `Integrator` class extends the `Executor` class to perform numerical
-    integrations of dynamical systems related to the Wilson--Cowan model.
-    All numerical integrations are performed with the class
+    `Integrator` extends `Executor` to perform numerical integrations of
+    dynamical systems related to the Wilson--Cowan model. All numerical
+    integrations are performed with the class
     [ode](https://tinyurl.com/scipy-integrate-ode) from SciPy&#39;s `integrate`
     module. Specific vector fields are implemented in `Integrator`&#39;s subclasses.
 
@@ -566,9 +566,9 @@ class Integrator(Executor):
 class Simulator(Executor):
     &#34;&#34;&#34;Numerical simulator of the stochastic process on a network.
 
-    The `Simulator` class extends the `Executor` class to perform numerical
-    simulations of a stochastic process on a network whose mean field reduction
-    is represented macroscopically by the Wilson--Cowan model.
+    `Simulator` extends `Executor` to perform numerical simulations of a
+    stochastic process on a network whose mean field reduction is represented
+    macroscopically by the Wilson--Cowan model.
 
     Parameters
     ----------
@@ -1007,10 +1007,10 @@ class Simulator(Executor):
 class SimpleSimulator(Simulator):
     &#34;&#34;&#34;Perform single simulations of the stochastic process on a network.
 
-    The `SimpleSimulator` class extends the `Simulator` class to ease the task
-    of running single simulations of the stochastic process. It has dedicated
-    methods to run simulations and output a `popnet.graphics.Trajectory`
-    instance. Its data attributes are the same as in the base class.
+    `SimpleSimulator` extends `Simulator` to ease the task of running single
+    simulations of the stochastic process. It has dedicated methods to run
+    simulations and output a `popnet.graphics.Trajectory` instance. Its data
+    attributes are the same as in the base class.
 
     The initialization parameters are the same as in the base class, except that
     the output type does not have to be explicitely given.
@@ -1105,11 +1105,11 @@ class SimpleSimulator(Simulator):
 class ChainSimulator(Simulator):
     &#34;&#34;&#34;Simulate multiple times the stochastic process on a network.
 
-    The `ChainSimulator` class extends the `Simulator` class to ease the task
-    of running many simulations of the stochastic process on the same network,
-    with the same configuration, in order to obtain statistics. It has dedicated
-    methods to run many simulations and output a `popnet.graphics.Statistics`
-    instance. Its data attributes are the same as in the base, except for a new
+    `ChainSimulator` extends `Simulator` to ease the task of running many
+    simulations of the stochastic process on the same network with the same
+    configuration in order to obtain statistics. It has dedicated methods to
+    run many simulations and output a `popnet.graphics.Statistics` instance.
+    Its data attributes are the same as in the base, except for a new
     `ChainSimulator.samples`, which stores the trajectories obtained from
     simulations of the stochastic process.
 
@@ -1540,11 +1540,11 @@ be defined to run a sequence of simulations at every run.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Simulate multiple times the stochastic process on a network.</p>
-<p>The <code><a title="popnet.executors.ChainSimulator" href="#popnet.executors.ChainSimulator">ChainSimulator</a></code> class extends the <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> class to ease the task
-of running many simulations of the stochastic process on the same network,
-with the same configuration, in order to obtain statistics. It has dedicated
-methods to run many simulations and output a <code><a title="popnet.graphics.Statistics" href="graphics.html#popnet.graphics.Statistics">Statistics</a></code>
-instance. Its data attributes are the same as in the base, except for a new
+<p><code><a title="popnet.executors.ChainSimulator" href="#popnet.executors.ChainSimulator">ChainSimulator</a></code> extends <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> to ease the task of running many
+simulations of the stochastic process on the same network with the same
+configuration in order to obtain statistics. It has dedicated methods to
+run many simulations and output a <code><a title="popnet.graphics.Statistics" href="graphics.html#popnet.graphics.Statistics">Statistics</a></code> instance.
+Its data attributes are the same as in the base, except for a new
 <code><a title="popnet.executors.ChainSimulator.samples" href="#popnet.executors.ChainSimulator.samples">ChainSimulator.samples</a></code>, which stores the trajectories obtained from
 simulations of the stochastic process.</p>
 <p>The initialization parameters are the same as in the base class, except that
@@ -1556,11 +1556,11 @@ the output type does not have to be explicitely given.</p></div>
 <pre><code class="python">class ChainSimulator(Simulator):
     &#34;&#34;&#34;Simulate multiple times the stochastic process on a network.
 
-    The `ChainSimulator` class extends the `Simulator` class to ease the task
-    of running many simulations of the stochastic process on the same network,
-    with the same configuration, in order to obtain statistics. It has dedicated
-    methods to run many simulations and output a `popnet.graphics.Statistics`
-    instance. Its data attributes are the same as in the base, except for a new
+    `ChainSimulator` extends `Simulator` to ease the task of running many
+    simulations of the stochastic process on the same network with the same
+    configuration in order to obtain statistics. It has dedicated methods to
+    run many simulations and output a `popnet.graphics.Statistics` instance.
+    Its data attributes are the same as in the base, except for a new
     `ChainSimulator.samples`, which stores the trajectories obtained from
     simulations of the stochastic process.
 
@@ -1939,9 +1939,9 @@ the files are saved in the current directory.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Execute numerical experiments on a network.</p>
-<p>The <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> class is meant to perform numerical experiments to study the
-dynamics of a network split into populations. These experiments are intended
-to be carried out by subclasses of <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code>.</p>
+<p><code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> is meant to perform numerical experiments to study the dynamics
+of a network split into populations. These experiments are intended to be
+carried out by subclasses of <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code>.</p>
 <ul>
 <li>To perform simulations of the stochastic process which rules the
 evolution of the network, use <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code>.</li>
@@ -1971,9 +1971,9 @@ end of the initialization, when setting the configuration.</p>
 <pre><code class="python">class Executor:
     &#34;&#34;&#34;Execute numerical experiments on a network.
 
-    The `Executor` class is meant to perform numerical experiments to study the
-    dynamics of a network split into populations. These experiments are intended
-    to be carried out by subclasses of `Executor`.
+    `Executor` is meant to perform numerical experiments to study the dynamics
+    of a network split into populations. These experiments are intended to be
+    carried out by subclasses of `Executor`.
 
      - To perform simulations of the stochastic process which rules the
        evolution of the network, use `Simulator`.
@@ -2475,9 +2475,9 @@ the file is saved in the current directory.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Numerical integrator for ODEs related to Wilson&ndash;Cowan's model.</p>
-<p>The <code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code> class extends the <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> class to perform numerical
-integrations of dynamical systems related to the Wilson&ndash;Cowan model.
-All numerical integrations are performed with the class
+<p><code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code> extends <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> to perform numerical integrations of
+dynamical systems related to the Wilson&ndash;Cowan model. All numerical
+integrations are performed with the class
 <a href="https://tinyurl.com/scipy-integrate-ode">ode</a> from SciPy's <code>integrate</code>
 module. Specific vector fields are implemented in <code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code>'s subclasses.</p>
 <h2 id="parameters">Parameters</h2>
@@ -2503,9 +2503,9 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
 <pre><code class="python">class Integrator(Executor):
     &#34;&#34;&#34;Numerical integrator for ODEs related to Wilson--Cowan&#39;s model.
 
-    The `Integrator` class extends the `Executor` class to perform numerical
-    integrations of dynamical systems related to the Wilson--Cowan model.
-    All numerical integrations are performed with the class
+    `Integrator` extends `Executor` to perform numerical integrations of
+    dynamical systems related to the Wilson--Cowan model. All numerical
+    integrations are performed with the class
     [ode](https://tinyurl.com/scipy-integrate-ode) from SciPy&#39;s `integrate`
     module. Specific vector fields are implemented in `Integrator`&#39;s subclasses.
 
@@ -2894,10 +2894,10 @@ the <code>ode</code> solver. It has no effect if <code>task</code> is not set to
 </code></dt>
 <dd>
 <div class="desc"><p>Perform single simulations of the stochastic process on a network.</p>
-<p>The <code><a title="popnet.executors.SimpleSimulator" href="#popnet.executors.SimpleSimulator">SimpleSimulator</a></code> class extends the <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> class to ease the task
-of running single simulations of the stochastic process. It has dedicated
-methods to run simulations and output a <code><a title="popnet.graphics.Trajectory" href="graphics.html#popnet.graphics.Trajectory">Trajectory</a></code>
-instance. Its data attributes are the same as in the base class.</p>
+<p><code><a title="popnet.executors.SimpleSimulator" href="#popnet.executors.SimpleSimulator">SimpleSimulator</a></code> extends <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> to ease the task of running single
+simulations of the stochastic process. It has dedicated methods to run
+simulations and output a <code><a title="popnet.graphics.Trajectory" href="graphics.html#popnet.graphics.Trajectory">Trajectory</a></code> instance. Its data
+attributes are the same as in the base class.</p>
 <p>The initialization parameters are the same as in the base class, except that
 the output type does not have to be explicitely given.</p></div>
 <details class="source">
@@ -2907,10 +2907,10 @@ the output type does not have to be explicitely given.</p></div>
 <pre><code class="python">class SimpleSimulator(Simulator):
     &#34;&#34;&#34;Perform single simulations of the stochastic process on a network.
 
-    The `SimpleSimulator` class extends the `Simulator` class to ease the task
-    of running single simulations of the stochastic process. It has dedicated
-    methods to run simulations and output a `popnet.graphics.Trajectory`
-    instance. Its data attributes are the same as in the base class.
+    `SimpleSimulator` extends `Simulator` to ease the task of running single
+    simulations of the stochastic process. It has dedicated methods to run
+    simulations and output a `popnet.graphics.Trajectory` instance. Its data
+    attributes are the same as in the base class.
 
     The initialization parameters are the same as in the base class, except that
     the output type does not have to be explicitely given.
@@ -3182,9 +3182,9 @@ the files are saved in the current directory.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Numerical simulator of the stochastic process on a network.</p>
-<p>The <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> class extends the <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> class to perform numerical
-simulations of a stochastic process on a network whose mean field reduction
-is represented macroscopically by the Wilson&ndash;Cowan model.</p>
+<p><code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> extends <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> to perform numerical simulations of a
+stochastic process on a network whose mean field reduction is represented
+macroscopically by the Wilson&ndash;Cowan model.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.MicroConfiguration" href="structures.html#popnet.structures.MicroConfiguration">MicroConfiguration</a></code></dt>
@@ -3211,9 +3211,9 @@ is represented macroscopically by the Wilson&ndash;Cowan model.</p>
 <pre><code class="python">class Simulator(Executor):
     &#34;&#34;&#34;Numerical simulator of the stochastic process on a network.
 
-    The `Simulator` class extends the `Executor` class to perform numerical
-    simulations of a stochastic process on a network whose mean field reduction
-    is represented macroscopically by the Wilson--Cowan model.
+    `Simulator` extends `Executor` to perform numerical simulations of a
+    stochastic process on a network whose mean field reduction is represented
+    macroscopically by the Wilson--Cowan model.
 
     Parameters
     ----------

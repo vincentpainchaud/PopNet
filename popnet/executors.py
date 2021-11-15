@@ -42,9 +42,9 @@ from . import graphics
 class Executor:
     """Execute numerical experiments on a network.
 
-    The `Executor` class is meant to perform numerical experiments to study the
-    dynamics of a network split into populations. These experiments are intended
-    to be carried out by subclasses of `Executor`.
+    `Executor` is meant to perform numerical experiments to study the dynamics
+    of a network split into populations. These experiments are intended to be
+    carried out by subclasses of `Executor`.
 
      - To perform simulations of the stochastic process which rules the
        evolution of the network, use `Simulator`.
@@ -246,9 +246,9 @@ class Executor:
 class Integrator(Executor):
     """Numerical integrator for ODEs related to Wilson--Cowan's model.
 
-    The `Integrator` class extends the `Executor` class to perform numerical
-    integrations of dynamical systems related to the Wilson--Cowan model.
-    All numerical integrations are performed with the class
+    `Integrator` extends `Executor` to perform numerical integrations of
+    dynamical systems related to the Wilson--Cowan model. All numerical
+    integrations are performed with the class
     [ode](https://tinyurl.com/scipy-integrate-ode) from SciPy's `integrate`
     module. Specific vector fields are implemented in `Integrator`'s subclasses.
 
@@ -455,9 +455,9 @@ class Integrator(Executor):
 class Simulator(Executor):
     """Numerical simulator of the stochastic process on a network.
 
-    The `Simulator` class extends the `Executor` class to perform numerical
-    simulations of a stochastic process on a network whose mean field reduction
-    is represented macroscopically by the Wilson--Cowan model.
+    `Simulator` extends `Executor` to perform numerical simulations of a
+    stochastic process on a network whose mean field reduction is represented
+    macroscopically by the Wilson--Cowan model.
 
     Parameters
     ----------
@@ -896,10 +896,10 @@ class Simulator(Executor):
 class SimpleSimulator(Simulator):
     """Perform single simulations of the stochastic process on a network.
 
-    The `SimpleSimulator` class extends the `Simulator` class to ease the task
-    of running single simulations of the stochastic process. It has dedicated
-    methods to run simulations and output a `popnet.graphics.Trajectory`
-    instance. Its data attributes are the same as in the base class.
+    `SimpleSimulator` extends `Simulator` to ease the task of running single
+    simulations of the stochastic process. It has dedicated methods to run
+    simulations and output a `popnet.graphics.Trajectory` instance. Its data
+    attributes are the same as in the base class.
 
     The initialization parameters are the same as in the base class, except that
     the output type does not have to be explicitely given.
@@ -994,11 +994,11 @@ class SimpleSimulator(Simulator):
 class ChainSimulator(Simulator):
     """Simulate multiple times the stochastic process on a network.
 
-    The `ChainSimulator` class extends the `Simulator` class to ease the task
-    of running many simulations of the stochastic process on the same network,
-    with the same configuration, in order to obtain statistics. It has dedicated
-    methods to run many simulations and output a `popnet.graphics.Statistics`
-    instance. Its data attributes are the same as in the base, except for a new
+    `ChainSimulator` extends `Simulator` to ease the task of running many
+    simulations of the stochastic process on the same network with the same
+    configuration in order to obtain statistics. It has dedicated methods to
+    run many simulations and output a `popnet.graphics.Statistics` instance.
+    Its data attributes are the same as in the base, except for a new
     `ChainSimulator.samples`, which stores the trajectories obtained from
     simulations of the stochastic process.
 

@@ -952,15 +952,15 @@ class Network:
 class MicroNetwork(Network):
     """Represent a biological neural network from a microscopic point of view.
 
-    The `MicroNetwork` class extends the `Network` class to characterize
-    individual neurons rather than characterizing only their mean values and
-    scales by populations. It introduces new attributes to get the values of
-    transition rates, thresholds and weights of connection for all neurons.
+    `MicroNetwork` extends `Network` to characterize individual neurons rather
+    than characterizing only their mean values and scales by populations. It
+    introduces new attributes to get the values of transition rates, thresholds
+    and weights of connection for all neurons.
 
-    The initialization of a `MicroNetwork` is the same as in the base class,
-    except that the parameters of individual neurons of the network are also
-    initialized. Hence, the size of every population of the network must be
-    defined.
+    The initialization of a `MicroNetwork` instance is the same as in the base
+    class, except that the parameters of individual neurons of the network are
+    also initialized. Hence, the size of every population of the network must
+    be defined.
 
     !!! note
         It is important to understand that, even if parameters `alpha`, `beta`,
@@ -1136,11 +1136,11 @@ class MicroNetwork(Network):
 class Configuration:
     """Configurations used in numerical experiments.
 
-    The `Configuration` class allows to easily group together all parameters
-    that are needed to perform numerical experiments. Although the base class
-    can be used with any network of any number of populations, it is better to
-    use the `ConfigurationOne` subclass for the case where the network has only
-    one population and the `MicroConfiguration` subclass when the network has a
+    `Configuration` allows to easily group together all parameters that are
+    needed to perform numerical experiments. Although the base class can be
+    used with any network of any number of populations, it is better to use the
+    `ConfigurationOne` subclass for the case where the network has only one
+    population and the `MicroConfiguration` subclass when the network has a
     defined microscopic structure, as more features are available in these
     cases.
 
@@ -1678,9 +1678,9 @@ class Configuration:
 class MicroConfiguration(Configuration):
     """Configurations used in numerical simulations.
 
-    The `MicroConfiguration` class extends the `Configuration` class to cases
-    where the microscopic structure of the network is needed to perform
-    numerical simulations. It adds two new properties:
+    `MicroConfiguration` extends `Configuration` to cases where the microscopic
+    structure of the network is needed to perform numerical simulations. It
+    adds two new properties:
 
      - `MicroConfiguration.micro_initial_state`, which gives the network's
        microscopic initial state;
@@ -1824,8 +1824,8 @@ class MicroConfiguration(Configuration):
 class ConfigurationOne(Configuration):
     """Extends `Configuration` in the special case of a single population.
 
-    Extends the `Configuration` class by adding methods specific to the case of 
-    only one population. The new methods allow to:
+    Extends `Configuration` by adding methods specific to the case of only one
+    population. The new methods allow to:
 
      - Verify if a state is in the domain where variables make sense,
        physiologically speaking;

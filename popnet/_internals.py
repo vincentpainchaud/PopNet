@@ -86,6 +86,18 @@ class PopNetDict(dict):
         return value
 
 
+def _format_filename(folder, ID, name, extension='txt'):
+    """Format filenames used in the module."""
+    def remove_if_empty(string, other):
+        if string is None:
+            return '', ''
+        return string, other
+    folder, slash = remove_if_empty(folder, '/')
+    ID, dash = remove_if_empty(ID, ' - ')
+    extension, dot = remove_if_empty(extension, '.')
+    return f'{folder}{slash}{ID}{dash}{name}{dot}{extension}'
+
+
 def _make_sure_folder_exists(folder):
     """Check if `folder` exists in the current directory, if not, create it."""
     if folder is None:
@@ -93,14 +105,6 @@ def _make_sure_folder_exists(folder):
     newpath = f'./{folder}/'
     if not os.path.exists(newpath):
         os.makedirs(newpath)
-
-
-def _format_filename(folder, ID, name, extension='txt'):
-    """Format filenames used in the module."""
-    if folder is None:
-        return f'{ID} - {name}.{extension}'
-    else:
-        return f'{folder}/{ID} - {name}.{extension}'
 
 
 def _unflat_scalar_triangle(Y):

@@ -310,12 +310,14 @@ class Graphics:
             figsize=figsize, dpi=dpi, tight_layout=tight_layout,
             font_family=font_family, usetex=usetex, preamble=preamble, **kwargs)
 
-    def draw(self, name=None, show=True, savefig=False, folder=None, **kwargs):
+    def draw(self, name=None, show=True, savefig=False, folder=None, 
+             format=None, **kwargs):
         &#34;&#34;&#34;Draw the plot.
 
         Draw a figure activated with `Graphics.activate`. If the figure is
-        saved, it will be under *ID - name.png*, where *ID* is the
-        configuration&#39;s ID and *name* is `name`.
+        saved, it will be named *ID - name*, where *ID* is the
+        configuration&#39;s ID, *name* is `name`, and will have the file format
+        chosen with `format`.
 
         Parameters
         ----------
@@ -331,6 +333,12 @@ class Graphics:
             the current directory and the figure is saved, it is created.
             Defaults to `None`, in which case the figure is saved in the
             current directory.
+        format : str, optional
+            The file format under which the figure is saved if `savefig` is
+            `True`. It must be a format handled by Matplotlib, which includes
+            &#39;png&#39;, &#39;jpg&#39;, &#39;pdf&#39; and &#39;svg&#39;. Defaults to `None`, in which case
+            the file format is Matplotlib&#39;s `savefig.format` parameter, which
+            defaults to &#39;png&#39;.
         **kwargs
             Keyword arguments passed to `matplotlib.pyplot.savefig` when
             `savefig` is `True`.
@@ -345,9 +353,9 @@ class Graphics:
             if name is None:
                 name = self.name
             filename = _internals._format_filename(
-                            folder, self.config.ID, name, &#39;png&#39;)
+                            folder, self.config.ID, name, extension=format)
             _internals._make_sure_folder_exists(folder)
-            plt.savefig(filename, **kwargs)
+            plt.savefig(filename, format=format, **kwargs)
         if show:
             plt.show()
         plt.close(self.fig)
@@ -880,10 +888,10 @@ class PhasePlane(Graphics):
 
 
 class _PhasePlaneWilsonCowan(PhasePlane):
-    &#34;&#34;&#34;Specializes the `PhasePlane` class for the Wilson--Cowan system.
+    &#34;&#34;&#34;Specializes `PhasePlane` for the Wilson--Cowan system.
 
-    Specializes the `PhasePlane` class for the classical Wilson--Cowan dynamical
-    system. All changes to the base class are implementation details.
+    Specializes `PhasePlane` for the classical Wilson--Cowan dynamical system.
+    All changes to the base class are implementation details.
 
     &#34;&#34;&#34;
 
@@ -903,11 +911,10 @@ class _PhasePlaneWilsonCowan(PhasePlane):
 
 
 class _PhasePlaneMeanField(PhasePlane):
-    &#34;&#34;&#34;Specializes the `PhasePlane` class for the simple system.
+    &#34;&#34;&#34;Specializes `PhasePlane` for the simple system.
 
-    Specializes the `PhasePlane` class for the Wilson--Cowan dynamical system
-    with refractory state. All changes to the base class are implementation
-    details.
+    Specializes `PhasePlane` for the Wilson--Cowan dynamical system with
+    refractory state. All changes to the base class are implementation details.
 
     &#34;&#34;&#34;
 
@@ -961,12 +968,12 @@ class _PhasePlaneMeanField(PhasePlane):
 class Result(Graphics):
     &#34;&#34;&#34;Results generated using PopNet executors.
 
-    The purpose of the `Result` class is to handle easily the outputs of
-    numerical simulations performed by PopNet functions. The class `Result`
-    has several methods, listed in the [Methods](#result-methods) section below,
-    to easily create and setup a [Matplotlib](https://matplotlib.org/)
-    figure with predefined formatting, allowing to easily produce many figures
-    in a consistent format. 
+    The purpose of `Result` is to handle easily the outputs of numerical
+    simulations performed by PopNet functions. The class `Result` has several
+    methods, listed in the [Methods](#result-methods) section below, to easily
+    create and setup a [Matplotlib](https://matplotlib.org/) figure with
+    predefined formatting, allowing to easily produce many figures in a
+    consistent format. 
 
     Although limited features would be available with the `Result` class alone,
     it is not inteded to be used by itself, but rather through its subclasses:
@@ -1709,10 +1716,10 @@ class Result(Graphics):
 
 
 class _ResultOne(Result):
-    &#34;&#34;&#34;Adapts the `Result` class to the special case of a single population.
+    &#34;&#34;&#34;Adapts `Result` to the special case of a single population.
 
-    The `_ResultOne` class adapts the `Result` class for the case where the
-    network associated with the configuration used has only one population.
+    `_ResultOne` adapts `Result` for the case where the network associated with
+    the configuration used has only one population.
 
     The main changes are that the attributes of the form `X` or `CXY` are
     overridden to return directly the corresponding quantity with respect to
@@ -1827,11 +1834,11 @@ class _ResultOne(Result):
 class Solution(Result):
     &#34;&#34;&#34;Represent solutions of dynamical systems.
 
-    The `Solution` class extends the `Result` class for the case where the
-    result is a solution obtained from a numerical integration of a dynamical
-    system related to the Wilson--Cowan model. It adds a method to the base
-    class to plot the expectations of fractions of populations all at once.
-    Other changes are implementation details.
+    `Solution` extends `Result` for the case where the result is a solution
+    obtained from a numerical integration of a dynamical system related to the
+    Wilson--Cowan model. It adds a method to the base class to plot the
+    expectations of fractions of populations all at once. Other changes are
+    implementation details.
 
     &#34;&#34;&#34;
 
@@ -1905,11 +1912,10 @@ class _WilsonCowanSolutionOne(_SolutionOne, _WilsonCowanSolution):
 class ExtendedSolution(Solution):
     &#34;&#34;&#34;Represent solutions of extended dynamical systems.
 
-    The `ExtendedSolution` class extends the `Solution` class for cases where
-    covariances are considered in the integrated dynamical system. It adds
-    methods to the base class to plot variances or non-symmetric covariances
-    of fractions of populations all at once. Other changes are implementation
-    details.
+    `ExtendedSolution` extends `Solution` for cases where covariances are
+    considered in the integrated dynamical system. It adds methods to the base
+    class to plot variances or non-symmetric covariances of fractions of
+    populations all at once. Other changes are implementation details.
 
     &#34;&#34;&#34;
 
@@ -2018,11 +2024,10 @@ class _ExtendedSolutionOne(_SolutionOne, ExtendedSolution):
 class Trajectory(Result):
     &#34;&#34;&#34;Represent trajectories of the stochastic process.
 
-    The `Trajectory` class extends the `Result` class for the case where the
-    result is a possible trajectory of the stochastic process which rules the
-    microscopic dynamics of the network. It adds a method to the base class to
-    plot the fractions of populations all at once. Other changes are
-    implementation details.
+    `Trajectory` extends `Result` for the case where the result is a possible
+    trajectory of the stochastic process which rules the microscopic dynamics
+    of the network. It adds a method to the base class to plot the fractions of
+    populations all at once. Other changes are implementation details.
 
     &#34;&#34;&#34;
 
@@ -2096,9 +2101,9 @@ class _TrajectoryOne(_ResultOne, Trajectory):
 class Statistics(Result):
     &#34;&#34;&#34;Represent statistics obtained from sample trajectories.
 
-    The `Statistics` class extends the `Result` class for the case where the
-    result is a set of statistics obtained from multiple trajectories of the
-    stochastic process which rules the microscopic evolution of the network.
+    `Statistics` extends `Result` for the case where the result is a set of
+    statistics obtained from multiple trajectories of the stochastic process
+    that rules the microscopic evolution of the network.
 
     The most important extension from the `Result` class is a set of methods to
     plot fills between given bounds around a mean value, and methods to plot the
@@ -2549,12 +2554,12 @@ class _StatisticsOne(_ResultOne, Statistics):
 class Spectrum(Result):
     &#34;&#34;&#34;Represent spectra of other results.
 
-    The `Spectrum` class extends the `Result` class for the case where the
-    result is the spectrum of another result. Specifically, it defines methods
-    to plot the spectra of state components, and it extends the options to setup
-    a figure. Its data attributes are the same as in the base class, but here
-    `times` is replaced with `freqs`; see `Spectrum.freqs`. Finally, the
-    `Spectrum` class suppresses `Result`&#39;s `load` and `get_spectrum` methods.
+    `Spectrum` extends `Result` for the case where the result is the spectrum
+    of another result. Specifically, it defines methods to plot the spectra of
+    state components, and it extends the options to setup a figure. Its data
+    attributes are the same as in the base class, but here `times` is replaced
+    with `freqs`; see `Spectrum.freqs`. Finally, `Spectrum` suppresses
+    `Result`&#39;s `load` and `get_spectrum` methods.
 
     The recommended way of instantiating a `Spectrum` instance is from another
     `Result` instance, with `Result.get_spectrum`. Parameters at initialization
@@ -2863,10 +2868,12 @@ class _SpectrumOne(Spectrum, _ResultOne):
         return f&#39;$\\hat{{\\mathrm{{M}}}}_{{{XYZ}}}$&#39;
 
 
-def draw(name=&#39;Figure&#39;, show=True, savefig=False, folder=None, **kwargs):
+def draw(name=&#39;Figure&#39;, show=True, savefig=False, folder=None, format=None,
+         **kwargs):
     &#34;&#34;&#34;Draw a figure.
 
-    Draw a figure previously activated and set up.
+    Draw a figure previously activated and set up. If the figure is saved, it
+    will be named `name` and will have the file format chosen with `format`.
 
     Parameters
     ----------
@@ -2880,14 +2887,19 @@ def draw(name=&#39;Figure&#39;, show=True, savefig=False, folder=None, **kwargs)
         A folder in which the figure can be saved. If it does not exist in
         the current directory and the figure is saved, it is created. Defaults
         to `None`, in which case the figure is saved in the current directory.
+    format : str, optional
+        The file format under which the figure is saved if `savefig` is `True`.
+        It must be a format handled by Matplotlib, which includes &#39;png&#39;, &#39;jpg&#39;,
+        &#39;pdf&#39; and &#39;svg&#39;. Defaults to `None`, in which case the file format is
+        Matplotlib&#39;s `savefig.format` parameter, which defaults to &#39;png&#39;.
     **kwargs
         Keyword arguments passed to `matplotlib.pyplot.savefig` when `savefig`
         is `True`.
     &#34;&#34;&#34;
     if savefig:
         _internals._make_sure_folder_exists(folder)
-        filename = name if folder is None else f&#39;{folder}/{name}&#39;
-        plt.savefig(filename, **kwargs)
+        filename = _internals._format_filename(folder, None, name, format)
+        plt.savefig(filename, format=format, **kwargs)
     if show:
         plt.show()
     plt.close()
@@ -2993,11 +3005,12 @@ def figure(subplots=None, figsize=(5,3.75), dpi=150, tight_layout=True,
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="popnet.graphics.draw"><code class="name flex">
-<span>def <span class="ident">draw</span></span>(<span>name='Figure', show=True, savefig=False, folder=None, **kwargs)</span>
+<span>def <span class="ident">draw</span></span>(<span>name='Figure', show=True, savefig=False, folder=None, format=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw a figure.</p>
-<p>Draw a figure previously activated and set up.</p>
+<p>Draw a figure previously activated and set up. If the figure is saved, it
+will be named <code>name</code> and will have the file format chosen with <code>format</code>.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
@@ -3010,6 +3023,11 @@ def figure(subplots=None, figsize=(5,3.75), dpi=150, tight_layout=True,
 <dd>A folder in which the figure can be saved. If it does not exist in
 the current directory and the figure is saved, it is created. Defaults
 to <code>None</code>, in which case the figure is saved in the current directory.</dd>
+<dt><strong><code>format</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The file format under which the figure is saved if <code>savefig</code> is <code>True</code>.
+It must be a format handled by Matplotlib, which includes 'png', 'jpg',
+'pdf' and 'svg'. Defaults to <code>None</code>, in which case the file format is
+Matplotlib's <code>savefig.format</code> parameter, which defaults to 'png'.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd>Keyword arguments passed to <code>matplotlib.pyplot.savefig</code> when <code>savefig</code>
 is <code>True</code>.</dd>
@@ -3018,10 +3036,12 @@ is <code>True</code>.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def draw(name=&#39;Figure&#39;, show=True, savefig=False, folder=None, **kwargs):
+<pre><code class="python">def draw(name=&#39;Figure&#39;, show=True, savefig=False, folder=None, format=None,
+         **kwargs):
     &#34;&#34;&#34;Draw a figure.
 
-    Draw a figure previously activated and set up.
+    Draw a figure previously activated and set up. If the figure is saved, it
+    will be named `name` and will have the file format chosen with `format`.
 
     Parameters
     ----------
@@ -3035,14 +3055,19 @@ is <code>True</code>.</dd>
         A folder in which the figure can be saved. If it does not exist in
         the current directory and the figure is saved, it is created. Defaults
         to `None`, in which case the figure is saved in the current directory.
+    format : str, optional
+        The file format under which the figure is saved if `savefig` is `True`.
+        It must be a format handled by Matplotlib, which includes &#39;png&#39;, &#39;jpg&#39;,
+        &#39;pdf&#39; and &#39;svg&#39;. Defaults to `None`, in which case the file format is
+        Matplotlib&#39;s `savefig.format` parameter, which defaults to &#39;png&#39;.
     **kwargs
         Keyword arguments passed to `matplotlib.pyplot.savefig` when `savefig`
         is `True`.
     &#34;&#34;&#34;
     if savefig:
         _internals._make_sure_folder_exists(folder)
-        filename = name if folder is None else f&#39;{folder}/{name}&#39;
-        plt.savefig(filename, **kwargs)
+        filename = _internals._format_filename(folder, None, name, format)
+        plt.savefig(filename, format=format, **kwargs)
     if show:
         plt.show()
     plt.close()</code></pre>
@@ -3202,11 +3227,10 @@ Defaults to <code>None</code>, in which case a default preamble is added.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Represent solutions of extended dynamical systems.</p>
-<p>The <code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code> class extends the <code><a title="popnet.graphics.Solution" href="#popnet.graphics.Solution">Solution</a></code> class for cases where
-covariances are considered in the integrated dynamical system. It adds
-methods to the base class to plot variances or non-symmetric covariances
-of fractions of populations all at once. Other changes are implementation
-details.</p></div>
+<p><code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code> extends <code><a title="popnet.graphics.Solution" href="#popnet.graphics.Solution">Solution</a></code> for cases where covariances are
+considered in the integrated dynamical system. It adds methods to the base
+class to plot variances or non-symmetric covariances of fractions of
+populations all at once. Other changes are implementation details.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3214,11 +3238,10 @@ details.</p></div>
 <pre><code class="python">class ExtendedSolution(Solution):
     &#34;&#34;&#34;Represent solutions of extended dynamical systems.
 
-    The `ExtendedSolution` class extends the `Solution` class for cases where
-    covariances are considered in the integrated dynamical system. It adds
-    methods to the base class to plot variances or non-symmetric covariances
-    of fractions of populations all at once. Other changes are implementation
-    details.
+    `ExtendedSolution` extends `Solution` for cases where covariances are
+    considered in the integrated dynamical system. It adds methods to the base
+    class to plot variances or non-symmetric covariances of fractions of
+    populations all at once. Other changes are implementation details.
 
     &#34;&#34;&#34;
 
@@ -3639,12 +3662,14 @@ is replaced with <code><a title="popnet.graphics.Graphics.default_name" href="#p
             figsize=figsize, dpi=dpi, tight_layout=tight_layout,
             font_family=font_family, usetex=usetex, preamble=preamble, **kwargs)
 
-    def draw(self, name=None, show=True, savefig=False, folder=None, **kwargs):
+    def draw(self, name=None, show=True, savefig=False, folder=None, 
+             format=None, **kwargs):
         &#34;&#34;&#34;Draw the plot.
 
         Draw a figure activated with `Graphics.activate`. If the figure is
-        saved, it will be under *ID - name.png*, where *ID* is the
-        configuration&#39;s ID and *name* is `name`.
+        saved, it will be named *ID - name*, where *ID* is the
+        configuration&#39;s ID, *name* is `name`, and will have the file format
+        chosen with `format`.
 
         Parameters
         ----------
@@ -3660,6 +3685,12 @@ is replaced with <code><a title="popnet.graphics.Graphics.default_name" href="#p
             the current directory and the figure is saved, it is created.
             Defaults to `None`, in which case the figure is saved in the
             current directory.
+        format : str, optional
+            The file format under which the figure is saved if `savefig` is
+            `True`. It must be a format handled by Matplotlib, which includes
+            &#39;png&#39;, &#39;jpg&#39;, &#39;pdf&#39; and &#39;svg&#39;. Defaults to `None`, in which case
+            the file format is Matplotlib&#39;s `savefig.format` parameter, which
+            defaults to &#39;png&#39;.
         **kwargs
             Keyword arguments passed to `matplotlib.pyplot.savefig` when
             `savefig` is `True`.
@@ -3674,9 +3705,9 @@ is replaced with <code><a title="popnet.graphics.Graphics.default_name" href="#p
             if name is None:
                 name = self.name
             filename = _internals._format_filename(
-                            folder, self.config.ID, name, &#39;png&#39;)
+                            folder, self.config.ID, name, extension=format)
             _internals._make_sure_folder_exists(folder)
-            plt.savefig(filename, **kwargs)
+            plt.savefig(filename, format=format, **kwargs)
         if show:
             plt.show()
         plt.close(self.fig)
@@ -3922,13 +3953,14 @@ added.</dd>
 </details>
 </dd>
 <dt id="popnet.graphics.Graphics.draw"><code class="name flex">
-<span>def <span class="ident">draw</span></span>(<span>self, name=None, show=True, savefig=False, folder=None, **kwargs)</span>
+<span>def <span class="ident">draw</span></span>(<span>self, name=None, show=True, savefig=False, folder=None, format=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw the plot.</p>
 <p>Draw a figure activated with <code><a title="popnet.graphics.Graphics.activate" href="#popnet.graphics.Graphics.activate">Graphics.activate()</a></code>. If the figure is
-saved, it will be under <em>ID - name.png</em>, where <em>ID</em> is the
-configuration's ID and <em>name</em> is <code>name</code>.</p>
+saved, it will be named <em>ID - name</em>, where <em>ID</em> is the
+configuration's ID, <em>name</em> is <code>name</code>, and will have the file format
+chosen with <code>format</code>.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>name</code></strong> :&ensp;<code>str</code>, optional</dt>
@@ -3943,6 +3975,12 @@ case the <code>name</code> attribute is used.</dd>
 the current directory and the figure is saved, it is created.
 Defaults to <code>None</code>, in which case the figure is saved in the
 current directory.</dd>
+<dt><strong><code>format</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>The file format under which the figure is saved if <code>savefig</code> is
+<code>True</code>. It must be a format handled by Matplotlib, which includes
+'png', 'jpg', 'pdf' and 'svg'. Defaults to <code>None</code>, in which case
+the file format is Matplotlib's <code>savefig.format</code> parameter, which
+defaults to 'png'.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd>Keyword arguments passed to <code>matplotlib.pyplot.savefig</code> when
 <code>savefig</code> is <code>True</code>.</dd>
@@ -3956,12 +3994,14 @@ current directory.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def draw(self, name=None, show=True, savefig=False, folder=None, **kwargs):
+<pre><code class="python">def draw(self, name=None, show=True, savefig=False, folder=None, 
+         format=None, **kwargs):
     &#34;&#34;&#34;Draw the plot.
 
     Draw a figure activated with `Graphics.activate`. If the figure is
-    saved, it will be under *ID - name.png*, where *ID* is the
-    configuration&#39;s ID and *name* is `name`.
+    saved, it will be named *ID - name*, where *ID* is the
+    configuration&#39;s ID, *name* is `name`, and will have the file format
+    chosen with `format`.
 
     Parameters
     ----------
@@ -3977,6 +4017,12 @@ current directory.</dd>
         the current directory and the figure is saved, it is created.
         Defaults to `None`, in which case the figure is saved in the
         current directory.
+    format : str, optional
+        The file format under which the figure is saved if `savefig` is
+        `True`. It must be a format handled by Matplotlib, which includes
+        &#39;png&#39;, &#39;jpg&#39;, &#39;pdf&#39; and &#39;svg&#39;. Defaults to `None`, in which case
+        the file format is Matplotlib&#39;s `savefig.format` parameter, which
+        defaults to &#39;png&#39;.
     **kwargs
         Keyword arguments passed to `matplotlib.pyplot.savefig` when
         `savefig` is `True`.
@@ -3991,9 +4037,9 @@ current directory.</dd>
         if name is None:
             name = self.name
         filename = _internals._format_filename(
-                        folder, self.config.ID, name, &#39;png&#39;)
+                        folder, self.config.ID, name, extension=format)
         _internals._make_sure_folder_exists(folder)
-        plt.savefig(filename, **kwargs)
+        plt.savefig(filename, format=format, **kwargs)
     if show:
         plt.show()
     plt.close(self.fig)</code></pre>
@@ -5077,12 +5123,12 @@ color is used.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Results generated using PopNet executors.</p>
-<p>The purpose of the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class is to handle easily the outputs of
-numerical simulations performed by PopNet functions. The class <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code>
-has several methods, listed in the <a href="#result-methods">Methods</a> section below,
-to easily create and setup a <a href="https://matplotlib.org/">Matplotlib</a>
-figure with predefined formatting, allowing to easily produce many figures
-in a consistent format. </p>
+<p>The purpose of <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> is to handle easily the outputs of numerical
+simulations performed by PopNet functions. The class <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> has several
+methods, listed in the <a href="#result-methods">Methods</a> section below, to easily
+create and setup a <a href="https://matplotlib.org/">Matplotlib</a> figure with
+predefined formatting, allowing to easily produce many figures in a
+consistent format. </p>
 <p>Although limited features would be available with the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class alone,
 it is not inteded to be used by itself, but rather through its subclasses:
 <code><a title="popnet.graphics.Solution" href="#popnet.graphics.Solution">Solution</a></code>, <code><a title="popnet.graphics.ExtendedSolution" href="#popnet.graphics.ExtendedSolution">ExtendedSolution</a></code>, <code><a title="popnet.graphics.Trajectory" href="#popnet.graphics.Trajectory">Trajectory</a></code>, <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> and <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code>.
@@ -5164,12 +5210,12 @@ suffixed with 'One', and rather instantiates this class if it exists.</p></div>
 <pre><code class="python">class Result(Graphics):
     &#34;&#34;&#34;Results generated using PopNet executors.
 
-    The purpose of the `Result` class is to handle easily the outputs of
-    numerical simulations performed by PopNet functions. The class `Result`
-    has several methods, listed in the [Methods](#result-methods) section below,
-    to easily create and setup a [Matplotlib](https://matplotlib.org/)
-    figure with predefined formatting, allowing to easily produce many figures
-    in a consistent format. 
+    The purpose of `Result` is to handle easily the outputs of numerical
+    simulations performed by PopNet functions. The class `Result` has several
+    methods, listed in the [Methods](#result-methods) section below, to easily
+    create and setup a [Matplotlib](https://matplotlib.org/) figure with
+    predefined formatting, allowing to easily produce many figures in a
+    consistent format. 
 
     Although limited features would be available with the `Result` class alone,
     it is not inteded to be used by itself, but rather through its subclasses:
@@ -6666,11 +6712,11 @@ Defaults to <code>'fractions'</code>.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Represent solutions of dynamical systems.</p>
-<p>The <code><a title="popnet.graphics.Solution" href="#popnet.graphics.Solution">Solution</a></code> class extends the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class for the case where the
-result is a solution obtained from a numerical integration of a dynamical
-system related to the Wilson&ndash;Cowan model. It adds a method to the base
-class to plot the expectations of fractions of populations all at once.
-Other changes are implementation details.</p></div>
+<p><code><a title="popnet.graphics.Solution" href="#popnet.graphics.Solution">Solution</a></code> extends <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> for the case where the result is a solution
+obtained from a numerical integration of a dynamical system related to the
+Wilson&ndash;Cowan model. It adds a method to the base class to plot the
+expectations of fractions of populations all at once. Other changes are
+implementation details.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -6678,11 +6724,11 @@ Other changes are implementation details.</p></div>
 <pre><code class="python">class Solution(Result):
     &#34;&#34;&#34;Represent solutions of dynamical systems.
 
-    The `Solution` class extends the `Result` class for the case where the
-    result is a solution obtained from a numerical integration of a dynamical
-    system related to the Wilson--Cowan model. It adds a method to the base
-    class to plot the expectations of fractions of populations all at once.
-    Other changes are implementation details.
+    `Solution` extends `Result` for the case where the result is a solution
+    obtained from a numerical integration of a dynamical system related to the
+    Wilson--Cowan model. It adds a method to the base class to plot the
+    expectations of fractions of populations all at once. Other changes are
+    implementation details.
 
     &#34;&#34;&#34;
 
@@ -6812,12 +6858,12 @@ object.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Represent spectra of other results.</p>
-<p>The <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code> class extends the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class for the case where the
-result is the spectrum of another result. Specifically, it defines methods
-to plot the spectra of state components, and it extends the options to setup
-a figure. Its data attributes are the same as in the base class, but here
-<code>times</code> is replaced with <code>freqs</code>; see <code><a title="popnet.graphics.Spectrum.freqs" href="#popnet.graphics.Spectrum.freqs">Spectrum.freqs</a></code>. Finally, the
-<code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code> class suppresses <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code>'s <code>load</code> and <code>get_spectrum</code> methods.</p>
+<p><code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code> extends <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> for the case where the result is the spectrum
+of another result. Specifically, it defines methods to plot the spectra of
+state components, and it extends the options to setup a figure. Its data
+attributes are the same as in the base class, but here <code>times</code> is replaced
+with <code>freqs</code>; see <code><a title="popnet.graphics.Spectrum.freqs" href="#popnet.graphics.Spectrum.freqs">Spectrum.freqs</a></code>. Finally, <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code> suppresses
+<code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code>'s <code>load</code> and <code>get_spectrum</code> methods.</p>
 <p>The recommended way of instantiating a <code><a title="popnet.graphics.Spectrum" href="#popnet.graphics.Spectrum">Spectrum</a></code> instance is from another
 <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> instance, with <code><a title="popnet.graphics.Result.get_spectrum" href="#popnet.graphics.Result.get_spectrum">Result.get_spectrum()</a></code>. Parameters at initialization
 are a bit different here than in the base class, so they are listed again.</p>
@@ -6845,12 +6891,12 @@ is replaced with <code><a title="popnet.graphics.Spectrum.default_name" href="#p
 <pre><code class="python">class Spectrum(Result):
     &#34;&#34;&#34;Represent spectra of other results.
 
-    The `Spectrum` class extends the `Result` class for the case where the
-    result is the spectrum of another result. Specifically, it defines methods
-    to plot the spectra of state components, and it extends the options to setup
-    a figure. Its data attributes are the same as in the base class, but here
-    `times` is replaced with `freqs`; see `Spectrum.freqs`. Finally, the
-    `Spectrum` class suppresses `Result`&#39;s `load` and `get_spectrum` methods.
+    `Spectrum` extends `Result` for the case where the result is the spectrum
+    of another result. Specifically, it defines methods to plot the spectra of
+    state components, and it extends the options to setup a figure. Its data
+    attributes are the same as in the base class, but here `times` is replaced
+    with `freqs`; see `Spectrum.freqs`. Finally, `Spectrum` suppresses
+    `Result`&#39;s `load` and `get_spectrum` methods.
 
     The recommended way of instantiating a `Spectrum` instance is from another
     `Result` instance, with `Result.get_spectrum`. Parameters at initialization
@@ -7485,9 +7531,9 @@ not be bounded. Defaults to <code>'freqs'</code>.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Represent statistics obtained from sample trajectories.</p>
-<p>The <code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> class extends the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class for the case where the
-result is a set of statistics obtained from multiple trajectories of the
-stochastic process which rules the microscopic evolution of the network.</p>
+<p><code><a title="popnet.graphics.Statistics" href="#popnet.graphics.Statistics">Statistics</a></code> extends <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> for the case where the result is a set of
+statistics obtained from multiple trajectories of the stochastic process
+that rules the microscopic evolution of the network.</p>
 <p>The most important extension from the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class is a set of methods to
 plot fills between given bounds around a mean value, and methods to plot the
 minimum and maximum values of a variable at each time step. For details,
@@ -7513,9 +7559,9 @@ unbiased estimates of central moments.</dd>
 <pre><code class="python">class Statistics(Result):
     &#34;&#34;&#34;Represent statistics obtained from sample trajectories.
 
-    The `Statistics` class extends the `Result` class for the case where the
-    result is a set of statistics obtained from multiple trajectories of the
-    stochastic process which rules the microscopic evolution of the network.
+    `Statistics` extends `Result` for the case where the result is a set of
+    statistics obtained from multiple trajectories of the stochastic process
+    that rules the microscopic evolution of the network.
 
     The most important extension from the `Result` class is a set of methods to
     plot fills between given bounds around a mean value, and methods to plot the
@@ -8403,11 +8449,10 @@ object.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Represent trajectories of the stochastic process.</p>
-<p>The <code><a title="popnet.graphics.Trajectory" href="#popnet.graphics.Trajectory">Trajectory</a></code> class extends the <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> class for the case where the
-result is a possible trajectory of the stochastic process which rules the
-microscopic dynamics of the network. It adds a method to the base class to
-plot the fractions of populations all at once. Other changes are
-implementation details.</p></div>
+<p><code><a title="popnet.graphics.Trajectory" href="#popnet.graphics.Trajectory">Trajectory</a></code> extends <code><a title="popnet.graphics.Result" href="#popnet.graphics.Result">Result</a></code> for the case where the result is a possible
+trajectory of the stochastic process which rules the microscopic dynamics
+of the network. It adds a method to the base class to plot the fractions of
+populations all at once. Other changes are implementation details.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -8415,11 +8460,10 @@ implementation details.</p></div>
 <pre><code class="python">class Trajectory(Result):
     &#34;&#34;&#34;Represent trajectories of the stochastic process.
 
-    The `Trajectory` class extends the `Result` class for the case where the
-    result is a possible trajectory of the stochastic process which rules the
-    microscopic dynamics of the network. It adds a method to the base class to
-    plot the fractions of populations all at once. Other changes are
-    implementation details.
+    `Trajectory` extends `Result` for the case where the result is a possible
+    trajectory of the stochastic process which rules the microscopic dynamics
+    of the network. It adds a method to the base class to plot the fractions of
+    populations all at once. Other changes are implementation details.
 
     &#34;&#34;&#34;
 

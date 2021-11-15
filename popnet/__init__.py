@@ -68,16 +68,16 @@ The following fonctions are all imported in the package's namespace.
     parameters.
   - `popnet.structures.default_network` : Define a network with default
     parameters.
+  - `popnet.graphics.draw` : Draw a figure.
+  - `popnet.graphics.figure` : Initialize a figure with default formatting.
+  - `popnet.executors.get_integrator` : Get a numerical integrator.
+  - `popnet.executors.get_simulator` : Get a simulator to perform stochastic
+    simulations.
+  - `popnet.systems.get_system` : Get a dynamical system from a configuration.
   - `popnet.structures.load_config` : Load a configuration from a text file.
   - `popnet.structures.load_network` : Load a network from a text file.
   - `popnet.structures.network` : Define a network from given populations.
   - `popnet.structures.population` : Define a population of biological neurons.
-  - `popnet.systems.get_system` : Get a dynamical system from a configuration.
-  - `popnet.executors.get_integrator` : Get a numerical integrator.
-  - `popnet.executors.get_simulator` : Get a simulator to perform stochastic
-    simulations.
-  - `popnet.graphics.figure` : Initialize a figure with default formatting.
-  - `popnet.graphics.draw` : Draw a figure.
 
 
 References

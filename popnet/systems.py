@@ -38,15 +38,17 @@ from . import graphics
 class DynamicalSystem:
     """Represent dynamical systems.
 
-    The `DynamicalSystem` class is an abstract base class intended to represent
-    dynamical systems in PopNet. Each subclass must implement a vector field,
-    and the base class has several methods to study this vector field. For
-    example, a method is available to find equilibrium points. A subclass can
-    also implement a jacobian matrix. If this is done, methods are available to
+    `DynamicalSystem` is an abstract base class intended to represent dynamical
+    systems in PopNet. Each subclass must implement a vector field, and the
+    base class has several methods to study this vector field. For example, a
+    method is available to find equilibrium points. A subclass can also
+    implement a jacobian matrix. If this is done, methods are available to
     find its eigenvalues and eigenvectors.
 
-    Aside from implementing a vector field, a subclass of `DynamicalSystem` must
-    also set the `dim` property at initialization.
+    !!! note
+        PopNet assumes that any subclass of `DynamicalSystem` implements the
+        method `DynamicalSystem.vector_field` and sets the property
+        `DynamicalSystem.dim` at initialization.
 
     Parameters
     ----------
@@ -289,7 +291,7 @@ class DynamicalSystem:
 class WilsonCowanSystem(DynamicalSystem):
     """Dynamical system for the Wilson--Cowan model.
 
-    Specializes the `DynamicalSystem` class for an equivalent to the original
+    Specializes `DynamicalSystem` for an equivalent to the original
     Wilson--Cowan model, without refractory state or correlations. For *p*
     populations, a state of this system has the form
     \\[
@@ -350,11 +352,11 @@ class WilsonCowanSystem(DynamicalSystem):
 class MixedSystem(DynamicalSystem):
     """Dynamical system for the 'mixed' Wilson--Cowan model.
 
-    Specializes the `DynamicalSystem` class to study the transition between the
-    classical Wilson--Cowan model and its extension with refractory state. This
-    class can be seen as a combination of the `WilsonCowanSystem` and
-    `MeanFieldSystem` classes. Covariances are not considered in this case. For
-    *p* populations, a state of this system has the form
+    Specializes `DynamicalSystem` to study the transition between the classical
+    Wilson--Cowan model and its extension with refractory state. This class can
+    be seen as a combination of the `WilsonCowanSystem` and `MeanFieldSystem`
+    classes. Covariances are not considered in this case. For *p* populations,
+    a state of this system has the form
     \\[
         (A_1, ..., A_p, R_1, ..., R_p),
     \\]
@@ -460,9 +462,9 @@ class MixedSystem(DynamicalSystem):
 class MeanFieldSystem(DynamicalSystem):
     """Dynamical system for the Wilson--Cowan model with refractory state.
 
-    Specializes the `DynamicalSystem` class for the Wilson--Cowan model with
-    refractory state explicitely included. Covariances are not considered in
-    this case. For *p* populations, a state of this system has the form
+    Specializes `DynamicalSystem` for the Wilson--Cowan model with refractory
+    state explicitely included. Covariances are not considered in this case.
+    For *p* populations, a state of this system has the form
     \\[
         (A_1, ..., A_p, R_1, ..., R_p),
     \\]
@@ -523,11 +525,10 @@ class MeanFieldSystem(DynamicalSystem):
 class TaylorExtendedSystem(DynamicalSystem):
     """Dynamical system for the extended Wilson--Cowan model.
 
-    Specializes the `DynamicalSystem` class for the extended Wilson--Cowan
-    model obtained from the closure that uses a second-order Taylor
-    approximation. Here the refractory state and the covariances between
-    fractions of populations are included. For *p* populations, a state of this
-    system has the form
+    Specializes `DynamicalSystem` for the extended Wilson--Cowan model obtained
+    from the closure that uses a second-order Taylor approximation. Here the
+    refractory state and the covariances between fractions of populations are
+    included. For *p* populations, a state of this system has the form
     \\[
         (\\begin{aligned}[t]
             & A_1, A_2, ..., A_p, \\\\
@@ -728,10 +729,10 @@ class _TaylorExtendedSystemOne(TaylorExtendedSystem):
 class ExtendedSystem(DynamicalSystem):
     """Dynamical system for the extended Wilson--Cowan model.
 
-    Specializes the `DynamicalSystem` class for the extended Wilson--Cowan
-    model, obtained from the closure based on sigmoid functions. Here the
-    refractory state and the covariances between fractions of populations are
-    included. For *p* populations, a state of this system has the form
+    Specializes `DynamicalSystem` for the extended Wilson--Cowan model,
+    obtained from the closure based on sigmoid functions. Here the refractory
+    state and the covariances between fractions of populations are included.
+    For *p* populations, a state of this system has the form
     \\[
         (\\begin{aligned}[t]
             & A_1, A_2, ..., A_p, \\\\
