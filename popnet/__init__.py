@@ -4,9 +4,8 @@ PopNet is a python package dedicated to the study of the Wilson--Cowan model
 [5], and some of its extensions where the refractory state or covariances
 between different fractions of populations are explicitely included. It can
 perform various numerical experiments, such as integrations of dynamical
-systems related to Wilson--Cowan's, or simulations of the stochastic process
-which rules the underlying dynamics of a network whose behavior can
-macroscopically be approximated by the Wilson--Cowan model.
+systems related to Wilson--Cowan's, or simulations of stochastic processes
+whose behavior can be approximated macroscopically by the Wilson--Cowan model.
 
 PopNet provides methods to set, save or load all parameters used for an
 expriment, and others to actually perform experiments. It also has a number of
@@ -30,15 +29,15 @@ The package is split into the following four main modules.
  - `popnet.systems` implements many dynamical systems related to the 
    Wilson--Cowan model.
  - `executors` implements methods to run numerical experiments, such as
-   numerical integrations or simulations of sample trajectories of a
-   stochastic process whose behavior can macroscopically be approximated by
+   numerical integrations or simulations of sample trajectories of
+   stochastic processes whose behavior can macroscopically be approximated by
    the Wilson--Cowan model.
  - `graphics` implements many classes to handle results of numerical experiments
    performed with the methods of the `popnet.executors` module.
 
 To ease the access to the main features of the package, the functions listed in
 the [Functions](#functions) section below, which are all defined in these
-modules, are also imported in the package's namespace. The other functions and
+modules, are also imported in the package's namespace. Other functions and
 classes remain in their module's namespace.
 
 
@@ -76,6 +75,10 @@ The following fonctions are all imported in the package's namespace.
   - `popnet.systems.get_system` : Get a dynamical system from a configuration.
   - `popnet.structures.load_config` : Load a configuration from a text file.
   - `popnet.structures.load_network` : Load a network from a text file.
+  - `popnet.graphics.load_extended_solution`: Load a solution from a text file.
+  - `popnet.graphics.load_solution`: Load a solution from a text file.
+  - `popnet.graphics.load_statistics`: Load statistics from text files.
+  - `popnet.graphics.load_trajectory`: Load a trajectory from text files.
   - `popnet.structures.network` : Define a network from given populations.
   - `popnet.structures.population` : Define a population of biological neurons.
 
@@ -116,10 +119,9 @@ References
 """
 
 from .exceptions import *
-from .structures import (
-    build_network, config, default_config, default_network, load_config,
-    load_network, network, population
-)
+from .structures import (build_network, config, default_config, default_network,
+                         load_config, load_network, network, population)
 from .systems import get_system
 from .executors import get_integrator, get_simulator
-from .graphics import figure, draw
+from .graphics import (figure, draw, load_extended_solution, load_solution, 
+                       load_statistics, load_trajectory)

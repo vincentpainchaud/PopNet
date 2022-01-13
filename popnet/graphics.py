@@ -246,13 +246,15 @@ class Graphics:
             plt.show()
         plt.close(self.fig)
 
-    def legend(self, fontsize=10, ncol=None, handletextpad=0.5, **kwargs):
+    def legend(self, lw=2, fontsize=10, ncol=None, handletextpad=0.5, **kwargs):
         """Generate a legend for the figure.
 
         Generate a legend for the figure with default options.
 
         Parameters
         ----------
+        lw : float, optional
+            Line width of the legend handles. Defaults to 2.
         fontsize : float, optional
             Fontsize of the legend's labels. Defaults to 10.
         ncol : int, optional
@@ -277,7 +279,7 @@ class Graphics:
         leg = self.ax.legend(fontsize=fontsize, ncol=ncol, 
                              handletextpad=handletextpad, **kwargs)
         for lego in leg.legendHandles:
-            lego.set_linewidth(2)
+            lego.set_linewidth(lw)
         return leg
 
     def _check_if_activated(self):
@@ -439,17 +441,17 @@ class PhasePlane(Graphics):
                  category=PopNetWarning, stacklevel=2)
             self._fixed_axes = None
 
-    def legend(self, fontsize=10, ncol=1, handletextpad=0.5, framealpha=1,
-               **kwargs):
+    def legend(self, lw=2, fontsize=10, ncol=1, handletextpad=0.5, 
+               framealpha=1, **kwargs):
         """Generate a legend for the figure.
 
         Generate a legend for the figure with default options. Same as the base
         class method `Graphics.legend`, but changes the default for `ncol` to 1
         and for `framealpha` to 1.
         """
-        return super().legend(
-                fontsize=fontsize, ncol=ncol, handletextpad=handletextpad,
-                framealpha=framealpha, **kwargs)
+        return super().legend(lw=lw, fontsize=fontsize, ncol=ncol, 
+                              handletextpad=handletextpad,
+                              framealpha=framealpha, **kwargs)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
                    cmap='bone', color=None, density=1.5, **kwargs):
@@ -962,8 +964,9 @@ class Result(Graphics):
                             'instance should be a \'Configuration\' instance.')
         if len(config.network.populations) == 1:
             prefix = '' if cls.__name__.startswith('_') else '_'
+            suffix = '' if cls.__name__.endswith('One') else 'One'
             try:
-                one_pop_class = globals()[f'{prefix}{cls.__name__}One']
+                one_pop_class = globals()[f'{prefix}{cls.__name__}{suffix}']
             except KeyError:
                 pass
             else:
@@ -1015,16 +1018,15 @@ class Result(Graphics):
         """
         config = cls._check_config(config, ID)
         if times is None:
-            times = np.linspace(config.initial_time, config.final_time, 
+            times = np.linspace(config.initial_time, config.final_time,
                                 1 + config.iterations)
         name = cls._get_name(name)
         filename = _internals._format_filename(folder, ID, name)
         try:
-            states = np.loadtxt(filename, dtype=float)
+            states = np.loadtxt(filename, dtype=float, ndmin=2)
         except FileNotFoundError as error:
             raise FileNotFoundError(
-                'It seems that the result has not been obtained yet from the '
-                f'configuration {ID}.') from error
+                    f'No result found for configuration {ID}.') from error
         return cls(config, states, times, name)
 
     @property
@@ -1056,8 +1058,8 @@ class Result(Graphics):
     @colors.setter
     def colors(self, new_colors):
         if not isinstance(new_colors, dict):
-            raise TypeError('The colors passed to a Result instance must be '
-                            'stored in a dictionary.')
+            raise TypeError('The colors passed to a \'Result\' instance must '
+                            'be stored in a dictionary.')
         self._colors = new_colors
 
     @property
@@ -1771,30 +1773,6 @@ class _SolutionOne(_ResultOne, Solution):
         return f'$\\mathcal{{{X}}}$'
 
 
-class _WilsonCowanSolution(Solution):
-    """Special case of `Solution` for the Wilson--Cowan system.
-
-    Special case of `Solution` for the Wilson--Cowan dynamical system. The only
-    change from the base class is a different initialization of the state
-    components dictionary.
-
-    """
-
-    def _init_states_dict(self, states):
-        """Initialize the state variables dictionary."""
-        A = np.transpose(states)
-        R = np.zeros(A.shape)
-        for J, popJ in enumerate(self.config.network.populations):
-            R[J] = popJ.beta / popJ.gamma * A[J]
-        S = 1 - A - R
-        self._states_dict = {'A': A, 'R': R, 'S': S}
-
-
-class _WilsonCowanSolutionOne(_SolutionOne, _WilsonCowanSolution):
-    """Special case of `_WilsonCowanSolution` for a single population."""
-    pass
-
-
 class ExtendedSolution(Solution):
     """Represent solutions of extended dynamical systems.
 
@@ -2020,7 +1998,7 @@ class Statistics(Result):
 
     @classmethod
     def load(cls, ID, sample_name=None, name=None, config=None, folder=None):
-        """Load the statistics associated computed from sample trajectories.
+        """Compute statistics from loaded sample trajectories.
 
         Compute statistics needed to define a `Statistics` instance from loaded
         samples. For each component *X*, the samples are supposed to be in a
@@ -2880,4 +2858,34 @@ def figure(subplots=None, figsize=(5,3.75), dpi=150, tight_layout=True,
     if len(axes) == 1:
         return fig, axes[0]
     return fig, axes
-#2746
+
+
+def load_extended_solution(ID, name=None, config=None, times=None, folder=None):
+    """Load a solution from a text file.
+
+    Load a solution of an extended dynamical system from a text file. This is
+    an alias for `ExtendedSolution.load`.
+    """
+    return ExtendedSolution.load(ID, name=name, config=config, times=times,
+                                 folder=folder)
+
+
+def load_solution(ID, name=None, config=None, times=None, folder=None):
+    """Load a solution from a text file.
+
+    Load a solution of a (non extended) dynamical system from a text file.
+    This is an alias for `Solution.load`.
+    """
+    return Solution.load(ID, name=name, config=config, times=times,
+                         folder=folder)
+
+
+def load_statistics(ID, sample_name=None, name=None, config=None, folder=None):
+    """Alias for `Statistics.load`."""
+    return Statistics.load(ID, sample_name=sample_name, name=name,
+                           config=config, folder=folder)
+
+
+def load_trajectory(ID, name=None, config=None, folder=None):
+    """Alias for `Trajectory.load`."""
+    return Trajectory.load(ID, name=name, config=config, folder=folder)

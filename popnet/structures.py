@@ -13,7 +13,7 @@ follows the hierarchy.
 
  - `Population` : Represent a population of biological neurons.
  - `Network` : Represent a network split into populations.
-    - `MicroNetwork` : Represent a network including its microscopic structure.
+    - `MicroNetwork` : Represent a network, including its microscopic structure.
  - `Configuration` : A complete configuration to perform a numerical experiment.
      - `ConfigurationOne` : A configuration with a network of one population.
      - `MicroConfiguration` : A configuration with a `MicroNetwork`.
@@ -622,7 +622,7 @@ class Network:
     ----------
     ID : str
         ID of the network.
-    populations : tuple of Population, or Population
+    populations : tuple of Population or Population
         Defines the populations that constitute the network. Can be given as a
         `Population` instance to make a network with a single population. 
 
@@ -662,7 +662,8 @@ class Network:
         for pop in self.populations:
             string += str(pop)
             string += '\n\n'
-        string += f'Connection matrix:\n{self.c}'
+        string += f'Connection matrix:\n{self.c}\n\n'
+        string += f'Connection scales matrix:\n{self.scale_c}'
         return string
 
     @staticmethod
@@ -736,7 +737,7 @@ class Network:
 
     @property
     def scale_c(self):
-        """Scaling factor of the weights' distributions.
+        """Scaling factors of the weights' distributions.
 
         Scaling factors used to define the weights' distributions, which are all
         assumed to be logistic. The exact relation to the weights of links
@@ -919,34 +920,6 @@ class Network:
         microself.scale_c = self.scale_c
         microself.reset_parameters()
         return microself
-
-    def _set_c_from_string(self, string):
-        """Set the connection matrix from a string.
-
-        Set the connection matrix `c` from a string.
-
-        Parameters
-        ----------
-        string : str
-            String from which the connection matrix is set. It should have the
-            format of a string representation of a NumPy array. 
-
-        Raises
-        ------
-        FormatError
-            If the string does not have the correct format. 
-        """
-        if string[-1] == '\n':
-            string = string[:-1]
-        string = re.sub(r'\[\s+', '[', string)
-        string = re.sub(r'\s+\]', ']', string)
-        string = re.sub(r'\s+', ',', string)
-        try:
-            new_c = ast.literal_eval(string)
-        except:
-            raise FormatError('It seems that the string cannot be converted '
-                              'to a connection matrix.')
-        self.c = new_c
 
 
 class MicroNetwork(Network):
@@ -1297,7 +1270,7 @@ class Configuration:
         network has *p* populations, the initial state always has *p*(2*p*+3)
         components. The setter method ensures that the initial state is always
         a NumPy array of floats of the correct length. If it is set as a shorter
-        array, it will be filled with zeros and a warning will be issued.
+        array, it will be filled with zeros.
 
         Notes {#configuration-initial-state-notes}
         -----
@@ -1345,10 +1318,14 @@ class Configuration:
     @initial_state.setter
     def initial_state(self, new_state):
         length = (p := len(self.network.populations)) * (2*p + 3)
-        if len(new_state) != length:
+        diff = length - len(new_state)
+        if diff > 0:
+            new_state = np.concatenate((new_state, np.zeros(diff)))
+        elif diff < 0:
             raise ValueError(f'The state provided has {len(new_state)} '
-                             f'components, but it should have {length} '
-                             f'components for a network of {p} populations.')
+                             'components, but it should have no more than '
+                             f'{length} components for a network of {p} '
+                             'populations.')
         self._initial_state = np.array(new_state, float)
 
     @property
@@ -1521,7 +1498,7 @@ class Configuration:
 
         Parameters
         ----------
-        sizes : list or tuple of int
+        sizes : int or list or tuple of int
             Sizes to give to the populations of the network, in the same order
             as in the network's attribute.
         new_ID : str
@@ -1531,6 +1508,7 @@ class Configuration:
         if new_ID is None:
             new_ID = self.ID
         net = self.network.copy(self.network.ID)
+        sizes = self._check_list_of_sizes(sizes)
         for pop, size in zip(net.populations, sizes):
             pop.size = size
         try:
@@ -1670,6 +1648,20 @@ class Configuration:
         state[p*(p+3) :] = -bound_cov + 2*bound_cov * rng.random(size=p**2)
         self.initial_state = state
 
+    def _check_list_of_sizes(self, sizes):
+        """Check a list of population sizes."""
+        if isinstance(sizes, int):
+            sizes = [sizes]
+        try:
+            sizes = list(sizes)
+        except TypeError as error:
+            raise TypeError('The given sizes could not be converted to a '
+                            'list.') from error
+        if len(sizes) != len(self.network.populations):
+            raise ValueError('The list of sizes should have the same length as '
+                             'the list of populations of the network.')
+        return sizes
+
     def _other_params_string(self):
         """Optional parameters for subclasses to write in `str(self)`."""
         pass
@@ -1712,7 +1704,7 @@ class MicroConfiguration(Configuration):
         super().__init__(network, ID=ID, **kwargs)
         if not isinstance(network, MicroNetwork):
             raise PopNetError('The network used with a \'MicroConfiguration\' '
-                              'should be a \'MicroNetwork\'.')
+                              'must be a \'MicroNetwork\'.')
 
     @Configuration.initial_state.setter
     def initial_state(self, new_state):
@@ -1765,7 +1757,7 @@ class MicroConfiguration(Configuration):
 
         Parameters
         ----------
-        sizes : list or tuple of int
+        sizes : int or list or tuple of int
             Sizes to give to the populations of the network, in the same order
             as in the network's attribute.
         new_ID : str
@@ -1787,10 +1779,11 @@ class MicroConfiguration(Configuration):
 
         Parameters
         ----------
-        new_sizes : list or tuple of int
+        new_sizes : int or list or tuple of int
             A new size for each population, given in the order prescribed by
             the network's list of populations.
         """
+        new_sizes = self._check_list_of_sizes(new_sizes)
         for pop, new_size in zip(self.network.populations, new_sizes):
             pop.size = new_size
         self.network.reset_parameters()
@@ -2041,7 +2034,7 @@ def build_network(ID, matrix):
         ID given to the network.
     matrix : array_like
         Weight matrix specifying the connections between neurons in the network.
-        It has to be square and to have real entries.
+        It has to be square with real entries.
 
     Returns
     -------
@@ -2050,36 +2043,76 @@ def build_network(ID, matrix):
     """
     N = matrix.shape[0]
     if matrix.shape != (N, N):
-        raise ValueError('The given matrix should be square.')
+        raise ValueError('The given matrix must be square.')
     net = default_network(ID, scale='micro')
     net.c = N * np.mean(matrix)
     net.W = matrix
     return net
 
 
+def config(network, ID=None, **kwargs):
+    """Define a configuration from a given network.
+
+    Define a new configuration using the most appropriate class constructor
+    according to the number of populations of the network and to the type of
+    network.
+
+    Parameters
+    ----------
+    network : Network
+        Network to use with the configuration.
+    ID : str, optional
+        ID to associate with the configuration. Defaults to `None`, in which
+        case the network's ID is used.
+    **kwargs
+        Keyword arguments to be passed to the class constructor.
+
+    Returns
+    -------
+    Configuration, MicroConfiguration, ConfigurationOne or MicroConfigurationOne
+        A configuration initialized with the given ID and network. It is an
+        instance of a subclass of `Configuration` if it is more appropriate
+        according to `scale` and to the number of populations of the network.
+    """
+    if ID is None:
+        ID = network.ID
+    if isinstance(network, MicroNetwork) and ID[0] == '1':
+        return MicroConfigurationOne(network, ID=ID, **kwargs)
+    if isinstance(network, MicroNetwork):
+        return MicroConfiguration(network, ID=ID, **kwargs)
+    if ID[0] == '1':
+        return ConfigurationOne(network, ID=ID, **kwargs)
+    return Configuration(network, ID=ID, **kwargs)
+
+
 def default_config(ID, scale='macro'):
     """Define a configuration with default parameters.
 
     Define a new configuration with default parameters and a given ID. The
-    network associated with this configuration will be defined with
+    network associated with this configuration is defined with
     `default_network`, using the same `scale`.
 
     Parameters
     ----------
     ID : str
-        ID given to the new configuration. Its first character should be a
-        positive integer, which is taken to be the number of populations.
+        ID given to the new configuration. Its first character must be a
+        positive integer and is taken to be the number of populations.
     scale : {'macro', 'micro'}, optional
-        Determine whether the new network has a defined microscopic structure.
-        If `'micro'`, a default size of 100 neurons will be given to each
-        population. If `'macro'`, population sizes will remain undefined.
+        Determines whether the new network has a defined microscopic structure.
+        If `'micro'`, a default size of 100 neurons is given to each population.
+        If `'macro'`, population sizes remain undefined.
 
     Returns
     -------
     Configuration, MicroConfiguration, ConfigurationOne or MicroConfigurationOne
-        The configuration with default parameters. It will be a subclass of
-        `Configuration` if it is more appropriate according to `scale` and to
-        the number of populations of the network.
+        The configuration with default parameters. It is an instance of a
+        subclass of `Configuration` if it is more appropriate according to
+        `scale` and to the number of populations of the network.
+
+    Raises
+    ------
+    popnet.exceptions.PopNetError
+        If a non-valid value is passed to `scale`.
     """
     net = default_network(ID, scale=scale)
     return config(net, ID)
@@ -2093,18 +2126,18 @@ def default_network(ID, scale='macro'):
     Parameters
     ----------
     ID : str
-        ID given to the new network. Its first character should be a positive
+        ID given to the new network. Its first character must be a positive
         integer, which is taken to be the number of populations.
     scale : {'macro', 'micro'}, optional
-        Determine whether the network has a defined microscopic structure. If
-        `'micro'`, a default size of 100 neurons will be given to each
-        population. If `'macro'`, population sizes will remain undefined.
+        Determines whether the new network has a defined microscopic structure.
+        If `'micro'`, a default size of 100 neurons is given to each population.
+        If `'macro'`, population sizes remain undefined.
 
     Returns
     -------
     Network or MicroNetwork
-        The network with default parameters. It will be a `MicroNetwork`
-        instance if the sizes of the populations are defined.
+        The network with default parameters. It is a `MicroNetwork` instance
+        if the sizes of the populations are defined.
 
     Raises
     ------
@@ -2144,7 +2177,10 @@ def load_config(load_ID, new_ID=None, network=None, folder=None):
         Defaults to `None`, in which case `load_ID` is used. 
     network : Network, optional
         The network to associate with the configuration. Defaults to `None`,
-        in which case a new `Network` instance is created with `load_network`.
+        in which case the configuration's network is created with `load_network`.
+        In that case, the network is loaded from the ID given in the
+        configuration's file, and the network's file is expected to be located
+        in the same folder as the configuration's.
     folder : str, optional
         Folder in which the text file is located. If given, if should be in
         the current directory. Defaults to `None`, in which case the text
@@ -2152,10 +2188,10 @@ def load_config(load_ID, new_ID=None, network=None, folder=None):
 
     Returns
     -------
-    Configuration
-        The loaded configuration with ID `new_ID`. It will be a subclass of
-        `Configuration` if it is more appropriate according to the number of
-        populations of the network and to their sizes.
+    Configuration, MicroConfiguration, ConfigurationOne or MicroConfigurationOne
+        The loaded configuration with ID `new_ID`. It is an instance of a
+        subclass of `Configuration` if it is more appropriate according to the
+        number of populations of the network and to their sizes.
 
     Raises
     ------
@@ -2179,18 +2215,12 @@ def load_config(load_ID, new_ID=None, network=None, folder=None):
         with open(filename, 'r', encoding='utf-8') as file:
             lines = file.readlines()
     except FileNotFoundError as error:
-        raise FileNotFoundError('No file is available to load configuration '
-                                f'{load_ID}. Maybe the configuration has not '
-                                'been saved, or maybe the file containing the '
-                                'data does not have the expected name. It '
-                                'should have the format ID - Configuration.txt.'
-                                ) from error
+        raise FileNotFoundError('No file found to load configuration '
+                                f'{load_ID}.') from error
     loaded_config = _read_config_file(load_ID, new_ID, network, folder, lines)
     if loaded_config is None:
-        raise FormatError(f'It seems that the file {load_ID} - Configuration.txt'
-                          ' does not have the correct format to import the conf'
-                          f'iguration {load_ID}. It should have the format of a'
-                          ' string representation of a Configuration instance.')
+        raise FormatError(f'The file \'{load_ID} - Configuration.txt\' does not'
+                          ' have the expected format to load a configuration.')
     return loaded_config
 
 
@@ -2218,8 +2248,8 @@ def load_network(load_ID, new_ID=None, folder=None):
     Returns
     -------
     Network or MicroNetwork
-        The loaded network. It will be a `MicroNetwork` if a size is given for
-        every population.
+        The loaded network. It is a `MicroNetwork` instance if a size is
+        defined for every population.
 
     Raises
     ------
@@ -2229,6 +2259,14 @@ def load_network(load_ID, new_ID=None, folder=None):
         If the information in the file is not consistent with `load_ID`.
     popnet.exceptions.FormatError
         If the file does not have the expected format.
+
+    Warnings
+    --------
+    While it is intended that network files contain data on all parameters,
+    missing population parameters are in fact silently ignored and replaced
+    with default values. The same goes for missing connection scales matrices.
+    However, this behavior is retained only for compatibility reasons and is
+    not guaranteed to work in all cases.
     """
     filename = _internals._format_filename(folder, load_ID, 'Network parameters')
     if new_ID is None:
@@ -2237,15 +2275,12 @@ def load_network(load_ID, new_ID=None, folder=None):
         with open(filename, 'r', encoding='utf-8') as file:
             lines = file.readlines()
     except FileNotFoundError as error:
-        raise FileNotFoundError(f'No file is available to load network {load_ID}'
-                                '. Maybe no parameters have been saved, or maybe'
-                                ' the file containing the data does not have the'
-                                f' expected name. It should be {load_ID} - '
-                                'Network parameters.txt.') from error
+        raise FileNotFoundError('No file found to load network '
+                                f'{load_ID}.') from error
     if load_ID != (other_ID := lines[0].strip().split()[-1]):
-        raise PopNetError(f'The file {load_ID} - Network parameters.txt seems '
-                          f'to contain information about a network {other_ID} '
-                          f'rather than {load_ID}; PopNet is confused.')
+        raise PopNetError(f'The file \'{load_ID} - Network parameters.txt\' '
+                          'seems to contain information about a network '
+                          f'{other_ID} rather than {load_ID}.')
     j = 2
     populations = []
     while j < len(lines):
@@ -2259,75 +2294,49 @@ def load_network(load_ID, new_ID=None, folder=None):
         populations.append(Population._load(lines[j : k]))
         j = k + 1
     else:
-        raise FormatError(f'It seems that the file {load_ID} - Network param'
-                          'eters.txt does not have the correct format to import'
-                          f' the network {load_ID}. It should have the format '
-                          'of a string representation of a Network instance.')
+        raise FormatError(f'The file \'{load_ID} - Network parameters.txt\' do'
+                          'es not have the expected format to load a network.')
     if any(pop.size is None for pop in populations):
         net = Network(new_ID, populations)
     else:
         net = MicroNetwork(new_ID, populations)
     # Set the connection matrix from the file's data.
-    string = ''.join(lines[j+1 : j+1+len(net.populations)])
-    net._set_c_from_string(string)
+    p = len(net.populations)
+    string_c = ''.join(lines[j+1 : j+1+p])
+    net.c = _get_matrix_from_string(string_c)
+    # If the weights' scales are not written in the file, pass.
+    string_scale_c = ''.join(lines[j+3+p : j+3+2*p])
+    try:
+        scale_c = _get_matrix_from_string(string_scale_c)
+    except FormatError:
+        raise
+    except Exception:
+        pass
+    else:
+        net.scale_c = scale_c
     if isinstance(net, MicroNetwork):
         net.reset_parameters()
     return net
 
 
-def config(network, ID=None, **kwargs):
-    """Define a configuration from a given network.
-
-    Define a new configuration using the most appropriate class constructor
-    according to the number of populations of the network and to the type of
-    the network.
-
-    Parameters
-    ----------
-    network : Network
-        The network used with this configuration.
-    ID : str, optional
-        The ID to associate with the configuration. The default is to take the
-        network's ID.
-    **kwargs
-        Keyword arguments to be passed to the class constructor.
-
-    Returns
-    -------
-    Configuration, MicroConfiguration, ConfigurationOne or MicroConfigurationOne
-        A configuration initialized with the given ID and network. It will be a
-        subclass of `Configuration` if it is more appropriate according to the
-        number of populations of the network and to their sizes.
-    """
-    if ID is None:
-        ID = network.ID
-    if isinstance(network, MicroNetwork) and ID[0] == '1':
-        return MicroConfigurationOne(network, ID=ID, **kwargs)
-    if isinstance(network, MicroNetwork):
-        return MicroConfiguration(network, ID=ID, **kwargs)
-    if ID[0] == '1':
-        return ConfigurationOne(network, ID=ID, **kwargs)
-    return Configuration(network, ID=ID, **kwargs)
-
-
 def network(ID, populations):
     """Define a network from given populations.
 
-    Define a `Network` instance from already defined populations. If all
-    populations have a defined size, the network will rather be a `MicroNetwork`
-    instance.
+    Define a network from populations that are already defined, possibly with
+    a microscopic structure.
 
     Parameters
     ----------
     ID : str
         ID given to the network.
-    populations : tuple of Population or Population
+    populations : list or tuple of Population or Population
         Populations that define the network.
 
     Returns
     -------
     Network or MicroNetwork
-        The network composed of the populations listed in `populations`.
+        The network made of the populations listed in `populations`. It is a
+        `MicroNetwork` instance when all populations have a defined size.
 
     Raises
     ------
@@ -2358,8 +2367,8 @@ def population(name, ID=None, size=None):
         last character of `name` is used if it is a number, else the first one
         is used.
     size : int, optional
-        Number of neurons of the population. It must be positive. Defaults to
-        `None`, in which case no size is defined for the population.
+        Number of neurons of the population. If given, it must be positive.
+        Defaults to `None`, in which case no size is defined for the population.
 
     Returns
     -------
@@ -2368,6 +2377,32 @@ def population(name, ID=None, size=None):
     """
     pop = Population(name, ID=ID, size=size)
     return pop
+
+
+def _get_matrix_from_string(string):
+    """Get a network connection matrix from a string.
+
+    Parameters
+    ----------
+    string : str
+        String from which to read the matrix. It should have the format of a
+        string representation of a NumPy array.
+
+    Raises
+    ------
+    FormatError
+        If the string does not have the correct format.
+    """
+    if string[-1] == '\n':
+        string = string[:-1]
+    string = re.sub(r'\[\s+', '[', string)
+    string = re.sub(r'\s+\]', ']', string)
+    string = re.sub(r'\s+', ',', string)
+    try:
+        matrix = ast.literal_eval(string)
+    except Exception as err:
+        raise FormatError('The string could be converted to a matrix.') from err
+    return matrix
 
 
 def _read_config_file(load_ID, new_ID, network, folder, lines):
@@ -2379,9 +2414,9 @@ def _read_config_file(load_ID, new_ID, network, folder, lines):
     if not lines[0].startswith('Configuration'):
         return None
     if load_ID != (other_ID := lines[0].strip().split()[-1]):
-        raise PopNetError(f'The file {load_ID} - Configuration.txt seems to cont'
-                          f'ain the information about a configuration {other_ID}'
-                          f' rather than {load_ID}; PopNet is confused.')
+        raise PopNetError(f'The file \'{load_ID} - Configuration.txt\' seems '
+                          'to contain information about a configuration '
+                          f'{other_ID} rather than {load_ID}.')
     if not lines[2].startswith('Network'):
         return None
     # If no network was given, load it from the ID given in the file.

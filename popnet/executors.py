@@ -182,7 +182,7 @@ class Executor:
         
         This method is abstract and is implemented in subclasses.
         """
-        raise NotImplementedError('An Executor must implement a \'run\''
+        raise NotImplementedError('An Executor must implement a \'run\' '
                                   'method.')
 
     def save_output(self, name=None, folder=None):
@@ -418,6 +418,17 @@ class Integrator(Executor):
         """
         return self.system.jac(Y)
 
+    def _output_states(self):
+        """States array to output."""
+        if isinstance(self.system, systems.WilsonCowanSystem):
+            p = len(self.config.network.populations)
+            output_states = np.zeros((len(self.times), 2*p))
+            output_states[:,:p] = self.states
+            for J, popJ in enumerate(self.config.network.populations):
+                output_states[:,p+J] = popJ.beta / popJ.gamma * self.states[:,J]
+            return output_states
+        return super()._output_states()
+
     def _run_ode(self, field, jac, progress, has_escaped, backend, **kwargs):
         """Run a numerical integration with `scipy.integrate.ode`."""
         try:
@@ -463,6 +474,8 @@ class Simulator(Executor):
     ----------
     config : popnet.structures.MicroConfiguration
         Sets the configuration used for the simulation.
+    act : {'step', 'sigmoid'}, optional
+        Sets the shape of the activation rate of a neuron. Defaults to `step`.
 
     Attributes
     ----------
@@ -477,10 +490,14 @@ class Simulator(Executor):
     activation_rates : list
         Activation rates of the neurons of the network. See
         `Simulator.activation_rates`.
+    activation_rates_shape : {'step', 'sigmoid'}
+        Describes the shape of the activation rate of neurons of the network.
+        See `Simulator.activation_rates_shape`.
 
     """
 
-    def __init__(self, config, **kwargs):
+    def __init__(self, config, act='step', **kwargs):
+        self.activation_rates_shape = act
         super().__init__(config, **kwargs)
         try:
             output_type = OUTPUT_TYPES[type(self)]
@@ -534,6 +551,50 @@ class Simulator(Executor):
         It cannot be manually set nor deleted.
         """
         return self._activation_rates
+
+    @property
+    def activation_rates_shape(self):
+        """Shape of the activation rates.
+
+        Shape of the activation rate of a single neuron of the network as a
+        function of its input. The only valid values are:
+
+            - `'step'`. In that case, the activation rate is a step function
+              going from zero to alpha at the neuron's threshold `theta`.
+            - `'sigmoid'`. In that case, the activation rate is the logistic
+              function `popnet.structures.Population.F` of the population to
+              which belongs the neuron.
+
+        !!! note
+            After initialization, a change in the value of this property will
+            only have an effect after a reset of the simulator with
+            `Simulator.reset`.
+
+        Warnings
+        --------
+        It is important to understand that the values taken by this parameter
+        yield two related, but distinct, interpretations of the models studied
+        in this package. Indeed, the macroscopic models can be seen as
+        approximations of two microscopic models: one in which neurons can
+        activate at a constant rate when given sufficient input but cannot
+        otherwise, and another one in which neurons rather activate at a rate
+        depending on the input according to a sigmoid function. While both of
+        these interpretations are valid, the documentation of this package is
+        written assuming the former interpretation. Thus, if simulations are
+        performed using the `'sigmoid'` option, the interpretation of the
+        function `popnet.structures.Population.F` changes a little bit. This
+        should be adapted shortly.
+        """
+        return self._activation_rates_shape
+
+    @activation_rates_shape.setter
+    def activation_rates_shape(self, new_value):
+        valid_values = ['step', 'sigmoid']
+        if new_value not in valid_values:
+            raise ValueError(f'Unexpected value {new_value} for the shape of '
+                             'the activation rates. Valid values are '
+                             f'{valid_values}.')
+        self._activation_rates_shape = new_value
 
     def calcium_output(self, indices=None, growth_rate=None, decay_rate=None):
         """Get the calcium concentration in neural cells.
@@ -798,13 +859,16 @@ class Simulator(Executor):
         self.micro_states.append(x.copy())
         return t, x
 
-    def _make_activation_rate(self, j):
-        """Generate the activation rate function for the `j`th neuron."""
-        J = 0
-        sum_sizes = self.config.network.populations[0].size
-        while j > sum_sizes:
-            sum_sizes += self.config.network.populations[J+1].size
-            J += 1
+    def _make_sigmoid_activation_rate(self, j, J):
+        """Define a sigmoid activation rate for the `j`th neuron."""
+        def act(x):
+            b = np.dot(self.config.network.W[j], np.real(x)) + self.config.Q[J]
+            F_value = self.config.network.populations[J].F(b)
+            return self.config.network.alpha[j] * F_value
+        return act
+
+    def _make_step_activation_rate(self, j, J):
+        """Define a step activation rate for the `j`th neuron."""
         def act(x):
             b = np.dot(self.config.network.W[j], np.real(x)) + self.config.Q[J]
             if b < self.config.network.theta[j]:
@@ -812,6 +876,20 @@ class Simulator(Executor):
             else:
                 return self.config.network.alpha[j]
         return act
+
+    def _make_activation_rate(self, j):
+        """Define the activation rate function for the `j`th neuron."""
+        J = 0
+        sum_sizes = self.config.network.populations[0].size
+        while j > sum_sizes:
+            sum_sizes += self.config.network.populations[J+1].size
+            J += 1
+        if self.activation_rates_shape == 'step':
+            return self._make_step_activation_rate(j, J)
+        elif self.activation_rates_shape == 'sigmoid':
+            return self._make_sigmoid_activation_rate(j, J)
+        raise ValueError(f'Unexpected value {self.activation_rates_shape} for '
+                         'the shape of the activation rate function.')
 
     def _next_states_and_rates(self, x):
         """Get all possible states to which the network can go from `x`.
@@ -867,7 +945,7 @@ class Simulator(Executor):
                          'imaginary unit.')
 
     def _reset_activation_rates(self):
-        """Defines the activation rate functions."""
+        """Reset the activation rate functions."""
         self._activation_rates = [self._make_activation_rate(j)
                                   for j in range(self.config.network.size())]
 
@@ -1138,7 +1216,7 @@ class ChainSimulator(Simulator):
         return self.samples
 
 
-OUTPUT_TYPES = {systems.WilsonCowanSystem: graphics._WilsonCowanSolution,
+OUTPUT_TYPES = {systems.WilsonCowanSystem: graphics.Solution,
                 systems.MeanFieldSystem: graphics.Solution,
                 systems.MixedSystem: graphics.Solution,
                 systems.TaylorExtendedSystem: graphics.ExtendedSolution,
@@ -1211,7 +1289,7 @@ def _(system, system_name=None, **kwargs):
 
 
 
-def get_simulator(config, mode='individual'):
+def get_simulator(config, act='step', mode='individual'):
     """Get a simulator to perform stochastic simulations.
 
     Define a simulator in order to perform either individual simulations, or
@@ -1221,6 +1299,12 @@ def get_simulator(config, mode='individual'):
     ----------
     config : popnet.structures.Configuration
         Configuration to associate with the simulator.
+    act : {'step', 'sigmoid'}, optional
+        Shape of neurons' activation rates. If `'step'`, an activation rate is
+        a step function going from zero to `alpha` at the threshold `theta`. If
+        `'sigmoid'`, an activation rate is the logistic function
+        `popnet.structures.F` of the population to which belongs a neuron.
+        Defaults to `'step'`.
     mode : {'individual', 'chain'}, optional
         How the simulations should be executed. If `'individual'`, the simulator
         will be defined to run one simulation at a time. If `'chain'`, it will
@@ -1237,7 +1321,7 @@ def get_simulator(config, mode='individual'):
         If `mode` is given an unexpected value.
     """
     if mode == 'individual':
-        return SimpleSimulator(config)
+        return SimpleSimulator(config, act=act)
     elif mode == 'chain':
-        return ChainSimulator(config)
+        return ChainSimulator(config, act=act)
     raise PopNetError(f'Unknown execution mode {mode}.')
