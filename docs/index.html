@@ -83,14 +83,15 @@
 [5], and some of its extensions where the refractory state or covariances
 between different fractions of populations are explicitely included. It can
 perform various numerical experiments, such as integrations of dynamical
-systems related to Wilson&ndash;Cowan's, or simulations of the stochastic process
-which rules the underlying dynamics of a network whose behavior can
-macroscopically be approximated by the Wilson&ndash;Cowan model.</p>
+systems related to Wilson&ndash;Cowan's, or simulations of stochastic processes
+whose behavior can be approximated macroscopically by the Wilson&ndash;Cowan model.</p>
 <p>PopNet provides methods to set, save or load all parameters used for an
 expriment, and others to actually perform experiments. It also has a number of
 methods to display outputs of experiments. The implementation is heavily
-dependent on NumPy [2] and Matplotlib [3], and uses some functions of SciPy [4]
-and <code>tqdm</code> [1] as well.</p>
+dependent on <a href="https://numpy.org/">NumPy</a> [2] and
+<a href="https://matplotlib.org/">Matplotlib</a> [3], and uses some functions of
+<a href="https://scipy.org/">SciPy</a> [4] and <a href="https://tqdm.github.io/"><code>tqdm</code></a> [1]
+as well.</p>
 <p>The features offered by PopNet are discussed briefly in the <a href="#modules">Modules</a>
 section below, and some conventions regarding expected data structures are
 explained in the <a href="#conventions">Conventions</a> section.</p>
@@ -104,15 +105,15 @@ neurons, as well as configurations which are used to perform experiments.</li>
 <li><code><a title="popnet.systems" href="systems.html">popnet.systems</a></code> implements many dynamical systems related to the
 Wilson&ndash;Cowan model.</li>
 <li><code><a title="popnet.executors" href="executors.html">popnet.executors</a></code> implements methods to run numerical experiments, such as
-numerical integrations or simulations of sample trajectories of a
-stochastic process whose behavior can macroscopically be approximated by
+numerical integrations or simulations of sample trajectories of
+stochastic processes whose behavior can macroscopically be approximated by
 the Wilson&ndash;Cowan model.</li>
 <li><code><a title="popnet.graphics" href="graphics.html">popnet.graphics</a></code> implements many classes to handle results of numerical experiments
 performed with the methods of the <code><a title="popnet.executors" href="executors.html">popnet.executors</a></code> module.</li>
 </ul>
 <p>To ease the access to the main features of the package, the functions listed in
 the <a href="#functions">Functions</a> section below, which are all defined in these
-modules, are also imported in the package's namespace. The other functions and
+modules, are also imported in the package's namespace. Other functions and
 classes remain in their module's namespace.</p>
 <h2 id="conventions">Conventions</h2>
 <p>In PopNet, every <code><a title="popnet.structures.Population" href="structures.html#popnet.structures.Population">Population</a></code>, <code><a title="popnet.structures.Network" href="structures.html#popnet.structures.Network">Network</a></code>
@@ -144,6 +145,10 @@ simulations.</li>
 <li><code><a title="popnet.systems.get_system" href="systems.html#popnet.systems.get_system">get_system()</a></code> : Get a dynamical system from a configuration.</li>
 <li><code><a title="popnet.structures.load_config" href="structures.html#popnet.structures.load_config">load_config()</a></code> : Load a configuration from a text file.</li>
 <li><code><a title="popnet.structures.load_network" href="structures.html#popnet.structures.load_network">load_network()</a></code> : Load a network from a text file.</li>
+<li><code><a title="popnet.graphics.load_extended_solution" href="graphics.html#popnet.graphics.load_extended_solution">load_extended_solution()</a></code>: Load a solution from a text file.</li>
+<li><code><a title="popnet.graphics.load_solution" href="graphics.html#popnet.graphics.load_solution">load_solution()</a></code>: Load a solution from a text file.</li>
+<li><code><a title="popnet.graphics.load_statistics" href="graphics.html#popnet.graphics.load_statistics">load_statistics()</a></code>: Load statistics from text files.</li>
+<li><code><a title="popnet.graphics.load_trajectory" href="graphics.html#popnet.graphics.load_trajectory">load_trajectory()</a></code>: Load a trajectory from text files.</li>
 <li><code><a title="popnet.structures.network" href="structures.html#popnet.structures.network">network()</a></code> : Define a network from given populations.</li>
 <li><code><a title="popnet.structures.population" href="structures.html#popnet.structures.population">population()</a></code> : Define a population of biological neurons.</li>
 </ul>
@@ -189,15 +194,16 @@ PopNet is a python package dedicated to the study of the Wilson--Cowan model
 [5], and some of its extensions where the refractory state or covariances
 between different fractions of populations are explicitely included. It can
 perform various numerical experiments, such as integrations of dynamical
-systems related to Wilson--Cowan&#39;s, or simulations of the stochastic process
-which rules the underlying dynamics of a network whose behavior can
-macroscopically be approximated by the Wilson--Cowan model.
+systems related to Wilson--Cowan&#39;s, or simulations of stochastic processes
+whose behavior can be approximated macroscopically by the Wilson--Cowan model.
 
 PopNet provides methods to set, save or load all parameters used for an
 expriment, and others to actually perform experiments. It also has a number of
 methods to display outputs of experiments. The implementation is heavily
-dependent on NumPy [2] and Matplotlib [3], and uses some functions of SciPy [4]
-and `tqdm` [1] as well.
+dependent on [NumPy](https://numpy.org/) [2] and
+[Matplotlib](https://matplotlib.org/) [3], and uses some functions of
+[SciPy](https://scipy.org/) [4] and [`tqdm`](https://tqdm.github.io/) [1]
+as well.
 
 The features offered by PopNet are discussed briefly in the [Modules](#modules)
 section below, and some conventions regarding expected data structures are
@@ -215,15 +221,15 @@ The package is split into the following four main modules.
  - `popnet.systems` implements many dynamical systems related to the 
    Wilson--Cowan model.
  - `executors` implements methods to run numerical experiments, such as
-   numerical integrations or simulations of sample trajectories of a
-   stochastic process whose behavior can macroscopically be approximated by
+   numerical integrations or simulations of sample trajectories of
+   stochastic processes whose behavior can macroscopically be approximated by
    the Wilson--Cowan model.
  - `graphics` implements many classes to handle results of numerical experiments
    performed with the methods of the `popnet.executors` module.
 
 To ease the access to the main features of the package, the functions listed in
 the [Functions](#functions) section below, which are all defined in these
-modules, are also imported in the package&#39;s namespace. The other functions and
+modules, are also imported in the package&#39;s namespace. Other functions and
 classes remain in their module&#39;s namespace.
 
 
@@ -261,6 +267,10 @@ The following fonctions are all imported in the package&#39;s namespace.
   - `popnet.systems.get_system` : Get a dynamical system from a configuration.
   - `popnet.structures.load_config` : Load a configuration from a text file.
   - `popnet.structures.load_network` : Load a network from a text file.
+  - `popnet.graphics.load_extended_solution`: Load a solution from a text file.
+  - `popnet.graphics.load_solution`: Load a solution from a text file.
+  - `popnet.graphics.load_statistics`: Load statistics from text files.
+  - `popnet.graphics.load_trajectory`: Load a trajectory from text files.
   - `popnet.structures.network` : Define a network from given populations.
   - `popnet.structures.population` : Define a population of biological neurons.
 
@@ -301,13 +311,12 @@ References
 &#34;&#34;&#34;
 
 from .exceptions import *
-from .structures import (
-    build_network, config, default_config, default_network, load_config,
-    load_network, network, population
-)
+from .structures import (build_network, config, default_config, default_network,
+                         load_config, load_network, network, population)
 from .systems import get_system
 from .executors import get_integrator, get_simulator
-from .graphics import figure, draw</code></pre>
+from .graphics import (figure, draw, load_extended_solution, load_solution, 
+                       load_statistics, load_trajectory)</code></pre>
 </details>
 </section>
 <section>

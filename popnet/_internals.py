@@ -13,9 +13,9 @@ class PopNetDict(dict):
     A `PopNetDict` is a dictionary which expects its keys to be strings and its
     values to be lists, or lists of lists forming a square array if the key
     begins with "C". The idea is to assign values to state variables of
-    populations in a network. A `PopNetDict` will not accept non-string keys,
-    and will place all values in a list of the correct form if possible. If it
-    is not an error will be raised. 
+    populations in a network. A `PopNetDict` does not accept non-string keys,
+    and places all values in a list of the correct form if possible. If it
+    is not, an error is raised. 
 
     Examples
     --------
@@ -26,8 +26,8 @@ class PopNetDict(dict):
     >>> D
     {'A': [1], 'CAA': [[2]]}
 
-    If new non-list values are assigned, they will still be placed in the
-    expected list format. 
+    If new non-list values are assigned, they are still placed in the expected
+    list format. 
 
     >>> D['R'] = 3
     >>> D['CRR'] = 4
@@ -35,17 +35,17 @@ class PopNetDict(dict):
     {'A': [1], 'CAA': [[2]], 'R': [3], 'CRR': [[4]]}
 
     It is not possible to add a key to the dictionary if it is not a string.
-    Trying to do so will raise an error.
+    Trying to do so raises an error.
 
     >>> D[1] = 5
-    PopNetError: The keys of a PopNetDict should be strings.
+    PopNetError: The keys of a 'PopNetDict' object must be strings.
 
     It is neither possible to set as a value a list of lists if it is not
     formatted as a square array, that is, if the lists contained in the list do
     not have the same length as the list itself. 
 
     >>> D['CSS'] = [1, 2]
-    PopNetError: The values of a PopNetDict should be lists or lists of 
+    PopNetError: The values of a 'PopNetDict' object must be lists or lists of 
     lists forming a square array.
 
     """
@@ -64,7 +64,8 @@ class PopNetDict(dict):
     @staticmethod
     def _key_check(key):
         if not isinstance(key, str):
-            raise PopNetError('The keys of a PopNetDict should be strings.')
+            raise PopNetError('The keys of a \'PopNetDict\' object must be '
+                              'strings.')
 
     @staticmethod
     def _value_check(key, value):
@@ -77,9 +78,9 @@ class PopNetDict(dict):
                         value[j] = [list_value]
             for list_value in value:
                 if len(list_value) != len(value):
-                    raise PopNetError('The values of a PopNetDict should be '
-                                      'lists or lists of lists forming a square'
-                                      ' array.')
+                    raise PopNetError('The values of a \'PopNetDict\' object '
+                                      'must be lists or lists of lists forming '
+                                      'a square array.')
         else:
             if not isinstance(value, list):
                 value = [value]

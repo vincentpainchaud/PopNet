@@ -10,8 +10,10 @@ whose behavior can be approximated macroscopically by the Wilson--Cowan model.
 PopNet provides methods to set, save or load all parameters used for an
 expriment, and others to actually perform experiments. It also has a number of
 methods to display outputs of experiments. The implementation is heavily
-dependent on NumPy [2] and Matplotlib [3], and uses some functions of SciPy [4]
-and `tqdm` [1] as well.
+dependent on [NumPy](https://numpy.org/) [2] and
+[Matplotlib](https://matplotlib.org/) [3], and uses some functions of
+[SciPy](https://scipy.org/) [4] and [`tqdm`](https://tqdm.github.io/) [1]
+as well.
 
 The features offered by PopNet are discussed briefly in the [Modules](#modules)
 section below, and some conventions regarding expected data structures are

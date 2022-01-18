@@ -83,7 +83,7 @@
 the data structures defined in <code><a title="popnet.structures" href="structures.html">popnet.structures</a></code> and the dynamical systems
 defined in <code><a title="popnet.systems" href="systems.html">popnet.systems</a></code>. Its methods allow both to</p>
 <ul>
-<li>Perform easily the numerical integration of several dynamical systems related
+<li>Perform easily numerical integrations of several dynamical systems related
 to the Wilson&ndash;Cowan model;</li>
 <li>Perform simulations to study sample trajectories of a stochastic process
 which is macroscopically approximated by the Wilson&ndash;Cowan model.</li>
@@ -99,7 +99,8 @@ experiments.<ul class="hierarchy sidebar">
 <li><code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code> : An interface to run numerical integrations.</li>
 <li><code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> : An interface to run simulations of a stochastic process.<ul class="hierarchy sidebar">
 <li><code><a title="popnet.executors.SimpleSimulator" href="#popnet.executors.SimpleSimulator">SimpleSimulator</a></code> : A simulator to run simulations one at a time.</li>
-<li><code><a title="popnet.executors.ChainSimulator" href="#popnet.executors.ChainSimulator">ChainSimulator</a></code> : A simulator to run multiple simulations at once.</li>
+<li><code><a title="popnet.executors.ChainSimulator" href="#popnet.executors.ChainSimulator">ChainSimulator</a></code> : A simulator to run multiple simulations at once,
+to compute statistics from the results.</li>
 </ul>
 </li>
 </ul>
@@ -115,7 +116,7 @@ This module defines several classes dedicated to run numerical experiments using
 the data structures defined in `popnet.structures` and the dynamical systems
 defined in `popnet.systems`. Its methods allow both to
 
- - Perform easily the numerical integration of several dynamical systems related
+ - Perform easily numerical integrations of several dynamical systems related
    to the Wilson--Cowan model;
  - Perform simulations to study sample trajectories of a stochastic process
    which is macroscopically approximated by the Wilson--Cowan model.
@@ -133,7 +134,8 @@ follows the hierarchy.
      - `Integrator` : An interface to run numerical integrations.
      - `Simulator` : An interface to run simulations of a stochastic process.
          - `SimpleSimulator` : A simulator to run simulations one at a time.
-         - `ChainSimulator` : A simulator to run multiple simulations at once.
+         - `ChainSimulator` : A simulator to run multiple simulations at once,
+           to compute statistics from the results.
 
 &#34;&#34;&#34;
 
@@ -154,16 +156,16 @@ class Executor:
     &#34;&#34;&#34;Execute numerical experiments on a network.
 
     `Executor` is meant to perform numerical experiments to study the dynamics
-    of a network split into populations. These experiments are intended to be
+    on a network split into populations. These experiments are intended to be
     carried out by subclasses of `Executor`.
 
-     - To perform simulations of the stochastic process which rules the
+     - To perform simulations of a stochastic process that rules the
        evolution of the network, use `Simulator`.
      - To perform numerical integrations of reduced dynamical systems
        describing the macroscopic behavior of the network, use `Integrator`.
 
-    A configuration must be given, and a reset of the executor is made at the
-    end of the initialization, when setting the configuration.
+    A reset of the executor is made at the end of the initialization, when
+    setting the configuration.
 
     Parameters
     ----------
@@ -191,7 +193,7 @@ class Executor:
 
         Configuration defining all parameters used by the executor. It must be
         a `popnet.structures.Configuration` instance, or a
-        `popnet.structures.MicroConfiguration` instance if the network should
+        `popnet.structures.MicroConfiguration` instance if the network must
         have a microscopic structure. If it is set, the executor is reset with
         `Executor.reset`. It cannot be deleted.
         &#34;&#34;&#34;
@@ -221,7 +223,7 @@ class Executor:
         &#34;&#34;&#34;Time.
 
         At initialization or with a call to `Executor.reset`, it is set
-        according to the integrator&#39;s configuration `config`. Specifically, it
+        according to the executor&#39;s configuration `config`. Specifically, it
         is an array starting at `config.initial_time` and ending at
         `config.final_time`, with an interval of `config.delta` between time
         steps. It cannot be manually set nor deleted.
@@ -258,10 +260,10 @@ class Executor:
 
         Returns
         -------
-        Result
+        popnet.graphics.Result
             The output of the experiment. The precise output type depends on the
-            experiment executed and on the number of populations of the network.
-            See the [summary](graphics.html#classes-and-hierarchy) of all
+            experiment executed; see the
+            [summary](graphics.html#classes-and-hierarchy) of all
             `popnet.graphics.Result` subclasses for a quick reference giving
             the output type of each case.
 
@@ -273,16 +275,20 @@ class Executor:
         self._check_if_run()
         if self._output_type is None:
             raise PopNetError(
-                &#39;PopNet does not know how to output the results of this &#39;
-                &#39;experiment. It might be due to the use of the base class &#39;
-                &#39;\&#39;Result\&#39; rather than its subclasses, or to the numerical &#39;
-                &#39;integration of an unrecognized dynamical system. It should &#39;
-                &#39;still be possible to save the results with \&#39;save_output\&#39;.&#39;)
+                &#39;PopNet does not know how to output the results of this experi&#39;
+                &#39;ment. It might be due to the use of the base class \&#39;Result\&#39; &#39;
+                &#39;rather than its subclasses, or to the numerical integration &#39;
+                &#39;of an unrecognized dynamical system. It might still be &#39;
+                &#39;possible to save the results with Executor.save_output().&#39;)
         return self._output_type(self.config, self._output_states(), 
                                  self._output_times(), **kwargs)
 
     def reset(self):
-        &#34;&#34;&#34;Reset the executor.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the executor.
+        
+        Reset the executor to run it again. Sets `Executor.success` to `None`
+        and resets `Executor.times` according to the configuration.
+        &#34;&#34;&#34;
         self._success = None
         self._times = np.linspace(self.config.initial_time, 
                                   self.config.final_time, 
@@ -293,7 +299,7 @@ class Executor:
         
         This method is abstract and is implemented in subclasses.
         &#34;&#34;&#34;
-        raise NotImplementedError(&#39;An Executor must implement a \&#39;run\&#39;&#39;
+        raise NotImplementedError(&#39;An executor must implement a \&#39;run\&#39; &#39;
                                   &#39;method.&#39;)
 
     def save_output(self, name=None, folder=None):
@@ -339,7 +345,7 @@ class Executor:
         &#34;&#34;&#34;Check if the executor has already run.&#34;&#34;&#34;
         if self.success is None:
             raise PopNetError(&#39;An executor has to run before the results are &#39;
-                              &#39;output. Call run() first.&#39;)
+                              &#39;output. Call Executor.run() first.&#39;)
 
     def _output_states(self):
         &#34;&#34;&#34;States array to output.&#34;&#34;&#34;
@@ -355,13 +361,13 @@ class Executor:
 
 
 class Integrator(Executor):
-    &#34;&#34;&#34;Numerical integrator for ODEs related to Wilson--Cowan&#39;s model.
+    &#34;&#34;&#34;Numerical integrators for systems related to Wilson--Cowan&#39;s model.
 
     `Integrator` extends `Executor` to perform numerical integrations of
-    dynamical systems related to the Wilson--Cowan model. All numerical
-    integrations are performed with the class
-    [ode](https://tinyurl.com/scipy-integrate-ode) from SciPy&#39;s `integrate`
-    module. Specific vector fields are implemented in `Integrator`&#39;s subclasses.
+    dynamical systems related to the Wilson--Cowan model. Numerical
+    integrations can either be performed with the class
+    [ode](https://31c8.short.gy/scipy-integrate-ode) from SciPy&#39;s `integrate`
+    module, or with a classical Runge--Kutta method.
 
     Parameters
     ----------
@@ -371,26 +377,36 @@ class Integrator(Executor):
     Attributes
     ----------
     config : popnet.structures.Configuration
-        Configuration used for the numerical integration. It is taken as that
-        of `Integrator.system`. See `Integrator.config`.
+        Configuration used for the numerical integration. At initialization, it
+        is automatically taken as that of `Integrator.system`. See
+        `Integrator.config`.
     system : popnet.systems.DynamicalSystem
         Dynamical system used for the integration. See `Integrator.system`.
-    states, times : array_like
-        Arrays representing the state of the network with respect to time. See
-        `Integrator.states` and `Integrator.times`.
+    times : array_like
+        Time. See `Integrator.times`.
+    states : array_like
+        State of the network with respect to time. See `Integrator.states`.
+
+    Raises
+    ------
+    TypeError
+        If `system` is not a `popnet.systems.DynamicalSystem` instance.
 
     &#34;&#34;&#34;
 
     def __init__(self, system, **kwargs):
-        self.system = system
+        if not isinstance(system, systems.DynamicalSystem):
+            raise TypeError(&#39;The dynamical system associated with an integrator&#39;
+                            &#39; must be a \&#39;DynamicalSystem\&#39; instance.&#39;)
+        self._system = system
         super().__init__(system.config, **kwargs)
         try:
             output_type = OUTPUT_TYPES[type(self.system)]
         except KeyError:
             warn(&#39;The type of dynamical system you want to integrate is not &#39;
-                 &#39;recognized by PopNet. The integration should be possible, &#39;
+                 &#39;recognized by PopNet. The integration might be possible, &#39;
                  &#39;but it will not be possible to output the results with &#39;
-                 &#39;\&#39;Integrator.output\&#39;.&#39;, category=PopNetWarning, stacklevel=2)
+                 &#39;Integrator.output().&#39;, category=PopNetWarning, stacklevel=2)
         else:
             self._output_type = output_type
 
@@ -399,38 +415,36 @@ class Integrator(Executor):
         &#34;&#34;&#34;Dynamical system used for the integration.
 
         The dynamical system used when performing numerical integrations. It
-        must be a `popnet.systems.DynamicalSystem` instance, and it is expected
-        to be associated with the same configuration as the integrator. It
-        cannot be deleted.
+        is a `popnet.systems.DynamicalSystem` instance associated with the
+        same configuration as the integrator. It is set at initialization,
+        and afterwards it cannot be manually set nor deleted.
         &#34;&#34;&#34;
         return self._system
 
-    @system.setter
-    def system(self, new_value):
-        if not isinstance(new_value, systems.DynamicalSystem):
-            raise TypeError(&#39;The dynamical system associated with an integrator&#39;
-                            &#39; must be a \&#39;DynamicalSystem\&#39; instance.&#39;)
-        self._system = new_value
-
     def reset(self):
-        &#34;&#34;&#34;Reset the integrator.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the integrator.
+
+        Reset the integrator to run it again. It extends the base class method
+        by also resetting `Integrator.states` and by setting the initial state
+        to be used in the integration from the configuration.
+        &#34;&#34;&#34;
         super().reset()
         self._states = np.zeros((len(self.times), self._state_length()))
         self.states[0] = self.config.initial_state[: self._state_length()]
 
     def run(self, task, time=&#39;forward&#39;, verbose=False, catch_escape=False,
             backend=&#39;vode&#39;, **kwargs):
-        &#34;&#34;&#34;Run the numerical integration.
+        &#34;&#34;&#34;Run a numerical integration.
 
         Run a numerical integration of the dynamical system using either an
-        [ode](https://tinyurl.com/scipy-integrate-ode) instance from SciPy&#39;s
+        [ode](https://31c8.short.gy/scipy-integrate-ode) instance from SciPy&#39;s
         `integrate` module, or a classical Runge--Kutta method.
 
         Parameters
         ----------
         task : {&#39;ode&#39;, &#39;runge-kutta&#39;}, optional
             Choose to integrate with SciPy&#39;s methods or with a classical
-            Runge-- Kutta method. Defaults to `&#39;ode&#39;`.
+            Runge--Kutta method. Defaults to `&#39;ode&#39;`.
         time : {&#39;forward&#39;, &#39;backward&#39;}, optional
             Chooses if the intergration is performed forward of backward in
             time. If the integration is done backward in time, it is done from
@@ -438,18 +452,18 @@ class Integrator(Executor):
             interval of the same length as if it was done forward. Defaults to
             `&#39;forward&#39;`.
         verbose : bool, optional
-            If `True`, a progression bar will be printed to show how much of the
+            If `True`, a progression bar is printed to show how much of the
             integration has been performed. Defaults to `False`.
         catch_escape : bool, optional
-            If `True`,  the integration will stop as soon as a state component
-            escapes the interval \\([-1, 1]\\), and the integration will be
+            If `True`,  the integration stops as soon as a state component
+            escapes the interval \\([-1, 1]\\), and the integration is
             considered to have failed. Defaults to `False`.
         backend : {&#39;vode&#39;, &#39;zvode&#39;, &#39;lsoda&#39;, &#39;dopri5&#39;, &#39;dop853&#39;}, optional
-            Integrator used with `ode`. Defaults to `&#39;vode&#39;`. It has no effect
-            if `task` is not set to `ode`.
+            Integrator used with SciPy&#39;s methods. Defaults to `&#39;vode&#39;`. It has
+            no effect if `task` is not set to `&#39;ode&#39;`.
         **kwargs
             Keyword arguments to be passed to the `set_integrator` method of
-            the `ode` solver. It has no effect if `task` is not set to `ode`.
+            the `ode` solver. It has no effect if `task` is not set to `&#39;ode&#39;`.
 
         Warns
         -----
@@ -466,8 +480,8 @@ class Integrator(Executor):
             def jac(t, x): 
                 return - self._jac(2 * self.config.initial_time - t, x)
         else:
-            raise ValueError(f&#39;Unknown value {time} for \&#39;time\&#39; keyword. Valid&#39;
-                             &#39; values are \&#39;forward\&#39; and \&#39;backward\&#39;.&#39;)
+            raise ValueError(f&#39;Unexpected value {time} for \&#39;time\&#39; keyword. &#39;
+                             &#39;Valid values are \&#39;forward\&#39; and \&#39;backward\&#39;.&#39;)
         if verbose:
             def progress(rg): return tqdm(rg)
         else:
@@ -481,8 +495,8 @@ class Integrator(Executor):
         elif task == &#39;runge-kutta&#39;:
             self._run_runge_kutta(field, progress, has_escaped)
         else:
-            raise ValueError(f&#39;Unknown task {task} for \&#39;Integrator.run\&#39;. Acce&#39;
-                             &#39;pted values are \&#39;ode\&#39;  and \&#39;runge-kutta\&#39;.&#39;)
+            raise ValueError(f&#39;Unexpected task {task} for Integrator.run(). &#39;
+                             &#39;Valid values are \&#39;ode\&#39;  and \&#39;runge-kutta\&#39;.&#39;)
         if time == &#39;backward&#39;:
             self._times = np.flip(2 * self.config.initial_time - self.times)
             self._states = np.flip(self.states, axis=0)
@@ -529,6 +543,17 @@ class Integrator(Executor):
         &#34;&#34;&#34;
         return self.system.jac(Y)
 
+    def _output_states(self):
+        &#34;&#34;&#34;States array to output.&#34;&#34;&#34;
+        if isinstance(self.system, systems.WilsonCowanSystem):
+            p = len(self.config.network.populations)
+            output_states = np.zeros((len(self.times), 2*p))
+            output_states[:,:p] = self.states
+            for J, popJ in enumerate(self.config.network.populations):
+                output_states[:,p+J] = popJ.beta / popJ.gamma * self.states[:,J]
+            return output_states
+        return super()._output_states()
+
     def _run_ode(self, field, jac, progress, has_escaped, backend, **kwargs):
         &#34;&#34;&#34;Run a numerical integration with `scipy.integrate.ode`.&#34;&#34;&#34;
         try:
@@ -566,14 +591,16 @@ class Integrator(Executor):
 class Simulator(Executor):
     &#34;&#34;&#34;Numerical simulator of the stochastic process on a network.
 
-    `Simulator` extends `Executor` to perform numerical simulations of a
-    stochastic process on a network whose mean field reduction is represented
-    macroscopically by the Wilson--Cowan model.
+    `Simulator` extends `Executor` to perform numerical simulations of
+    stochastic processes on a network that can be macroscopically approximated
+    by the Wilson--Cowan model.
 
     Parameters
     ----------
     config : popnet.structures.MicroConfiguration
-        Sets the configuration used for the simulation.
+        Sets the configuration used for simulations.
+    act : {&#39;step&#39;, &#39;sigmoid&#39;}, optional
+        Sets the shape of the activation rate of a neuron. Defaults to `step`.
 
     Attributes
     ----------
@@ -588,10 +615,14 @@ class Simulator(Executor):
     activation_rates : list
         Activation rates of the neurons of the network. See
         `Simulator.activation_rates`.
+    activation_rates_shape : {&#39;step&#39;, &#39;sigmoid&#39;}
+        Describes the shape of the activation rate of neurons of the network.
+        See `Simulator.activation_rates_shape`.
 
     &#34;&#34;&#34;
 
-    def __init__(self, config, **kwargs):
+    def __init__(self, config, act=&#39;step&#39;, **kwargs):
+        self.activation_rates_shape = act
         super().__init__(config, **kwargs)
         try:
             output_type = OUTPUT_TYPES[type(self)]
@@ -599,7 +630,7 @@ class Simulator(Executor):
             warn(&#39;The type of simulator you want to run is not recognized by &#39;
                  &#39;PopNet. The simulation might be possible if a \&#39;run\&#39; method &#39;
                  &#39;is implemented, but it will not be possible to output the &#39;
-                 &#39;results with \&#39;Simulator.output\&#39;.&#39;, category=PopNetWarning,
+                 &#39;results with Simulator.output().&#39;, category=PopNetWarning,
                  stacklevel=2)
         else:
             self._output_type = output_type
@@ -616,7 +647,7 @@ class Simulator(Executor):
     def micro_states(self):
         &#34;&#34;&#34;Microscopic state of the network with respect to time.
 
-        Microscopic state of the network at each time step given by
+        Microscopic state of the network at each time step in
         `Simulator.transition_times`. It does not contain any relevant data at
         initialization or right after a reset, but it is updated during a call
         to `Simulator.run`. It cannot be manually set nor deleted.
@@ -646,6 +677,39 @@ class Simulator(Executor):
         &#34;&#34;&#34;
         return self._activation_rates
 
+    @property
+    def activation_rates_shape(self):
+        &#34;&#34;&#34;Shape of the activation rates.
+
+        Shape of the activation rate of a single neuron of the network as a
+        function of its input. The only valid values are:
+
+         - `&#39;step&#39;`. In that case, a neuron&#39;s activation rate is a step
+           function going from zero to `popnet.structures.MicroNetwork.alpha`
+           at its threshold `popnet.structures.MicroNetwork.theta`.
+         - `&#39;sigmoid&#39;`. In that case, a neuron&#39;s activation rate is the
+           logistic function `popnet.structures.Population.F` of the population
+           to which it belongs.
+
+        It can only be set to one of the above values, and it cannot be
+        manually deleted.
+
+        !!! note
+            After initialization, a change in the value of this property will
+            only have an effect after a reset of the simulator with
+            `Simulator.reset`.
+        &#34;&#34;&#34;
+        return self._activation_rates_shape
+
+    @activation_rates_shape.setter
+    def activation_rates_shape(self, new_value):
+        valid_values = [&#39;step&#39;, &#39;sigmoid&#39;]
+        if new_value not in valid_values:
+            raise ValueError(f&#39;Unexpected value {new_value} for the shape of &#39;
+                             &#39;the activation rates. Valid values are &#39;
+                             f&#39;{valid_values}.&#39;)
+        self._activation_rates_shape = new_value
+
     def calcium_output(self, indices=None, growth_rate=None, decay_rate=None):
         &#34;&#34;&#34;Get the calcium concentration in neural cells.
 
@@ -673,7 +737,7 @@ class Simulator(Executor):
         array_like
             Calcium concentration with respect to time for every requested
             neuron, with neurons along the first axis and time along the second.
-            If a single neuron was requested, it will be one-dimensional.
+            If a single neuron was requested, it is one-dimensional.
 
         Raises
         ------
@@ -709,8 +773,8 @@ class Simulator(Executor):
     def micro_output(self, fmt=&#39;ternary&#39;):
         &#34;&#34;&#34;Get the simulation&#39;s microscopic output.
         
-        Get the microscopic state of the network with respect to time from the
-        last simulation that was performed.
+        Get the microscopic state of the network with respect to time after
+        a simulation was performed.
 
         Parameters
         ----------
@@ -741,10 +805,19 @@ class Simulator(Executor):
             return np.real(self.micro_states)
         if fmt == &#39;calcium&#39;:
             return self.calcium_output()
-        raise ValueError(f&#39;Unknown format {fmt} for microscopic states.&#39;)
+        raise ValueError(f&#39;Unexpected format {fmt} for microscopic states. Valid&#39;
+                         &#39; values are \&#39;ternary\&#39;, \&#39;binary\&#39; and \&#39;calcium\&#39;.&#39;)
 
     def reset(self):
-        &#34;&#34;&#34;Reset the simulator.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the simulator.
+
+        Reset the simulator to run it again. It extends the base class method
+        by also resetting the arrays `Simulator.states`,
+        `Simulator.micro_states` and `Simulator.transition_times`, by
+        resetting the activation rate functions, and by resetting the
+        microscopic initial state to be used in the simulation from the
+        configuration.
+        &#34;&#34;&#34;
         super().reset()
         self._states = None
         self._transition_times = [self.config.initial_time]
@@ -772,11 +845,11 @@ class Simulator(Executor):
             A random number generator.
         do_step : callable
             Dictates how to do the Monte Carlo step of the Doob--Gillespie
-            algorithm. To be passed to `iterate`. It expects as inputs, in
-            order: `rng`, the current time `t`, an array of the next possible
-            network states, and an array of the corresponding transition rates.
-            It should return the index of the next network state and the time
-            interval between `t` and the next transition.
+            algorithm. It is a function to be passed to `iterate`. It expects
+            as inputs, in order: `rng`, the current time `t`, an array of the
+            next possible network states, and an array of the corresponding
+            transition rates. It should return the index of the next network
+            state and the time interval between `t` and the next transition.
         iterate : callable
             Dictates how a complete iteration of the simulation is performed.
             This includes the Monte Carlo step as well as all other tasks that
@@ -790,12 +863,12 @@ class Simulator(Executor):
         From the microscopic point of view, the evolution of the state of the
         whole network is described by a stochastic process. The simulation run
         by this method outputs a possible trajectory of this stochastic process,
-        using the Doob--Gillespie algorithm, popularized by Gillespie in [3] and
-        based on results of Doob [1,2]. The idea to pass from a state to another
-        is first to find all of the states to which the network can go from the
-        current one, with the corresponding transition rates. This information
-        is in fact sufficient to determine the distribution of the time at which
-        the next transition occur, and which one will occur. 
+        using the Doob--Gillespie algorithm, based on results of Doob [1,2] and
+        popularized by Gillespie in [3]. To pass from a state to another, the
+        idea is first to find all of the states to which the network can go
+        from the current one, with the corresponding transition rates. This
+        information is in fact sufficient to determine the distribution of the
+        time at which the next transition occurs and which one will occur.
 
         In [3], Gillespie introduces two methods, called the *direct* and
         *first reaction* methods respectively, to choose the time interval until
@@ -840,9 +913,9 @@ class Simulator(Executor):
     def _check_sizes(self):
         &#34;&#34;&#34;Check the consistency of the network&#39;s size and the initial state.&#34;&#34;&#34;
         if len(self.config.micro_initial_state) != self.config.network.size():
-            raise PopNetError(&#39;It seems that the size of the network has &#39;
-                              &#39;changed since the microscopic initial state has &#39;
-                              &#39;been set. It has to be reset. The network\&#39;s &#39;
+            raise PopNetError(&#39;The size of the network has changed since the &#39;
+                              &#39;microscopic initial state was set. Reset the &#39;
+                              &#39;simulator before to run it. The network\&#39;s &#39;
                               &#39;parameters might also have to be reset.&#39;)
 
     def _direct_method(self, rng, t, next_states, rates):
@@ -909,13 +982,16 @@ class Simulator(Executor):
         self.micro_states.append(x.copy())
         return t, x
 
-    def _make_activation_rate(self, j):
-        &#34;&#34;&#34;Generate the activation rate function for the `j`th neuron.&#34;&#34;&#34;
-        J = 0
-        sum_sizes = self.config.network.populations[0].size
-        while j &gt; sum_sizes:
-            sum_sizes += self.config.network.populations[J+1].size
-            J += 1
+    def _make_sigmoid_activation_rate(self, j, J):
+        &#34;&#34;&#34;Define a sigmoid activation rate for the `j`th neuron.&#34;&#34;&#34;
+        def act(x):
+            b = np.dot(self.config.network.W[j], np.real(x)) + self.config.Q[J]
+            F_value = self.config.network.populations[J].F(b)
+            return self.config.network.alpha[j] * F_value
+        return act
+
+    def _make_step_activation_rate(self, j, J):
+        &#34;&#34;&#34;Define a step activation rate for the `j`th neuron.&#34;&#34;&#34;
         def act(x):
             b = np.dot(self.config.network.W[j], np.real(x)) + self.config.Q[J]
             if b &lt; self.config.network.theta[j]:
@@ -923,6 +999,20 @@ class Simulator(Executor):
             else:
                 return self.config.network.alpha[j]
         return act
+
+    def _make_activation_rate(self, j):
+        &#34;&#34;&#34;Define the activation rate function for the `j`th neuron.&#34;&#34;&#34;
+        J = 0
+        sum_sizes = self.config.network.populations[0].size
+        while j &gt; sum_sizes:
+            sum_sizes += self.config.network.populations[J+1].size
+            J += 1
+        if self.activation_rates_shape == &#39;step&#39;:
+            return self._make_step_activation_rate(j, J)
+        elif self.activation_rates_shape == &#39;sigmoid&#39;:
+            return self._make_sigmoid_activation_rate(j, J)
+        raise ValueError(f&#39;Unexpected value {self.activation_rates_shape} for &#39;
+                         &#39;the shape of the activation rate functions.&#39;)
 
     def _next_states_and_rates(self, x):
         &#34;&#34;&#34;Get all possible states to which the network can go from `x`.
@@ -974,11 +1064,11 @@ class Simulator(Executor):
             return 1j, self.config.network.beta[j]
         if z == 1j:
             return 0., self.config.network.gamma[j]
-        raise ValueError(&#39;The state of a neuron should always be 0, 1 or the&#39;
+        raise ValueError(&#39;The state of a neuron must always be 0, 1 or the &#39;
                          &#39;imaginary unit.&#39;)
 
     def _reset_activation_rates(self):
-        &#34;&#34;&#34;Defines the activation rate functions.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the activation rate functions.&#34;&#34;&#34;
         self._activation_rates = [self._make_activation_rate(j)
                                   for j in range(self.config.network.size())]
 
@@ -1005,23 +1095,22 @@ class Simulator(Executor):
 
 
 class SimpleSimulator(Simulator):
-    &#34;&#34;&#34;Perform single simulations of the stochastic process on a network.
+    &#34;&#34;&#34;Perform single simulations of a stochastic process on a network.
 
     `SimpleSimulator` extends `Simulator` to ease the task of running single
-    simulations of the stochastic process. It has dedicated methods to run
+    simulations of a stochastic process. It has dedicated methods to run
     simulations and output a `popnet.graphics.Trajectory` instance. Its data
     attributes are the same as in the base class.
 
-    The initialization parameters are the same as in the base class, except that
-    the output type does not have to be explicitely given.
+    The initialization parameters are the same as in the base class.
 
     &#34;&#34;&#34;
 
     def run(self, method=&#39;direct&#39;, verbose=False):
         &#34;&#34;&#34;Run a simulation.
 
-        Run a simulation to obtain a possible trajectory of the stochastic
-        process which describes the evolution of the network. To obtain this
+        Run a simulation to obtain a possible trajectory of a stochastic
+        process that rules the evolution of the network&#39;s state. To obtain this
         trajectory, we use the Doob--Gillespie algorithm, either with the direct
         or with the first reaction method. See `Simulator.single_run` for more
         details about the Doob--Gillespie algorithm.
@@ -1032,13 +1121,14 @@ class SimpleSimulator(Simulator):
             Chooses which method is used to perform the Monte Carlo step in the
             Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
         verbose : bool, optional
-            If `True`, the current time will be printed. Defaults to `False`.
+            If `True`, the current time is printed at each iteration. Defaults
+            to `False`.
 
         Raises
         ------
         popnet.exceptions.PopNetError
-            If the length of the microscopic initial state is different of the
-            network&#39;s size.
+            If the length of the microscopic initial state is different from
+            the network&#39;s size.
         ValueError
             If an unexpected value is passed to `method`.
         &#34;&#34;&#34;
@@ -1048,7 +1138,8 @@ class SimpleSimulator(Simulator):
         elif method == &#39;first reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
-            raise ValueError(f&#39;Simulator does not know a method {method}.&#39;)
+            raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
+                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
         if verbose:
             def iterate(do_step, rng, t, x):
                 print(f&#39;t = {t:&lt;.2f}&#39;, end=&#39;\r&#39;)
@@ -1103,18 +1194,17 @@ class SimpleSimulator(Simulator):
 
 
 class ChainSimulator(Simulator):
-    &#34;&#34;&#34;Simulate multiple times the stochastic process on a network.
+    &#34;&#34;&#34;Simulate multiple times a stochastic process on a network.
 
     `ChainSimulator` extends `Simulator` to ease the task of running many
-    simulations of the stochastic process on the same network with the same
+    simulations of a stochastic process on the same network with the same
     configuration in order to obtain statistics. It has dedicated methods to
     run many simulations and output a `popnet.graphics.Statistics` instance.
     Its data attributes are the same as in the base, except for a new
     `ChainSimulator.samples`, which stores the trajectories obtained from
     simulations of the stochastic process.
 
-    The initialization parameters are the same as in the base class, except that
-    the output type does not have to be explicitely given.
+    The initialization parameters are the same as in the base class.
 
     &#34;&#34;&#34;
 
@@ -1122,10 +1212,12 @@ class ChainSimulator(Simulator):
     def samples(self):
         &#34;&#34;&#34;Samples of trajectories.
 
-        Samples of trajectories of the stochastic process, once a simulation has
-        been performed. It is a three dimensional array, where the first axis is
-        time, the second is the macroscopic state component, and the third is
-        associated with a given trajectory. It cannot be manually set nor deleted.
+        Samples of trajectories of the stochastic process. It does not contain
+        any relevant data at initialization or right after a reset, but it is
+        updated during a call to `ChainSimulator.run`. It is a three
+        dimensional array, where the first axis is time, the second is the
+        macroscopic state component, and the third is associated with a given
+        trajectory. It cannot be manually set nor deleted.
         &#34;&#34;&#34;
         return self._samples
 
@@ -1135,16 +1227,22 @@ class ChainSimulator(Simulator):
         del self._samples
 
     def reset(self):
-        &#34;&#34;&#34;Reset the simulator.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the simulator.
+
+        Reset the simulator to run it again. It extends the base class method
+        by also resetting `ChainSimulator.samples`.
+        &#34;&#34;&#34;
         super().reset()
         self._samples = None
 
     def run(self, method=&#39;direct&#39;, initial_state=&#39;fixed&#39;, verbose=False):
         &#34;&#34;&#34;Run multiple simulations.
 
-        Run multiple simulations of the stochastic process which describes the
-        evolution of the network, in order to obtain a sample of possible
-        trajectories. Each single simulation is perforfmed with the
+        Run multiple simulations of a stochastic process that describes the
+        evolution of the network&#39;s state in order to obtain a sample of
+        possible trajectories. The number of simulations performed is given by
+        the `popnet.structures.MicroConfiguration.executions` attribute of the
+        configuration. Each individual simulation is performed with the
         Doob--Gillespie algorithm, either with the direct or the first reaction
         method. See `Simulator.single_run` for more details about the
         Doob--Gillespie algorithm.
@@ -1161,16 +1259,16 @@ class ChainSimulator(Simulator):
             `popnet.structures.MicroConfiguration.reset_micro_initial_state`
             between each simulation. Defaults to `&#39;fixed&#39;`.
         verbose : bool, optional
-            If `True`, a progression bar will be printed to show how much of the
-            `n` simulations have been performed. Defaults to `False`.
+            If `True`, a progression bar is printed to show how much of the
+            simulations have been performed. Defaults to `False`.
 
         Raises
         ------
         popnet.exceptions.PopNetError
-            If the length of the microscopic initial state is different of the
-            network&#39;s size.
+            If the length of the microscopic initial state is different from
+            the network&#39;s size.
         ValueError
-            If an unexpected value is passed to `method`.
+            If an unexpected value is passed to `method` or to `initial_state`.
         &#34;&#34;&#34;
         self._check_sizes()
         samples = np.zeros((1+self.config.iterations, self._state_length(), 
@@ -1180,14 +1278,15 @@ class ChainSimulator(Simulator):
         elif method == &#39;first reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
-            raise ValueError(f&#39;\&#39;Simulator\&#39; does not know a method {method}.&#39;)
+            raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
+                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
         if initial_state == &#39;fixed&#39;:
             def reset_initial_state(): pass
         elif initial_state == &#39;random&#39;:
             def reset_initial_state(): self.config.reset_micro_initial_state()
         else:
-            raise ValueError(f&#39;Unknown keyword {initial_state} to choose the &#39;
-                             &#39;initial state. Valid values are \&#39;fixed\&#39; and &#39;
+            raise ValueError(f&#39;Unexpected keyword {initial_state} to choose the&#39;
+                             &#39; initial state. Valid values are \&#39;fixed\&#39; and &#39;
                              &#39;\&#39;random\&#39;.&#39;)
         if verbose:
             def progress(rg): return tqdm(rg)
@@ -1208,7 +1307,7 @@ class ChainSimulator(Simulator):
         &#34;&#34;&#34;Save the samples obtained from simulations.
 
         Overrides the base class method to save the samples of trajectories
-        obtainedfrom numerical simulations rather than the macroscopic states
+        obtained from numerical simulations rather than the macroscopic states
         they yield. Each state component *X* is saved in its own file, named
         *ID - name X.txt*, where *ID* is the ID of the configuration used for
         the simulations, and *name* is `name`.
@@ -1249,7 +1348,7 @@ class ChainSimulator(Simulator):
         return self.samples
 
 
-OUTPUT_TYPES = {systems.WilsonCowanSystem: graphics._WilsonCowanSolution,
+OUTPUT_TYPES = {systems.WilsonCowanSystem: graphics.Solution,
                 systems.MeanFieldSystem: graphics.Solution,
                 systems.MixedSystem: graphics.Solution,
                 systems.TaylorExtendedSystem: graphics.ExtendedSolution,
@@ -1257,10 +1356,8 @@ OUTPUT_TYPES = {systems.WilsonCowanSystem: graphics._WilsonCowanSolution,
                 systems.ExtendedSystem: graphics.ExtendedSolution,
                 SimpleSimulator: graphics.Trajectory,
                 ChainSimulator: graphics.Statistics}
-&#34;&#34;&#34;Type in which an execution should be output, indexed by
-`popnet.systems.DynamicalSystem` or by `Simulator` subclass. This dictionary
-is intended to be used only when more entries should be added, so that new
-dynamical systems and new simulators can be defined by a user.&#34;&#34;&#34;
+&#34;&#34;&#34;Type in which an execution is to be output, indexed by
+`popnet.systems.DynamicalSystem` or by `Simulator` subclass.&#34;&#34;&#34;
 
 
 @singledispatch
@@ -1268,18 +1365,19 @@ def get_integrator(arg, system_name=None, **kwargs):
     &#34;&#34;&#34;Get a numerical integrator.
 
     Define a numerical integrator, either from a dynamical system or from a
-    configuration and a keyword specifying which dynamical system should be
+    configuration and a keyword specifying which dynamical system is to be
     integrated.
 
     Parameters
     ----------
     arg : popnet.systems.DynamicalSystem or popnet.structures.Configuration
         Either a dynamical system to integrate, or a configuration to associate
-        to the integrator.
+        with the integrator.
     system_name : str, optional
         Decides which dynamical system is integrated when `arg` is a
-        configuration. It is mandatory when `arg` is a configuration. but has no
-        effect when it is a dynamical system. The following values are accepted.
+        configuration. It is in fact mandatory when `arg` is a configuration,
+        but has no effect when it is a dynamical system. The following values
+        are accepted.
 
          - `&#39;mean-field&#39;`: the Wilson--Cowan&#39;s model with refractory state.
          - `&#39;wilson-cowan&#39;`: an equivalent to the original Wilson--Cowan model.
@@ -1322,7 +1420,7 @@ def _(system, system_name=None, **kwargs):
 
 
 
-def get_simulator(config, mode=&#39;individual&#39;):
+def get_simulator(config, act=&#39;step&#39;, mode=&#39;individual&#39;):
     &#34;&#34;&#34;Get a simulator to perform stochastic simulations.
 
     Define a simulator in order to perform either individual simulations, or
@@ -1332,10 +1430,19 @@ def get_simulator(config, mode=&#39;individual&#39;):
     ----------
     config : popnet.structures.Configuration
         Configuration to associate with the simulator.
+    act : {&#39;step&#39;, &#39;sigmoid&#39;}, optional
+        Shape of neurons&#39; activation rates. If `&#39;step&#39;`, a neuron&#39;s activation
+        rate is a step function going from zero to
+        `popnet.structures.MicroNetwork.alpha` at its threshold
+        `popnet.structures.MicroNetwork.theta`. If `&#39;sigmoid&#39;`, a neuron&#39;s
+        activation rate is the logistic function
+        `popnet.structures.Population.F` of the population to which it belongs.
+        Defaults to `&#39;step&#39;`.
     mode : {&#39;individual&#39;, &#39;chain&#39;}, optional
-        How the simulations should be executed. If `&#39;individual&#39;`, the simulator
-        will be defined to run one simulation at a time. If `&#39;chain&#39;`, it will
-        be defined to run a sequence of simulations at every run.
+        How the simulations are to be executed. If `&#39;individual&#39;`, the simulator
+        is defined to run one simulation at a time. If `&#39;chain&#39;`, it is rather
+        defined to run a sequence of simulations at every run. Defaults to
+        `&#39;individual&#39;`.
 
     Returns
     -------
@@ -1348,10 +1455,11 @@ def get_simulator(config, mode=&#39;individual&#39;):
         If `mode` is given an unexpected value.
     &#34;&#34;&#34;
     if mode == &#39;individual&#39;:
-        return SimpleSimulator(config)
+        return SimpleSimulator(config, act=act)
     elif mode == &#39;chain&#39;:
-        return ChainSimulator(config)
-    raise PopNetError(f&#39;Unknown execution mode {mode}.&#39;)</code></pre>
+        return ChainSimulator(config, act=act)
+    raise PopNetError(f&#39;Unknown execution mode {mode}. Valid values are &#39;
+                      &#39;\&#39;individual\&#39; and \&#39;chain\&#39;.&#39;)</code></pre>
 </details>
 </section>
 <section>
@@ -1361,10 +1469,8 @@ def get_simulator(config, mode=&#39;individual&#39;):
 <dl>
 <dt id="popnet.executors.OUTPUT_TYPES"><code class="name">var <span class="ident">OUTPUT_TYPES</span></code></dt>
 <dd>
-<div class="desc"><p>Type in which an execution should be output, indexed by
-<code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> or by <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> subclass. This dictionary
-is intended to be used only when more entries should be added, so that new
-dynamical systems and new simulators can be defined by a user.</p></div>
+<div class="desc"><p>Type in which an execution is to be output, indexed by
+<code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> or by <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> subclass.</p></div>
 </dd>
 </dl>
 </section>
@@ -1377,18 +1483,19 @@ dynamical systems and new simulators can be defined by a user.</p></div>
 <dd>
 <div class="desc"><p>Get a numerical integrator.</p>
 <p>Define a numerical integrator, either from a dynamical system or from a
-configuration and a keyword specifying which dynamical system should be
+configuration and a keyword specifying which dynamical system is to be
 integrated.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>arg</code></strong> :&ensp;<code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> or <code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
 <dd>Either a dynamical system to integrate, or a configuration to associate
-to the integrator.</dd>
+with the integrator.</dd>
 <dt><strong><code>system_name</code></strong> :&ensp;<code>str</code>, optional</dt>
 <dd>
 <p>Decides which dynamical system is integrated when <code>arg</code> is a
-configuration. It is mandatory when <code>arg</code> is a configuration. but has no
-effect when it is a dynamical system. The following values are accepted.</p>
+configuration. It is in fact mandatory when <code>arg</code> is a configuration,
+but has no effect when it is a dynamical system. The following values
+are accepted.</p>
 <ul>
 <li><code>'mean-field'</code>: the Wilson&ndash;Cowan's model with refractory state.</li>
 <li><code>'wilson-cowan'</code>: an equivalent to the original Wilson&ndash;Cowan model.</li>
@@ -1425,18 +1532,19 @@ def get_integrator(arg, system_name=None, **kwargs):
     &#34;&#34;&#34;Get a numerical integrator.
 
     Define a numerical integrator, either from a dynamical system or from a
-    configuration and a keyword specifying which dynamical system should be
+    configuration and a keyword specifying which dynamical system is to be
     integrated.
 
     Parameters
     ----------
     arg : popnet.systems.DynamicalSystem or popnet.structures.Configuration
         Either a dynamical system to integrate, or a configuration to associate
-        to the integrator.
+        with the integrator.
     system_name : str, optional
         Decides which dynamical system is integrated when `arg` is a
-        configuration. It is mandatory when `arg` is a configuration. but has no
-        effect when it is a dynamical system. The following values are accepted.
+        configuration. It is in fact mandatory when `arg` is a configuration,
+        but has no effect when it is a dynamical system. The following values
+        are accepted.
 
          - `&#39;mean-field&#39;`: the Wilson--Cowan&#39;s model with refractory state.
          - `&#39;wilson-cowan&#39;`: an equivalent to the original Wilson--Cowan model.
@@ -1468,7 +1576,7 @@ def get_integrator(arg, system_name=None, **kwargs):
 </details>
 </dd>
 <dt id="popnet.executors.get_simulator"><code class="name flex">
-<span>def <span class="ident">get_simulator</span></span>(<span>config, mode='individual')</span>
+<span>def <span class="ident">get_simulator</span></span>(<span>config, act='step', mode='individual')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Get a simulator to perform stochastic simulations.</p>
@@ -1478,10 +1586,19 @@ chains of simulations.</p>
 <dl>
 <dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
 <dd>Configuration to associate with the simulator.</dd>
+<dt><strong><code>act</code></strong> :&ensp;<code>{'step', 'sigmoid'}</code>, optional</dt>
+<dd>Shape of neurons' activation rates. If <code>'step'</code>, a neuron's activation
+rate is a step function going from zero to
+<code><a title="popnet.structures.MicroNetwork.alpha" href="structures.html#popnet.structures.MicroNetwork.alpha">MicroNetwork.alpha</a></code> at its threshold
+<code><a title="popnet.structures.MicroNetwork.theta" href="structures.html#popnet.structures.MicroNetwork.theta">MicroNetwork.theta</a></code>. If <code>'sigmoid'</code>, a neuron's
+activation rate is the logistic function
+<code><a title="popnet.structures.Population.F" href="structures.html#popnet.structures.Population.F">Population.F()</a></code> of the population to which it belongs.
+Defaults to <code>'step'</code>.</dd>
 <dt><strong><code>mode</code></strong> :&ensp;<code>{'individual', 'chain'}</code>, optional</dt>
-<dd>How the simulations should be executed. If <code>'individual'</code>, the simulator
-will be defined to run one simulation at a time. If <code>'chain'</code>, it will
-be defined to run a sequence of simulations at every run.</dd>
+<dd>How the simulations are to be executed. If <code>'individual'</code>, the simulator
+is defined to run one simulation at a time. If <code>'chain'</code>, it is rather
+defined to run a sequence of simulations at every run. Defaults to
+<code>'individual'</code>.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1497,7 +1614,7 @@ be defined to run a sequence of simulations at every run.</dd>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_simulator(config, mode=&#39;individual&#39;):
+<pre><code class="python">def get_simulator(config, act=&#39;step&#39;, mode=&#39;individual&#39;):
     &#34;&#34;&#34;Get a simulator to perform stochastic simulations.
 
     Define a simulator in order to perform either individual simulations, or
@@ -1507,10 +1624,19 @@ be defined to run a sequence of simulations at every run.</dd>
     ----------
     config : popnet.structures.Configuration
         Configuration to associate with the simulator.
+    act : {&#39;step&#39;, &#39;sigmoid&#39;}, optional
+        Shape of neurons&#39; activation rates. If `&#39;step&#39;`, a neuron&#39;s activation
+        rate is a step function going from zero to
+        `popnet.structures.MicroNetwork.alpha` at its threshold
+        `popnet.structures.MicroNetwork.theta`. If `&#39;sigmoid&#39;`, a neuron&#39;s
+        activation rate is the logistic function
+        `popnet.structures.Population.F` of the population to which it belongs.
+        Defaults to `&#39;step&#39;`.
     mode : {&#39;individual&#39;, &#39;chain&#39;}, optional
-        How the simulations should be executed. If `&#39;individual&#39;`, the simulator
-        will be defined to run one simulation at a time. If `&#39;chain&#39;`, it will
-        be defined to run a sequence of simulations at every run.
+        How the simulations are to be executed. If `&#39;individual&#39;`, the simulator
+        is defined to run one simulation at a time. If `&#39;chain&#39;`, it is rather
+        defined to run a sequence of simulations at every run. Defaults to
+        `&#39;individual&#39;`.
 
     Returns
     -------
@@ -1523,10 +1649,11 @@ be defined to run a sequence of simulations at every run.</dd>
         If `mode` is given an unexpected value.
     &#34;&#34;&#34;
     if mode == &#39;individual&#39;:
-        return SimpleSimulator(config)
+        return SimpleSimulator(config, act=act)
     elif mode == &#39;chain&#39;:
-        return ChainSimulator(config)
-    raise PopNetError(f&#39;Unknown execution mode {mode}.&#39;)</code></pre>
+        return ChainSimulator(config, act=act)
+    raise PopNetError(f&#39;Unknown execution mode {mode}. Valid values are &#39;
+                      &#39;\&#39;individual\&#39; and \&#39;chain\&#39;.&#39;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -1536,36 +1663,34 @@ be defined to run a sequence of simulations at every run.</dd>
 <dl>
 <dt id="popnet.executors.ChainSimulator"><code class="flex name class">
 <span>class <span class="ident">ChainSimulator</span></span>
-<span>(</span><span>config, **kwargs)</span>
+<span>(</span><span>config, act='step', **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Simulate multiple times the stochastic process on a network.</p>
+<div class="desc"><p>Simulate multiple times a stochastic process on a network.</p>
 <p><code><a title="popnet.executors.ChainSimulator" href="#popnet.executors.ChainSimulator">ChainSimulator</a></code> extends <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> to ease the task of running many
-simulations of the stochastic process on the same network with the same
+simulations of a stochastic process on the same network with the same
 configuration in order to obtain statistics. It has dedicated methods to
 run many simulations and output a <code><a title="popnet.graphics.Statistics" href="graphics.html#popnet.graphics.Statistics">Statistics</a></code> instance.
 Its data attributes are the same as in the base, except for a new
 <code><a title="popnet.executors.ChainSimulator.samples" href="#popnet.executors.ChainSimulator.samples">ChainSimulator.samples</a></code>, which stores the trajectories obtained from
 simulations of the stochastic process.</p>
-<p>The initialization parameters are the same as in the base class, except that
-the output type does not have to be explicitely given.</p></div>
+<p>The initialization parameters are the same as in the base class.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class ChainSimulator(Simulator):
-    &#34;&#34;&#34;Simulate multiple times the stochastic process on a network.
+    &#34;&#34;&#34;Simulate multiple times a stochastic process on a network.
 
     `ChainSimulator` extends `Simulator` to ease the task of running many
-    simulations of the stochastic process on the same network with the same
+    simulations of a stochastic process on the same network with the same
     configuration in order to obtain statistics. It has dedicated methods to
     run many simulations and output a `popnet.graphics.Statistics` instance.
     Its data attributes are the same as in the base, except for a new
     `ChainSimulator.samples`, which stores the trajectories obtained from
     simulations of the stochastic process.
 
-    The initialization parameters are the same as in the base class, except that
-    the output type does not have to be explicitely given.
+    The initialization parameters are the same as in the base class.
 
     &#34;&#34;&#34;
 
@@ -1573,10 +1698,12 @@ the output type does not have to be explicitely given.</p></div>
     def samples(self):
         &#34;&#34;&#34;Samples of trajectories.
 
-        Samples of trajectories of the stochastic process, once a simulation has
-        been performed. It is a three dimensional array, where the first axis is
-        time, the second is the macroscopic state component, and the third is
-        associated with a given trajectory. It cannot be manually set nor deleted.
+        Samples of trajectories of the stochastic process. It does not contain
+        any relevant data at initialization or right after a reset, but it is
+        updated during a call to `ChainSimulator.run`. It is a three
+        dimensional array, where the first axis is time, the second is the
+        macroscopic state component, and the third is associated with a given
+        trajectory. It cannot be manually set nor deleted.
         &#34;&#34;&#34;
         return self._samples
 
@@ -1586,16 +1713,22 @@ the output type does not have to be explicitely given.</p></div>
         del self._samples
 
     def reset(self):
-        &#34;&#34;&#34;Reset the simulator.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the simulator.
+
+        Reset the simulator to run it again. It extends the base class method
+        by also resetting `ChainSimulator.samples`.
+        &#34;&#34;&#34;
         super().reset()
         self._samples = None
 
     def run(self, method=&#39;direct&#39;, initial_state=&#39;fixed&#39;, verbose=False):
         &#34;&#34;&#34;Run multiple simulations.
 
-        Run multiple simulations of the stochastic process which describes the
-        evolution of the network, in order to obtain a sample of possible
-        trajectories. Each single simulation is perforfmed with the
+        Run multiple simulations of a stochastic process that describes the
+        evolution of the network&#39;s state in order to obtain a sample of
+        possible trajectories. The number of simulations performed is given by
+        the `popnet.structures.MicroConfiguration.executions` attribute of the
+        configuration. Each individual simulation is performed with the
         Doob--Gillespie algorithm, either with the direct or the first reaction
         method. See `Simulator.single_run` for more details about the
         Doob--Gillespie algorithm.
@@ -1612,16 +1745,16 @@ the output type does not have to be explicitely given.</p></div>
             `popnet.structures.MicroConfiguration.reset_micro_initial_state`
             between each simulation. Defaults to `&#39;fixed&#39;`.
         verbose : bool, optional
-            If `True`, a progression bar will be printed to show how much of the
-            `n` simulations have been performed. Defaults to `False`.
+            If `True`, a progression bar is printed to show how much of the
+            simulations have been performed. Defaults to `False`.
 
         Raises
         ------
         popnet.exceptions.PopNetError
-            If the length of the microscopic initial state is different of the
-            network&#39;s size.
+            If the length of the microscopic initial state is different from
+            the network&#39;s size.
         ValueError
-            If an unexpected value is passed to `method`.
+            If an unexpected value is passed to `method` or to `initial_state`.
         &#34;&#34;&#34;
         self._check_sizes()
         samples = np.zeros((1+self.config.iterations, self._state_length(), 
@@ -1631,14 +1764,15 @@ the output type does not have to be explicitely given.</p></div>
         elif method == &#39;first reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
-            raise ValueError(f&#39;\&#39;Simulator\&#39; does not know a method {method}.&#39;)
+            raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
+                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
         if initial_state == &#39;fixed&#39;:
             def reset_initial_state(): pass
         elif initial_state == &#39;random&#39;:
             def reset_initial_state(): self.config.reset_micro_initial_state()
         else:
-            raise ValueError(f&#39;Unknown keyword {initial_state} to choose the &#39;
-                             &#39;initial state. Valid values are \&#39;fixed\&#39; and &#39;
+            raise ValueError(f&#39;Unexpected keyword {initial_state} to choose the&#39;
+                             &#39; initial state. Valid values are \&#39;fixed\&#39; and &#39;
                              &#39;\&#39;random\&#39;.&#39;)
         if verbose:
             def progress(rg): return tqdm(rg)
@@ -1659,7 +1793,7 @@ the output type does not have to be explicitely given.</p></div>
         &#34;&#34;&#34;Save the samples obtained from simulations.
 
         Overrides the base class method to save the samples of trajectories
-        obtainedfrom numerical simulations rather than the macroscopic states
+        obtained from numerical simulations rather than the macroscopic states
         they yield. Each state component *X* is saved in its own file, named
         *ID - name X.txt*, where *ID* is the ID of the configuration used for
         the simulations, and *name* is `name`.
@@ -1709,10 +1843,12 @@ the output type does not have to be explicitely given.</p></div>
 <dt id="popnet.executors.ChainSimulator.samples"><code class="name">var <span class="ident">samples</span></code></dt>
 <dd>
 <div class="desc"><p>Samples of trajectories.</p>
-<p>Samples of trajectories of the stochastic process, once a simulation has
-been performed. It is a three dimensional array, where the first axis is
-time, the second is the macroscopic state component, and the third is
-associated with a given trajectory. It cannot be manually set nor deleted.</p></div>
+<p>Samples of trajectories of the stochastic process. It does not contain
+any relevant data at initialization or right after a reset, but it is
+updated during a call to <code><a title="popnet.executors.ChainSimulator.run" href="#popnet.executors.ChainSimulator.run">ChainSimulator.run()</a></code>. It is a three
+dimensional array, where the first axis is time, the second is the
+macroscopic state component, and the third is associated with a given
+trajectory. It cannot be manually set nor deleted.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -1721,10 +1857,12 @@ associated with a given trajectory. It cannot be manually set nor deleted.</p></
 def samples(self):
     &#34;&#34;&#34;Samples of trajectories.
 
-    Samples of trajectories of the stochastic process, once a simulation has
-    been performed. It is a three dimensional array, where the first axis is
-    time, the second is the macroscopic state component, and the third is
-    associated with a given trajectory. It cannot be manually set nor deleted.
+    Samples of trajectories of the stochastic process. It does not contain
+    any relevant data at initialization or right after a reset, but it is
+    updated during a call to `ChainSimulator.run`. It is a three
+    dimensional array, where the first axis is time, the second is the
+    macroscopic state component, and the third is associated with a given
+    trajectory. It cannot be manually set nor deleted.
     &#34;&#34;&#34;
     return self._samples</code></pre>
 </details>
@@ -1732,14 +1870,37 @@ def samples(self):
 </dl>
 <h3>Methods</h3>
 <dl>
+<dt id="popnet.executors.ChainSimulator.reset"><code class="name flex">
+<span>def <span class="ident">reset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Reset the simulator.</p>
+<p>Reset the simulator to run it again. It extends the base class method
+by also resetting <code><a title="popnet.executors.ChainSimulator.samples" href="#popnet.executors.ChainSimulator.samples">ChainSimulator.samples</a></code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset(self):
+    &#34;&#34;&#34;Reset the simulator.
+
+    Reset the simulator to run it again. It extends the base class method
+    by also resetting `ChainSimulator.samples`.
+    &#34;&#34;&#34;
+    super().reset()
+    self._samples = None</code></pre>
+</details>
+</dd>
 <dt id="popnet.executors.ChainSimulator.run"><code class="name flex">
 <span>def <span class="ident">run</span></span>(<span>self, method='direct', initial_state='fixed', verbose=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Run multiple simulations.</p>
-<p>Run multiple simulations of the stochastic process which describes the
-evolution of the network, in order to obtain a sample of possible
-trajectories. Each single simulation is perforfmed with the
+<p>Run multiple simulations of a stochastic process that describes the
+evolution of the network's state in order to obtain a sample of
+possible trajectories. The number of simulations performed is given by
+the <code><a title="popnet.structures.MicroConfiguration.executions" href="structures.html#popnet.structures.MicroConfiguration.executions">MicroConfiguration.executions</a></code> attribute of the
+configuration. Each individual simulation is performed with the
 Doob&ndash;Gillespie algorithm, either with the direct or the first reaction
 method. See <code><a title="popnet.executors.Simulator.single_run" href="#popnet.executors.Simulator.single_run">Simulator.single_run()</a></code> for more details about the
 Doob&ndash;Gillespie algorithm.</p>
@@ -1755,16 +1916,16 @@ randomly with
 <code><a title="popnet.structures.MicroConfiguration.reset_micro_initial_state" href="structures.html#popnet.structures.MicroConfiguration.reset_micro_initial_state">MicroConfiguration.reset_micro_initial_state()</a></code>
 between each simulation. Defaults to <code>'fixed'</code>.</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>If <code>True</code>, a progression bar will be printed to show how much of the
-<code>n</code> simulations have been performed. Defaults to <code>False</code>.</dd>
+<dd>If <code>True</code>, a progression bar is printed to show how much of the
+simulations have been performed. Defaults to <code>False</code>.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code><a title="popnet.exceptions.PopNetError" href="exceptions.html#popnet.exceptions.PopNetError">PopNetError</a></code></dt>
-<dd>If the length of the microscopic initial state is different of the
-network's size.</dd>
+<dd>If the length of the microscopic initial state is different from
+the network's size.</dd>
 <dt><code>ValueError</code></dt>
-<dd>If an unexpected value is passed to <code>method</code>.</dd>
+<dd>If an unexpected value is passed to <code>method</code> or to <code>initial_state</code>.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -1773,9 +1934,11 @@ network's size.</dd>
 <pre><code class="python">def run(self, method=&#39;direct&#39;, initial_state=&#39;fixed&#39;, verbose=False):
     &#34;&#34;&#34;Run multiple simulations.
 
-    Run multiple simulations of the stochastic process which describes the
-    evolution of the network, in order to obtain a sample of possible
-    trajectories. Each single simulation is perforfmed with the
+    Run multiple simulations of a stochastic process that describes the
+    evolution of the network&#39;s state in order to obtain a sample of
+    possible trajectories. The number of simulations performed is given by
+    the `popnet.structures.MicroConfiguration.executions` attribute of the
+    configuration. Each individual simulation is performed with the
     Doob--Gillespie algorithm, either with the direct or the first reaction
     method. See `Simulator.single_run` for more details about the
     Doob--Gillespie algorithm.
@@ -1792,16 +1955,16 @@ network's size.</dd>
         `popnet.structures.MicroConfiguration.reset_micro_initial_state`
         between each simulation. Defaults to `&#39;fixed&#39;`.
     verbose : bool, optional
-        If `True`, a progression bar will be printed to show how much of the
-        `n` simulations have been performed. Defaults to `False`.
+        If `True`, a progression bar is printed to show how much of the
+        simulations have been performed. Defaults to `False`.
 
     Raises
     ------
     popnet.exceptions.PopNetError
-        If the length of the microscopic initial state is different of the
-        network&#39;s size.
+        If the length of the microscopic initial state is different from
+        the network&#39;s size.
     ValueError
-        If an unexpected value is passed to `method`.
+        If an unexpected value is passed to `method` or to `initial_state`.
     &#34;&#34;&#34;
     self._check_sizes()
     samples = np.zeros((1+self.config.iterations, self._state_length(), 
@@ -1811,14 +1974,15 @@ network's size.</dd>
     elif method == &#39;first reaction&#39;:
         def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
     else:
-        raise ValueError(f&#39;\&#39;Simulator\&#39; does not know a method {method}.&#39;)
+        raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
+                         &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
     if initial_state == &#39;fixed&#39;:
         def reset_initial_state(): pass
     elif initial_state == &#39;random&#39;:
         def reset_initial_state(): self.config.reset_micro_initial_state()
     else:
-        raise ValueError(f&#39;Unknown keyword {initial_state} to choose the &#39;
-                         &#39;initial state. Valid values are \&#39;fixed\&#39; and &#39;
+        raise ValueError(f&#39;Unexpected keyword {initial_state} to choose the&#39;
+                         &#39; initial state. Valid values are \&#39;fixed\&#39; and &#39;
                          &#39;\&#39;random\&#39;.&#39;)
     if verbose:
         def progress(rg): return tqdm(rg)
@@ -1842,7 +2006,7 @@ network's size.</dd>
 <dd>
 <div class="desc"><p>Save the samples obtained from simulations.</p>
 <p>Overrides the base class method to save the samples of trajectories
-obtainedfrom numerical simulations rather than the macroscopic states
+obtained from numerical simulations rather than the macroscopic states
 they yield. Each state component <em>X</em> is saved in its own file, named
 <em>ID - name X.txt</em>, where <em>ID</em> is the ID of the configuration used for
 the simulations, and <em>name</em> is <code>name</code>.</p>
@@ -1874,7 +2038,7 @@ the files are saved in the current directory.</dd>
     &#34;&#34;&#34;Save the samples obtained from simulations.
 
     Overrides the base class method to save the samples of trajectories
-    obtainedfrom numerical simulations rather than the macroscopic states
+    obtained from numerical simulations rather than the macroscopic states
     they yield. Each state component *X* is saved in its own file, named
     *ID - name X.txt*, where *ID* is the ID of the configuration used for
     the simulations, and *name* is `name`.
@@ -1917,13 +2081,13 @@ the files are saved in the current directory.</dd>
 <li><code><b><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></b></code>:
 <ul class="hlist">
 <li><code><a title="popnet.executors.Simulator.activation_rates" href="#popnet.executors.Simulator.activation_rates">activation_rates</a></code></li>
+<li><code><a title="popnet.executors.Simulator.activation_rates_shape" href="#popnet.executors.Simulator.activation_rates_shape">activation_rates_shape</a></code></li>
 <li><code><a title="popnet.executors.Simulator.calcium_output" href="#popnet.executors.Simulator.calcium_output">calcium_output</a></code></li>
 <li><code><a title="popnet.executors.Simulator.close" href="#popnet.executors.Simulator.close">close</a></code></li>
 <li><code><a title="popnet.executors.Simulator.config" href="#popnet.executors.Executor.config">config</a></code></li>
 <li><code><a title="popnet.executors.Simulator.micro_output" href="#popnet.executors.Simulator.micro_output">micro_output</a></code></li>
 <li><code><a title="popnet.executors.Simulator.micro_states" href="#popnet.executors.Simulator.micro_states">micro_states</a></code></li>
 <li><code><a title="popnet.executors.Simulator.output" href="#popnet.executors.Executor.output">output</a></code></li>
-<li><code><a title="popnet.executors.Simulator.reset" href="#popnet.executors.Simulator.reset">reset</a></code></li>
 <li><code><a title="popnet.executors.Simulator.single_run" href="#popnet.executors.Simulator.single_run">single_run</a></code></li>
 <li><code><a title="popnet.executors.Simulator.states" href="#popnet.executors.Executor.states">states</a></code></li>
 <li><code><a title="popnet.executors.Simulator.success" href="#popnet.executors.Executor.success">success</a></code></li>
@@ -1940,16 +2104,16 @@ the files are saved in the current directory.</dd>
 <dd>
 <div class="desc"><p>Execute numerical experiments on a network.</p>
 <p><code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> is meant to perform numerical experiments to study the dynamics
-of a network split into populations. These experiments are intended to be
+on a network split into populations. These experiments are intended to be
 carried out by subclasses of <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code>.</p>
 <ul>
-<li>To perform simulations of the stochastic process which rules the
+<li>To perform simulations of a stochastic process that rules the
 evolution of the network, use <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code>.</li>
 <li>To perform numerical integrations of reduced dynamical systems
 describing the macroscopic behavior of the network, use <code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code>.</li>
 </ul>
-<p>A configuration must be given, and a reset of the executor is made at the
-end of the initialization, when setting the configuration.</p>
+<p>A reset of the executor is made at the end of the initialization, when
+setting the configuration.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
@@ -1972,16 +2136,16 @@ end of the initialization, when setting the configuration.</p>
     &#34;&#34;&#34;Execute numerical experiments on a network.
 
     `Executor` is meant to perform numerical experiments to study the dynamics
-    of a network split into populations. These experiments are intended to be
+    on a network split into populations. These experiments are intended to be
     carried out by subclasses of `Executor`.
 
-     - To perform simulations of the stochastic process which rules the
+     - To perform simulations of a stochastic process that rules the
        evolution of the network, use `Simulator`.
      - To perform numerical integrations of reduced dynamical systems
        describing the macroscopic behavior of the network, use `Integrator`.
 
-    A configuration must be given, and a reset of the executor is made at the
-    end of the initialization, when setting the configuration.
+    A reset of the executor is made at the end of the initialization, when
+    setting the configuration.
 
     Parameters
     ----------
@@ -2009,7 +2173,7 @@ end of the initialization, when setting the configuration.</p>
 
         Configuration defining all parameters used by the executor. It must be
         a `popnet.structures.Configuration` instance, or a
-        `popnet.structures.MicroConfiguration` instance if the network should
+        `popnet.structures.MicroConfiguration` instance if the network must
         have a microscopic structure. If it is set, the executor is reset with
         `Executor.reset`. It cannot be deleted.
         &#34;&#34;&#34;
@@ -2039,7 +2203,7 @@ end of the initialization, when setting the configuration.</p>
         &#34;&#34;&#34;Time.
 
         At initialization or with a call to `Executor.reset`, it is set
-        according to the integrator&#39;s configuration `config`. Specifically, it
+        according to the executor&#39;s configuration `config`. Specifically, it
         is an array starting at `config.initial_time` and ending at
         `config.final_time`, with an interval of `config.delta` between time
         steps. It cannot be manually set nor deleted.
@@ -2076,10 +2240,10 @@ end of the initialization, when setting the configuration.</p>
 
         Returns
         -------
-        Result
+        popnet.graphics.Result
             The output of the experiment. The precise output type depends on the
-            experiment executed and on the number of populations of the network.
-            See the [summary](graphics.html#classes-and-hierarchy) of all
+            experiment executed; see the
+            [summary](graphics.html#classes-and-hierarchy) of all
             `popnet.graphics.Result` subclasses for a quick reference giving
             the output type of each case.
 
@@ -2091,16 +2255,20 @@ end of the initialization, when setting the configuration.</p>
         self._check_if_run()
         if self._output_type is None:
             raise PopNetError(
-                &#39;PopNet does not know how to output the results of this &#39;
-                &#39;experiment. It might be due to the use of the base class &#39;
-                &#39;\&#39;Result\&#39; rather than its subclasses, or to the numerical &#39;
-                &#39;integration of an unrecognized dynamical system. It should &#39;
-                &#39;still be possible to save the results with \&#39;save_output\&#39;.&#39;)
+                &#39;PopNet does not know how to output the results of this experi&#39;
+                &#39;ment. It might be due to the use of the base class \&#39;Result\&#39; &#39;
+                &#39;rather than its subclasses, or to the numerical integration &#39;
+                &#39;of an unrecognized dynamical system. It might still be &#39;
+                &#39;possible to save the results with Executor.save_output().&#39;)
         return self._output_type(self.config, self._output_states(), 
                                  self._output_times(), **kwargs)
 
     def reset(self):
-        &#34;&#34;&#34;Reset the executor.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the executor.
+        
+        Reset the executor to run it again. Sets `Executor.success` to `None`
+        and resets `Executor.times` according to the configuration.
+        &#34;&#34;&#34;
         self._success = None
         self._times = np.linspace(self.config.initial_time, 
                                   self.config.final_time, 
@@ -2111,7 +2279,7 @@ end of the initialization, when setting the configuration.</p>
         
         This method is abstract and is implemented in subclasses.
         &#34;&#34;&#34;
-        raise NotImplementedError(&#39;An Executor must implement a \&#39;run\&#39;&#39;
+        raise NotImplementedError(&#39;An executor must implement a \&#39;run\&#39; &#39;
                                   &#39;method.&#39;)
 
     def save_output(self, name=None, folder=None):
@@ -2157,7 +2325,7 @@ end of the initialization, when setting the configuration.</p>
         &#34;&#34;&#34;Check if the executor has already run.&#34;&#34;&#34;
         if self.success is None:
             raise PopNetError(&#39;An executor has to run before the results are &#39;
-                              &#39;output. Call run() first.&#39;)
+                              &#39;output. Call Executor.run() first.&#39;)
 
     def _output_states(self):
         &#34;&#34;&#34;States array to output.&#34;&#34;&#34;
@@ -2183,7 +2351,7 @@ end of the initialization, when setting the configuration.</p>
 <div class="desc"><p>Configuration used with the executor.</p>
 <p>Configuration defining all parameters used by the executor. It must be
 a <code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code> instance, or a
-<code><a title="popnet.structures.MicroConfiguration" href="structures.html#popnet.structures.MicroConfiguration">MicroConfiguration</a></code> instance if the network should
+<code><a title="popnet.structures.MicroConfiguration" href="structures.html#popnet.structures.MicroConfiguration">MicroConfiguration</a></code> instance if the network must
 have a microscopic structure. If it is set, the executor is reset with
 <code><a title="popnet.executors.Executor.reset" href="#popnet.executors.Executor.reset">Executor.reset()</a></code>. It cannot be deleted.</p></div>
 <details class="source">
@@ -2196,7 +2364,7 @@ def config(self):
 
     Configuration defining all parameters used by the executor. It must be
     a `popnet.structures.Configuration` instance, or a
-    `popnet.structures.MicroConfiguration` instance if the network should
+    `popnet.structures.MicroConfiguration` instance if the network must
     have a microscopic structure. If it is set, the executor is reset with
     `Executor.reset`. It cannot be deleted.
     &#34;&#34;&#34;
@@ -2253,7 +2421,7 @@ def success(self):
 <dd>
 <div class="desc"><p>Time.</p>
 <p>At initialization or with a call to <code><a title="popnet.executors.Executor.reset" href="#popnet.executors.Executor.reset">Executor.reset()</a></code>, it is set
-according to the integrator's configuration <code>config</code>. Specifically, it
+according to the executor's configuration <code>config</code>. Specifically, it
 is an array starting at <code>config.initial_time</code> and ending at
 <code>config.final_time</code>, with an interval of <code>config.delta</code> between time
 steps. It cannot be manually set nor deleted.</p></div>
@@ -2266,7 +2434,7 @@ def times(self):
     &#34;&#34;&#34;Time.
 
     At initialization or with a call to `Executor.reset`, it is set
-    according to the integrator&#39;s configuration `config`. Specifically, it
+    according to the executor&#39;s configuration `config`. Specifically, it
     is an array starting at `config.initial_time` and ending at
     `config.final_time`, with an interval of `config.delta` between time
     steps. It cannot be manually set nor deleted.
@@ -2307,10 +2475,10 @@ def times(self):
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
-<dt><code>Result</code></dt>
+<dt><code><a title="popnet.graphics.Result" href="graphics.html#popnet.graphics.Result">Result</a></code></dt>
 <dd>The output of the experiment. The precise output type depends on the
-experiment executed and on the number of populations of the network.
-See the <a href="graphics.html#classes-and-hierarchy">summary</a> of all
+experiment executed; see the
+<a href="graphics.html#classes-and-hierarchy">summary</a> of all
 <code><a title="popnet.graphics.Result" href="graphics.html#popnet.graphics.Result">Result</a></code> subclasses for a quick reference giving
 the output type of each case.</dd>
 </dl>
@@ -2335,10 +2503,10 @@ the output type of each case.</dd>
 
     Returns
     -------
-    Result
+    popnet.graphics.Result
         The output of the experiment. The precise output type depends on the
-        experiment executed and on the number of populations of the network.
-        See the [summary](graphics.html#classes-and-hierarchy) of all
+        experiment executed; see the
+        [summary](graphics.html#classes-and-hierarchy) of all
         `popnet.graphics.Result` subclasses for a quick reference giving
         the output type of each case.
 
@@ -2350,11 +2518,11 @@ the output type of each case.</dd>
     self._check_if_run()
     if self._output_type is None:
         raise PopNetError(
-            &#39;PopNet does not know how to output the results of this &#39;
-            &#39;experiment. It might be due to the use of the base class &#39;
-            &#39;\&#39;Result\&#39; rather than its subclasses, or to the numerical &#39;
-            &#39;integration of an unrecognized dynamical system. It should &#39;
-            &#39;still be possible to save the results with \&#39;save_output\&#39;.&#39;)
+            &#39;PopNet does not know how to output the results of this experi&#39;
+            &#39;ment. It might be due to the use of the base class \&#39;Result\&#39; &#39;
+            &#39;rather than its subclasses, or to the numerical integration &#39;
+            &#39;of an unrecognized dynamical system. It might still be &#39;
+            &#39;possible to save the results with Executor.save_output().&#39;)
     return self._output_type(self.config, self._output_states(), 
                              self._output_times(), **kwargs)</code></pre>
 </details>
@@ -2363,13 +2531,19 @@ the output type of each case.</dd>
 <span>def <span class="ident">reset</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reset the executor.</p></div>
+<div class="desc"><p>Reset the executor.</p>
+<p>Reset the executor to run it again. Sets <code><a title="popnet.executors.Executor.success" href="#popnet.executors.Executor.success">Executor.success</a></code> to <code>None</code>
+and resets <code><a title="popnet.executors.Executor.times" href="#popnet.executors.Executor.times">Executor.times</a></code> according to the configuration.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self):
-    &#34;&#34;&#34;Reset the executor.&#34;&#34;&#34;
+    &#34;&#34;&#34;Reset the executor.
+    
+    Reset the executor to run it again. Sets `Executor.success` to `None`
+    and resets `Executor.times` according to the configuration.
+    &#34;&#34;&#34;
     self._success = None
     self._times = np.linspace(self.config.initial_time, 
                               self.config.final_time, 
@@ -2391,7 +2565,7 @@ the output type of each case.</dd>
     
     This method is abstract and is implemented in subclasses.
     &#34;&#34;&#34;
-    raise NotImplementedError(&#39;An Executor must implement a \&#39;run\&#39;&#39;
+    raise NotImplementedError(&#39;An executor must implement a \&#39;run\&#39; &#39;
                               &#39;method.&#39;)</code></pre>
 </details>
 </dd>
@@ -2474,12 +2648,12 @@ the file is saved in the current directory.</dd>
 <span>(</span><span>system, **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Numerical integrator for ODEs related to Wilson&ndash;Cowan's model.</p>
+<div class="desc"><p>Numerical integrators for systems related to Wilson&ndash;Cowan's model.</p>
 <p><code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code> extends <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> to perform numerical integrations of
-dynamical systems related to the Wilson&ndash;Cowan model. All numerical
-integrations are performed with the class
-<a href="https://tinyurl.com/scipy-integrate-ode">ode</a> from SciPy's <code>integrate</code>
-module. Specific vector fields are implemented in <code><a title="popnet.executors.Integrator" href="#popnet.executors.Integrator">Integrator</a></code>'s subclasses.</p>
+dynamical systems related to the Wilson&ndash;Cowan model. Numerical
+integrations can either be performed with the class
+<a href="https://31c8.short.gy/scipy-integrate-ode">ode</a> from SciPy's <code>integrate</code>
+module, or with a classical Runge&ndash;Kutta method.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>system</code></strong> :&ensp;<code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code></dt>
@@ -2488,26 +2662,33 @@ module. Specific vector fields are implemented in <code><a title="popnet.executo
 <h2 id="attributes">Attributes</h2>
 <dl>
 <dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.Configuration" href="structures.html#popnet.structures.Configuration">Configuration</a></code></dt>
-<dd>Configuration used for the numerical integration. It is taken as that
-of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.Integrator.system">Integrator.system</a></code>. See <code><a title="popnet.executors.Integrator.config" href="#popnet.executors.Executor.config">Integrator.config</a></code>.</dd>
+<dd>Configuration used for the numerical integration. At initialization, it
+is automatically taken as that of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.Integrator.system">Integrator.system</a></code>. See
+<code><a title="popnet.executors.Integrator.config" href="#popnet.executors.Executor.config">Integrator.config</a></code>.</dd>
 <dt><strong><code>system</code></strong> :&ensp;<code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code></dt>
 <dd>Dynamical system used for the integration. See <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.Integrator.system">Integrator.system</a></code>.</dd>
-<dt><strong><code>states</code></strong>, <strong><code>times</code></strong> :&ensp;<code>array_like</code></dt>
-<dd>Arrays representing the state of the network with respect to time. See
-<code><a title="popnet.executors.Integrator.states" href="#popnet.executors.Executor.states">Integrator.states</a></code> and <code><a title="popnet.executors.Integrator.times" href="#popnet.executors.Executor.times">Integrator.times</a></code>.</dd>
+<dt><strong><code>times</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>Time. See <code><a title="popnet.executors.Integrator.times" href="#popnet.executors.Executor.times">Integrator.times</a></code>.</dd>
+<dt><strong><code>states</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>State of the network with respect to time. See <code><a title="popnet.executors.Integrator.states" href="#popnet.executors.Executor.states">Integrator.states</a></code>.</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>If <code>system</code> is not a <code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> instance.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Integrator(Executor):
-    &#34;&#34;&#34;Numerical integrator for ODEs related to Wilson--Cowan&#39;s model.
+    &#34;&#34;&#34;Numerical integrators for systems related to Wilson--Cowan&#39;s model.
 
     `Integrator` extends `Executor` to perform numerical integrations of
-    dynamical systems related to the Wilson--Cowan model. All numerical
-    integrations are performed with the class
-    [ode](https://tinyurl.com/scipy-integrate-ode) from SciPy&#39;s `integrate`
-    module. Specific vector fields are implemented in `Integrator`&#39;s subclasses.
+    dynamical systems related to the Wilson--Cowan model. Numerical
+    integrations can either be performed with the class
+    [ode](https://31c8.short.gy/scipy-integrate-ode) from SciPy&#39;s `integrate`
+    module, or with a classical Runge--Kutta method.
 
     Parameters
     ----------
@@ -2517,26 +2698,36 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
     Attributes
     ----------
     config : popnet.structures.Configuration
-        Configuration used for the numerical integration. It is taken as that
-        of `Integrator.system`. See `Integrator.config`.
+        Configuration used for the numerical integration. At initialization, it
+        is automatically taken as that of `Integrator.system`. See
+        `Integrator.config`.
     system : popnet.systems.DynamicalSystem
         Dynamical system used for the integration. See `Integrator.system`.
-    states, times : array_like
-        Arrays representing the state of the network with respect to time. See
-        `Integrator.states` and `Integrator.times`.
+    times : array_like
+        Time. See `Integrator.times`.
+    states : array_like
+        State of the network with respect to time. See `Integrator.states`.
+
+    Raises
+    ------
+    TypeError
+        If `system` is not a `popnet.systems.DynamicalSystem` instance.
 
     &#34;&#34;&#34;
 
     def __init__(self, system, **kwargs):
-        self.system = system
+        if not isinstance(system, systems.DynamicalSystem):
+            raise TypeError(&#39;The dynamical system associated with an integrator&#39;
+                            &#39; must be a \&#39;DynamicalSystem\&#39; instance.&#39;)
+        self._system = system
         super().__init__(system.config, **kwargs)
         try:
             output_type = OUTPUT_TYPES[type(self.system)]
         except KeyError:
             warn(&#39;The type of dynamical system you want to integrate is not &#39;
-                 &#39;recognized by PopNet. The integration should be possible, &#39;
+                 &#39;recognized by PopNet. The integration might be possible, &#39;
                  &#39;but it will not be possible to output the results with &#39;
-                 &#39;\&#39;Integrator.output\&#39;.&#39;, category=PopNetWarning, stacklevel=2)
+                 &#39;Integrator.output().&#39;, category=PopNetWarning, stacklevel=2)
         else:
             self._output_type = output_type
 
@@ -2545,38 +2736,36 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
         &#34;&#34;&#34;Dynamical system used for the integration.
 
         The dynamical system used when performing numerical integrations. It
-        must be a `popnet.systems.DynamicalSystem` instance, and it is expected
-        to be associated with the same configuration as the integrator. It
-        cannot be deleted.
+        is a `popnet.systems.DynamicalSystem` instance associated with the
+        same configuration as the integrator. It is set at initialization,
+        and afterwards it cannot be manually set nor deleted.
         &#34;&#34;&#34;
         return self._system
 
-    @system.setter
-    def system(self, new_value):
-        if not isinstance(new_value, systems.DynamicalSystem):
-            raise TypeError(&#39;The dynamical system associated with an integrator&#39;
-                            &#39; must be a \&#39;DynamicalSystem\&#39; instance.&#39;)
-        self._system = new_value
-
     def reset(self):
-        &#34;&#34;&#34;Reset the integrator.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the integrator.
+
+        Reset the integrator to run it again. It extends the base class method
+        by also resetting `Integrator.states` and by setting the initial state
+        to be used in the integration from the configuration.
+        &#34;&#34;&#34;
         super().reset()
         self._states = np.zeros((len(self.times), self._state_length()))
         self.states[0] = self.config.initial_state[: self._state_length()]
 
     def run(self, task, time=&#39;forward&#39;, verbose=False, catch_escape=False,
             backend=&#39;vode&#39;, **kwargs):
-        &#34;&#34;&#34;Run the numerical integration.
+        &#34;&#34;&#34;Run a numerical integration.
 
         Run a numerical integration of the dynamical system using either an
-        [ode](https://tinyurl.com/scipy-integrate-ode) instance from SciPy&#39;s
+        [ode](https://31c8.short.gy/scipy-integrate-ode) instance from SciPy&#39;s
         `integrate` module, or a classical Runge--Kutta method.
 
         Parameters
         ----------
         task : {&#39;ode&#39;, &#39;runge-kutta&#39;}, optional
             Choose to integrate with SciPy&#39;s methods or with a classical
-            Runge-- Kutta method. Defaults to `&#39;ode&#39;`.
+            Runge--Kutta method. Defaults to `&#39;ode&#39;`.
         time : {&#39;forward&#39;, &#39;backward&#39;}, optional
             Chooses if the intergration is performed forward of backward in
             time. If the integration is done backward in time, it is done from
@@ -2584,18 +2773,18 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
             interval of the same length as if it was done forward. Defaults to
             `&#39;forward&#39;`.
         verbose : bool, optional
-            If `True`, a progression bar will be printed to show how much of the
+            If `True`, a progression bar is printed to show how much of the
             integration has been performed. Defaults to `False`.
         catch_escape : bool, optional
-            If `True`,  the integration will stop as soon as a state component
-            escapes the interval \\([-1, 1]\\), and the integration will be
+            If `True`,  the integration stops as soon as a state component
+            escapes the interval \\([-1, 1]\\), and the integration is
             considered to have failed. Defaults to `False`.
         backend : {&#39;vode&#39;, &#39;zvode&#39;, &#39;lsoda&#39;, &#39;dopri5&#39;, &#39;dop853&#39;}, optional
-            Integrator used with `ode`. Defaults to `&#39;vode&#39;`. It has no effect
-            if `task` is not set to `ode`.
+            Integrator used with SciPy&#39;s methods. Defaults to `&#39;vode&#39;`. It has
+            no effect if `task` is not set to `&#39;ode&#39;`.
         **kwargs
             Keyword arguments to be passed to the `set_integrator` method of
-            the `ode` solver. It has no effect if `task` is not set to `ode`.
+            the `ode` solver. It has no effect if `task` is not set to `&#39;ode&#39;`.
 
         Warns
         -----
@@ -2612,8 +2801,8 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
             def jac(t, x): 
                 return - self._jac(2 * self.config.initial_time - t, x)
         else:
-            raise ValueError(f&#39;Unknown value {time} for \&#39;time\&#39; keyword. Valid&#39;
-                             &#39; values are \&#39;forward\&#39; and \&#39;backward\&#39;.&#39;)
+            raise ValueError(f&#39;Unexpected value {time} for \&#39;time\&#39; keyword. &#39;
+                             &#39;Valid values are \&#39;forward\&#39; and \&#39;backward\&#39;.&#39;)
         if verbose:
             def progress(rg): return tqdm(rg)
         else:
@@ -2627,8 +2816,8 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
         elif task == &#39;runge-kutta&#39;:
             self._run_runge_kutta(field, progress, has_escaped)
         else:
-            raise ValueError(f&#39;Unknown task {task} for \&#39;Integrator.run\&#39;. Acce&#39;
-                             &#39;pted values are \&#39;ode\&#39;  and \&#39;runge-kutta\&#39;.&#39;)
+            raise ValueError(f&#39;Unexpected task {task} for Integrator.run(). &#39;
+                             &#39;Valid values are \&#39;ode\&#39;  and \&#39;runge-kutta\&#39;.&#39;)
         if time == &#39;backward&#39;:
             self._times = np.flip(2 * self.config.initial_time - self.times)
             self._states = np.flip(self.states, axis=0)
@@ -2675,6 +2864,17 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
         &#34;&#34;&#34;
         return self.system.jac(Y)
 
+    def _output_states(self):
+        &#34;&#34;&#34;States array to output.&#34;&#34;&#34;
+        if isinstance(self.system, systems.WilsonCowanSystem):
+            p = len(self.config.network.populations)
+            output_states = np.zeros((len(self.times), 2*p))
+            output_states[:,:p] = self.states
+            for J, popJ in enumerate(self.config.network.populations):
+                output_states[:,p+J] = popJ.beta / popJ.gamma * self.states[:,J]
+            return output_states
+        return super()._output_states()
+
     def _run_ode(self, field, jac, progress, has_escaped, backend, **kwargs):
         &#34;&#34;&#34;Run a numerical integration with `scipy.integrate.ode`.&#34;&#34;&#34;
         try:
@@ -2718,9 +2918,9 @@ of <code><a title="popnet.executors.Integrator.system" href="#popnet.executors.I
 <dd>
 <div class="desc"><p>Dynamical system used for the integration.</p>
 <p>The dynamical system used when performing numerical integrations. It
-must be a <code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> instance, and it is expected
-to be associated with the same configuration as the integrator. It
-cannot be deleted.</p></div>
+is a <code><a title="popnet.systems.DynamicalSystem" href="systems.html#popnet.systems.DynamicalSystem">DynamicalSystem</a></code> instance associated with the
+same configuration as the integrator. It is set at initialization,
+and afterwards it cannot be manually set nor deleted.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2730,9 +2930,9 @@ def system(self):
     &#34;&#34;&#34;Dynamical system used for the integration.
 
     The dynamical system used when performing numerical integrations. It
-    must be a `popnet.systems.DynamicalSystem` instance, and it is expected
-    to be associated with the same configuration as the integrator. It
-    cannot be deleted.
+    is a `popnet.systems.DynamicalSystem` instance associated with the
+    same configuration as the integrator. It is set at initialization,
+    and afterwards it cannot be manually set nor deleted.
     &#34;&#34;&#34;
     return self._system</code></pre>
 </details>
@@ -2744,13 +2944,21 @@ def system(self):
 <span>def <span class="ident">reset</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reset the integrator.</p></div>
+<div class="desc"><p>Reset the integrator.</p>
+<p>Reset the integrator to run it again. It extends the base class method
+by also resetting <code><a title="popnet.executors.Integrator.states" href="#popnet.executors.Executor.states">Integrator.states</a></code> and by setting the initial state
+to be used in the integration from the configuration.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self):
-    &#34;&#34;&#34;Reset the integrator.&#34;&#34;&#34;
+    &#34;&#34;&#34;Reset the integrator.
+
+    Reset the integrator to run it again. It extends the base class method
+    by also resetting `Integrator.states` and by setting the initial state
+    to be used in the integration from the configuration.
+    &#34;&#34;&#34;
     super().reset()
     self._states = np.zeros((len(self.times), self._state_length()))
     self.states[0] = self.config.initial_state[: self._state_length()]</code></pre>
@@ -2760,15 +2968,15 @@ def system(self):
 <span>def <span class="ident">run</span></span>(<span>self, task, time='forward', verbose=False, catch_escape=False, backend='vode', **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Run the numerical integration.</p>
+<div class="desc"><p>Run a numerical integration.</p>
 <p>Run a numerical integration of the dynamical system using either an
-<a href="https://tinyurl.com/scipy-integrate-ode">ode</a> instance from SciPy's
+<a href="https://31c8.short.gy/scipy-integrate-ode">ode</a> instance from SciPy's
 <code>integrate</code> module, or a classical Runge&ndash;Kutta method.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>task</code></strong> :&ensp;<code>{'ode', 'runge-kutta'}</code>, optional</dt>
 <dd>Choose to integrate with SciPy's methods or with a classical
-Runge&ndash; Kutta method. Defaults to <code>'ode'</code>.</dd>
+Runge&ndash;Kutta method. Defaults to <code>'ode'</code>.</dd>
 <dt><strong><code>time</code></strong> :&ensp;<code>{'forward', 'backward'}</code>, optional</dt>
 <dd>Chooses if the intergration is performed forward of backward in
 time. If the integration is done backward in time, it is done from
@@ -2776,19 +2984,19 @@ the initial time given by the configuration and for a total time
 interval of the same length as if it was done forward. Defaults to
 <code>'forward'</code>.</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>If <code>True</code>, a progression bar will be printed to show how much of the
+<dd>If <code>True</code>, a progression bar is printed to show how much of the
 integration has been performed. Defaults to <code>False</code>.</dd>
 <dt><strong><code>catch_escape</code></strong> :&ensp;<code>bool</code>, optional</dt>
 <dd>If <code>True</code>,
-the integration will stop as soon as a state component
-escapes the interval <span><span class="MathJax_Preview">[-1, 1]</span><script type="math/tex">[-1, 1]</script></span>, and the integration will be
+the integration stops as soon as a state component
+escapes the interval <span><span class="MathJax_Preview">[-1, 1]</span><script type="math/tex">[-1, 1]</script></span>, and the integration is
 considered to have failed. Defaults to <code>False</code>.</dd>
 <dt><strong><code>backend</code></strong> :&ensp;<code>{'vode', 'zvode', 'lsoda', 'dopri5', 'dop853'}</code>, optional</dt>
-<dd>Integrator used with <code>ode</code>. Defaults to <code>'vode'</code>. It has no effect
-if <code>task</code> is not set to <code>ode</code>.</dd>
+<dd>Integrator used with SciPy's methods. Defaults to <code>'vode'</code>. It has
+no effect if <code>task</code> is not set to <code>'ode'</code>.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd>Keyword arguments to be passed to the <code>set_integrator</code> method of
-the <code>ode</code> solver. It has no effect if <code>task</code> is not set to <code>ode</code>.</dd>
+the <code>ode</code> solver. It has no effect if <code>task</code> is not set to <code>'ode'</code>.</dd>
 </dl>
 <h2 id="warns">Warns</h2>
 <dl>
@@ -2801,17 +3009,17 @@ the <code>ode</code> solver. It has no effect if <code>task</code> is not set to
 </summary>
 <pre><code class="python">def run(self, task, time=&#39;forward&#39;, verbose=False, catch_escape=False,
         backend=&#39;vode&#39;, **kwargs):
-    &#34;&#34;&#34;Run the numerical integration.
+    &#34;&#34;&#34;Run a numerical integration.
 
     Run a numerical integration of the dynamical system using either an
-    [ode](https://tinyurl.com/scipy-integrate-ode) instance from SciPy&#39;s
+    [ode](https://31c8.short.gy/scipy-integrate-ode) instance from SciPy&#39;s
     `integrate` module, or a classical Runge--Kutta method.
 
     Parameters
     ----------
     task : {&#39;ode&#39;, &#39;runge-kutta&#39;}, optional
         Choose to integrate with SciPy&#39;s methods or with a classical
-        Runge-- Kutta method. Defaults to `&#39;ode&#39;`.
+        Runge--Kutta method. Defaults to `&#39;ode&#39;`.
     time : {&#39;forward&#39;, &#39;backward&#39;}, optional
         Chooses if the intergration is performed forward of backward in
         time. If the integration is done backward in time, it is done from
@@ -2819,18 +3027,18 @@ the <code>ode</code> solver. It has no effect if <code>task</code> is not set to
         interval of the same length as if it was done forward. Defaults to
         `&#39;forward&#39;`.
     verbose : bool, optional
-        If `True`, a progression bar will be printed to show how much of the
+        If `True`, a progression bar is printed to show how much of the
         integration has been performed. Defaults to `False`.
     catch_escape : bool, optional
-        If `True`,  the integration will stop as soon as a state component
-        escapes the interval \\([-1, 1]\\), and the integration will be
+        If `True`,  the integration stops as soon as a state component
+        escapes the interval \\([-1, 1]\\), and the integration is
         considered to have failed. Defaults to `False`.
     backend : {&#39;vode&#39;, &#39;zvode&#39;, &#39;lsoda&#39;, &#39;dopri5&#39;, &#39;dop853&#39;}, optional
-        Integrator used with `ode`. Defaults to `&#39;vode&#39;`. It has no effect
-        if `task` is not set to `ode`.
+        Integrator used with SciPy&#39;s methods. Defaults to `&#39;vode&#39;`. It has
+        no effect if `task` is not set to `&#39;ode&#39;`.
     **kwargs
         Keyword arguments to be passed to the `set_integrator` method of
-        the `ode` solver. It has no effect if `task` is not set to `ode`.
+        the `ode` solver. It has no effect if `task` is not set to `&#39;ode&#39;`.
 
     Warns
     -----
@@ -2847,8 +3055,8 @@ the <code>ode</code> solver. It has no effect if <code>task</code> is not set to
         def jac(t, x): 
             return - self._jac(2 * self.config.initial_time - t, x)
     else:
-        raise ValueError(f&#39;Unknown value {time} for \&#39;time\&#39; keyword. Valid&#39;
-                         &#39; values are \&#39;forward\&#39; and \&#39;backward\&#39;.&#39;)
+        raise ValueError(f&#39;Unexpected value {time} for \&#39;time\&#39; keyword. &#39;
+                         &#39;Valid values are \&#39;forward\&#39; and \&#39;backward\&#39;.&#39;)
     if verbose:
         def progress(rg): return tqdm(rg)
     else:
@@ -2862,8 +3070,8 @@ the <code>ode</code> solver. It has no effect if <code>task</code> is not set to
     elif task == &#39;runge-kutta&#39;:
         self._run_runge_kutta(field, progress, has_escaped)
     else:
-        raise ValueError(f&#39;Unknown task {task} for \&#39;Integrator.run\&#39;. Acce&#39;
-                         &#39;pted values are \&#39;ode\&#39;  and \&#39;runge-kutta\&#39;.&#39;)
+        raise ValueError(f&#39;Unexpected task {task} for Integrator.run(). &#39;
+                         &#39;Valid values are \&#39;ode\&#39;  and \&#39;runge-kutta\&#39;.&#39;)
     if time == &#39;backward&#39;:
         self._times = np.flip(2 * self.config.initial_time - self.times)
         self._states = np.flip(self.states, axis=0)
@@ -2890,38 +3098,36 @@ the <code>ode</code> solver. It has no effect if <code>task</code> is not set to
 </dd>
 <dt id="popnet.executors.SimpleSimulator"><code class="flex name class">
 <span>class <span class="ident">SimpleSimulator</span></span>
-<span>(</span><span>config, **kwargs)</span>
+<span>(</span><span>config, act='step', **kwargs)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Perform single simulations of the stochastic process on a network.</p>
+<div class="desc"><p>Perform single simulations of a stochastic process on a network.</p>
 <p><code><a title="popnet.executors.SimpleSimulator" href="#popnet.executors.SimpleSimulator">SimpleSimulator</a></code> extends <code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> to ease the task of running single
-simulations of the stochastic process. It has dedicated methods to run
+simulations of a stochastic process. It has dedicated methods to run
 simulations and output a <code><a title="popnet.graphics.Trajectory" href="graphics.html#popnet.graphics.Trajectory">Trajectory</a></code> instance. Its data
 attributes are the same as in the base class.</p>
-<p>The initialization parameters are the same as in the base class, except that
-the output type does not have to be explicitely given.</p></div>
+<p>The initialization parameters are the same as in the base class.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class SimpleSimulator(Simulator):
-    &#34;&#34;&#34;Perform single simulations of the stochastic process on a network.
+    &#34;&#34;&#34;Perform single simulations of a stochastic process on a network.
 
     `SimpleSimulator` extends `Simulator` to ease the task of running single
-    simulations of the stochastic process. It has dedicated methods to run
+    simulations of a stochastic process. It has dedicated methods to run
     simulations and output a `popnet.graphics.Trajectory` instance. Its data
     attributes are the same as in the base class.
 
-    The initialization parameters are the same as in the base class, except that
-    the output type does not have to be explicitely given.
+    The initialization parameters are the same as in the base class.
 
     &#34;&#34;&#34;
 
     def run(self, method=&#39;direct&#39;, verbose=False):
         &#34;&#34;&#34;Run a simulation.
 
-        Run a simulation to obtain a possible trajectory of the stochastic
-        process which describes the evolution of the network. To obtain this
+        Run a simulation to obtain a possible trajectory of a stochastic
+        process that rules the evolution of the network&#39;s state. To obtain this
         trajectory, we use the Doob--Gillespie algorithm, either with the direct
         or with the first reaction method. See `Simulator.single_run` for more
         details about the Doob--Gillespie algorithm.
@@ -2932,13 +3138,14 @@ the output type does not have to be explicitely given.</p></div>
             Chooses which method is used to perform the Monte Carlo step in the
             Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
         verbose : bool, optional
-            If `True`, the current time will be printed. Defaults to `False`.
+            If `True`, the current time is printed at each iteration. Defaults
+            to `False`.
 
         Raises
         ------
         popnet.exceptions.PopNetError
-            If the length of the microscopic initial state is different of the
-            network&#39;s size.
+            If the length of the microscopic initial state is different from
+            the network&#39;s size.
         ValueError
             If an unexpected value is passed to `method`.
         &#34;&#34;&#34;
@@ -2948,7 +3155,8 @@ the output type does not have to be explicitely given.</p></div>
         elif method == &#39;first reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
-            raise ValueError(f&#39;Simulator does not know a method {method}.&#39;)
+            raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
+                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
         if verbose:
             def iterate(do_step, rng, t, x):
                 print(f&#39;t = {t:&lt;.2f}&#39;, end=&#39;\r&#39;)
@@ -3013,8 +3221,8 @@ the output type does not have to be explicitely given.</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Run a simulation.</p>
-<p>Run a simulation to obtain a possible trajectory of the stochastic
-process which describes the evolution of the network. To obtain this
+<p>Run a simulation to obtain a possible trajectory of a stochastic
+process that rules the evolution of the network's state. To obtain this
 trajectory, we use the Doob&ndash;Gillespie algorithm, either with the direct
 or with the first reaction method. See <code><a title="popnet.executors.Simulator.single_run" href="#popnet.executors.Simulator.single_run">Simulator.single_run()</a></code> for more
 details about the Doob&ndash;Gillespie algorithm.</p>
@@ -3024,13 +3232,14 @@ details about the Doob&ndash;Gillespie algorithm.</p>
 <dd>Chooses which method is used to perform the Monte Carlo step in the
 Doob&ndash;Gillespie algorithm. Defaults to <code>'direct'</code>.</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
-<dd>If <code>True</code>, the current time will be printed. Defaults to <code>False</code>.</dd>
+<dd>If <code>True</code>, the current time is printed at each iteration. Defaults
+to <code>False</code>.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code><a title="popnet.exceptions.PopNetError" href="exceptions.html#popnet.exceptions.PopNetError">PopNetError</a></code></dt>
-<dd>If the length of the microscopic initial state is different of the
-network's size.</dd>
+<dd>If the length of the microscopic initial state is different from
+the network's size.</dd>
 <dt><code>ValueError</code></dt>
 <dd>If an unexpected value is passed to <code>method</code>.</dd>
 </dl></div>
@@ -3041,8 +3250,8 @@ network's size.</dd>
 <pre><code class="python">def run(self, method=&#39;direct&#39;, verbose=False):
     &#34;&#34;&#34;Run a simulation.
 
-    Run a simulation to obtain a possible trajectory of the stochastic
-    process which describes the evolution of the network. To obtain this
+    Run a simulation to obtain a possible trajectory of a stochastic
+    process that rules the evolution of the network&#39;s state. To obtain this
     trajectory, we use the Doob--Gillespie algorithm, either with the direct
     or with the first reaction method. See `Simulator.single_run` for more
     details about the Doob--Gillespie algorithm.
@@ -3053,13 +3262,14 @@ network's size.</dd>
         Chooses which method is used to perform the Monte Carlo step in the
         Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
     verbose : bool, optional
-        If `True`, the current time will be printed. Defaults to `False`.
+        If `True`, the current time is printed at each iteration. Defaults
+        to `False`.
 
     Raises
     ------
     popnet.exceptions.PopNetError
-        If the length of the microscopic initial state is different of the
-        network&#39;s size.
+        If the length of the microscopic initial state is different from
+        the network&#39;s size.
     ValueError
         If an unexpected value is passed to `method`.
     &#34;&#34;&#34;
@@ -3069,7 +3279,8 @@ network's size.</dd>
     elif method == &#39;first reaction&#39;:
         def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
     else:
-        raise ValueError(f&#39;Simulator does not know a method {method}.&#39;)
+        raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
+                         &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
     if verbose:
         def iterate(do_step, rng, t, x):
             print(f&#39;t = {t:&lt;.2f}&#39;, end=&#39;\r&#39;)
@@ -3160,6 +3371,7 @@ the files are saved in the current directory.</dd>
 <li><code><b><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></b></code>:
 <ul class="hlist">
 <li><code><a title="popnet.executors.Simulator.activation_rates" href="#popnet.executors.Simulator.activation_rates">activation_rates</a></code></li>
+<li><code><a title="popnet.executors.Simulator.activation_rates_shape" href="#popnet.executors.Simulator.activation_rates_shape">activation_rates_shape</a></code></li>
 <li><code><a title="popnet.executors.Simulator.calcium_output" href="#popnet.executors.Simulator.calcium_output">calcium_output</a></code></li>
 <li><code><a title="popnet.executors.Simulator.close" href="#popnet.executors.Simulator.close">close</a></code></li>
 <li><code><a title="popnet.executors.Simulator.config" href="#popnet.executors.Executor.config">config</a></code></li>
@@ -3178,17 +3390,19 @@ the files are saved in the current directory.</dd>
 </dd>
 <dt id="popnet.executors.Simulator"><code class="flex name class">
 <span>class <span class="ident">Simulator</span></span>
-<span>(</span><span>config, **kwargs)</span>
+<span>(</span><span>config, act='step', **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Numerical simulator of the stochastic process on a network.</p>
-<p><code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> extends <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> to perform numerical simulations of a
-stochastic process on a network whose mean field reduction is represented
-macroscopically by the Wilson&ndash;Cowan model.</p>
+<p><code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code> extends <code><a title="popnet.executors.Executor" href="#popnet.executors.Executor">Executor</a></code> to perform numerical simulations of
+stochastic processes on a network that can be macroscopically approximated
+by the Wilson&ndash;Cowan model.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>config</code></strong> :&ensp;<code><a title="popnet.structures.MicroConfiguration" href="structures.html#popnet.structures.MicroConfiguration">MicroConfiguration</a></code></dt>
-<dd>Sets the configuration used for the simulation.</dd>
+<dd>Sets the configuration used for simulations.</dd>
+<dt><strong><code>act</code></strong> :&ensp;<code>{'step', 'sigmoid'}</code>, optional</dt>
+<dd>Sets the shape of the activation rate of a neuron. Defaults to <code>step</code>.</dd>
 </dl>
 <h2 id="attributes">Attributes</h2>
 <dl>
@@ -3203,6 +3417,9 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
 <dt><strong><code>activation_rates</code></strong> :&ensp;<code>list</code></dt>
 <dd>Activation rates of the neurons of the network. See
 <code><a title="popnet.executors.Simulator.activation_rates" href="#popnet.executors.Simulator.activation_rates">Simulator.activation_rates</a></code>.</dd>
+<dt><strong><code>activation_rates_shape</code></strong> :&ensp;<code>{'step', 'sigmoid'}</code></dt>
+<dd>Describes the shape of the activation rate of neurons of the network.
+See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#popnet.executors.Simulator.activation_rates_shape">Simulator.activation_rates_shape</a></code>.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -3211,14 +3428,16 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
 <pre><code class="python">class Simulator(Executor):
     &#34;&#34;&#34;Numerical simulator of the stochastic process on a network.
 
-    `Simulator` extends `Executor` to perform numerical simulations of a
-    stochastic process on a network whose mean field reduction is represented
-    macroscopically by the Wilson--Cowan model.
+    `Simulator` extends `Executor` to perform numerical simulations of
+    stochastic processes on a network that can be macroscopically approximated
+    by the Wilson--Cowan model.
 
     Parameters
     ----------
     config : popnet.structures.MicroConfiguration
-        Sets the configuration used for the simulation.
+        Sets the configuration used for simulations.
+    act : {&#39;step&#39;, &#39;sigmoid&#39;}, optional
+        Sets the shape of the activation rate of a neuron. Defaults to `step`.
 
     Attributes
     ----------
@@ -3233,10 +3452,14 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
     activation_rates : list
         Activation rates of the neurons of the network. See
         `Simulator.activation_rates`.
+    activation_rates_shape : {&#39;step&#39;, &#39;sigmoid&#39;}
+        Describes the shape of the activation rate of neurons of the network.
+        See `Simulator.activation_rates_shape`.
 
     &#34;&#34;&#34;
 
-    def __init__(self, config, **kwargs):
+    def __init__(self, config, act=&#39;step&#39;, **kwargs):
+        self.activation_rates_shape = act
         super().__init__(config, **kwargs)
         try:
             output_type = OUTPUT_TYPES[type(self)]
@@ -3244,7 +3467,7 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
             warn(&#39;The type of simulator you want to run is not recognized by &#39;
                  &#39;PopNet. The simulation might be possible if a \&#39;run\&#39; method &#39;
                  &#39;is implemented, but it will not be possible to output the &#39;
-                 &#39;results with \&#39;Simulator.output\&#39;.&#39;, category=PopNetWarning,
+                 &#39;results with Simulator.output().&#39;, category=PopNetWarning,
                  stacklevel=2)
         else:
             self._output_type = output_type
@@ -3261,7 +3484,7 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
     def micro_states(self):
         &#34;&#34;&#34;Microscopic state of the network with respect to time.
 
-        Microscopic state of the network at each time step given by
+        Microscopic state of the network at each time step in
         `Simulator.transition_times`. It does not contain any relevant data at
         initialization or right after a reset, but it is updated during a call
         to `Simulator.run`. It cannot be manually set nor deleted.
@@ -3291,6 +3514,39 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
         &#34;&#34;&#34;
         return self._activation_rates
 
+    @property
+    def activation_rates_shape(self):
+        &#34;&#34;&#34;Shape of the activation rates.
+
+        Shape of the activation rate of a single neuron of the network as a
+        function of its input. The only valid values are:
+
+         - `&#39;step&#39;`. In that case, a neuron&#39;s activation rate is a step
+           function going from zero to `popnet.structures.MicroNetwork.alpha`
+           at its threshold `popnet.structures.MicroNetwork.theta`.
+         - `&#39;sigmoid&#39;`. In that case, a neuron&#39;s activation rate is the
+           logistic function `popnet.structures.Population.F` of the population
+           to which it belongs.
+
+        It can only be set to one of the above values, and it cannot be
+        manually deleted.
+
+        !!! note
+            After initialization, a change in the value of this property will
+            only have an effect after a reset of the simulator with
+            `Simulator.reset`.
+        &#34;&#34;&#34;
+        return self._activation_rates_shape
+
+    @activation_rates_shape.setter
+    def activation_rates_shape(self, new_value):
+        valid_values = [&#39;step&#39;, &#39;sigmoid&#39;]
+        if new_value not in valid_values:
+            raise ValueError(f&#39;Unexpected value {new_value} for the shape of &#39;
+                             &#39;the activation rates. Valid values are &#39;
+                             f&#39;{valid_values}.&#39;)
+        self._activation_rates_shape = new_value
+
     def calcium_output(self, indices=None, growth_rate=None, decay_rate=None):
         &#34;&#34;&#34;Get the calcium concentration in neural cells.
 
@@ -3318,7 +3574,7 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
         array_like
             Calcium concentration with respect to time for every requested
             neuron, with neurons along the first axis and time along the second.
-            If a single neuron was requested, it will be one-dimensional.
+            If a single neuron was requested, it is one-dimensional.
 
         Raises
         ------
@@ -3354,8 +3610,8 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
     def micro_output(self, fmt=&#39;ternary&#39;):
         &#34;&#34;&#34;Get the simulation&#39;s microscopic output.
         
-        Get the microscopic state of the network with respect to time from the
-        last simulation that was performed.
+        Get the microscopic state of the network with respect to time after
+        a simulation was performed.
 
         Parameters
         ----------
@@ -3386,10 +3642,19 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
             return np.real(self.micro_states)
         if fmt == &#39;calcium&#39;:
             return self.calcium_output()
-        raise ValueError(f&#39;Unknown format {fmt} for microscopic states.&#39;)
+        raise ValueError(f&#39;Unexpected format {fmt} for microscopic states. Valid&#39;
+                         &#39; values are \&#39;ternary\&#39;, \&#39;binary\&#39; and \&#39;calcium\&#39;.&#39;)
 
     def reset(self):
-        &#34;&#34;&#34;Reset the simulator.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the simulator.
+
+        Reset the simulator to run it again. It extends the base class method
+        by also resetting the arrays `Simulator.states`,
+        `Simulator.micro_states` and `Simulator.transition_times`, by
+        resetting the activation rate functions, and by resetting the
+        microscopic initial state to be used in the simulation from the
+        configuration.
+        &#34;&#34;&#34;
         super().reset()
         self._states = None
         self._transition_times = [self.config.initial_time]
@@ -3417,11 +3682,11 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
             A random number generator.
         do_step : callable
             Dictates how to do the Monte Carlo step of the Doob--Gillespie
-            algorithm. To be passed to `iterate`. It expects as inputs, in
-            order: `rng`, the current time `t`, an array of the next possible
-            network states, and an array of the corresponding transition rates.
-            It should return the index of the next network state and the time
-            interval between `t` and the next transition.
+            algorithm. It is a function to be passed to `iterate`. It expects
+            as inputs, in order: `rng`, the current time `t`, an array of the
+            next possible network states, and an array of the corresponding
+            transition rates. It should return the index of the next network
+            state and the time interval between `t` and the next transition.
         iterate : callable
             Dictates how a complete iteration of the simulation is performed.
             This includes the Monte Carlo step as well as all other tasks that
@@ -3435,12 +3700,12 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
         From the microscopic point of view, the evolution of the state of the
         whole network is described by a stochastic process. The simulation run
         by this method outputs a possible trajectory of this stochastic process,
-        using the Doob--Gillespie algorithm, popularized by Gillespie in [3] and
-        based on results of Doob [1,2]. The idea to pass from a state to another
-        is first to find all of the states to which the network can go from the
-        current one, with the corresponding transition rates. This information
-        is in fact sufficient to determine the distribution of the time at which
-        the next transition occur, and which one will occur. 
+        using the Doob--Gillespie algorithm, based on results of Doob [1,2] and
+        popularized by Gillespie in [3]. To pass from a state to another, the
+        idea is first to find all of the states to which the network can go
+        from the current one, with the corresponding transition rates. This
+        information is in fact sufficient to determine the distribution of the
+        time at which the next transition occurs and which one will occur.
 
         In [3], Gillespie introduces two methods, called the *direct* and
         *first reaction* methods respectively, to choose the time interval until
@@ -3485,9 +3750,9 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
     def _check_sizes(self):
         &#34;&#34;&#34;Check the consistency of the network&#39;s size and the initial state.&#34;&#34;&#34;
         if len(self.config.micro_initial_state) != self.config.network.size():
-            raise PopNetError(&#39;It seems that the size of the network has &#39;
-                              &#39;changed since the microscopic initial state has &#39;
-                              &#39;been set. It has to be reset. The network\&#39;s &#39;
+            raise PopNetError(&#39;The size of the network has changed since the &#39;
+                              &#39;microscopic initial state was set. Reset the &#39;
+                              &#39;simulator before to run it. The network\&#39;s &#39;
                               &#39;parameters might also have to be reset.&#39;)
 
     def _direct_method(self, rng, t, next_states, rates):
@@ -3554,13 +3819,16 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
         self.micro_states.append(x.copy())
         return t, x
 
-    def _make_activation_rate(self, j):
-        &#34;&#34;&#34;Generate the activation rate function for the `j`th neuron.&#34;&#34;&#34;
-        J = 0
-        sum_sizes = self.config.network.populations[0].size
-        while j &gt; sum_sizes:
-            sum_sizes += self.config.network.populations[J+1].size
-            J += 1
+    def _make_sigmoid_activation_rate(self, j, J):
+        &#34;&#34;&#34;Define a sigmoid activation rate for the `j`th neuron.&#34;&#34;&#34;
+        def act(x):
+            b = np.dot(self.config.network.W[j], np.real(x)) + self.config.Q[J]
+            F_value = self.config.network.populations[J].F(b)
+            return self.config.network.alpha[j] * F_value
+        return act
+
+    def _make_step_activation_rate(self, j, J):
+        &#34;&#34;&#34;Define a step activation rate for the `j`th neuron.&#34;&#34;&#34;
         def act(x):
             b = np.dot(self.config.network.W[j], np.real(x)) + self.config.Q[J]
             if b &lt; self.config.network.theta[j]:
@@ -3568,6 +3836,20 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
             else:
                 return self.config.network.alpha[j]
         return act
+
+    def _make_activation_rate(self, j):
+        &#34;&#34;&#34;Define the activation rate function for the `j`th neuron.&#34;&#34;&#34;
+        J = 0
+        sum_sizes = self.config.network.populations[0].size
+        while j &gt; sum_sizes:
+            sum_sizes += self.config.network.populations[J+1].size
+            J += 1
+        if self.activation_rates_shape == &#39;step&#39;:
+            return self._make_step_activation_rate(j, J)
+        elif self.activation_rates_shape == &#39;sigmoid&#39;:
+            return self._make_sigmoid_activation_rate(j, J)
+        raise ValueError(f&#39;Unexpected value {self.activation_rates_shape} for &#39;
+                         &#39;the shape of the activation rate functions.&#39;)
 
     def _next_states_and_rates(self, x):
         &#34;&#34;&#34;Get all possible states to which the network can go from `x`.
@@ -3619,11 +3901,11 @@ macroscopically by the Wilson&ndash;Cowan model.</p>
             return 1j, self.config.network.beta[j]
         if z == 1j:
             return 0., self.config.network.gamma[j]
-        raise ValueError(&#39;The state of a neuron should always be 0, 1 or the&#39;
+        raise ValueError(&#39;The state of a neuron must always be 0, 1 or the &#39;
                          &#39;imaginary unit.&#39;)
 
     def _reset_activation_rates(self):
-        &#34;&#34;&#34;Defines the activation rate functions.&#34;&#34;&#34;
+        &#34;&#34;&#34;Reset the activation rate functions.&#34;&#34;&#34;
         self._activation_rates = [self._make_activation_rate(j)
                                   for j in range(self.config.network.size())]
 
@@ -3682,10 +3964,60 @@ def activation_rates(self):
     return self._activation_rates</code></pre>
 </details>
 </dd>
+<dt id="popnet.executors.Simulator.activation_rates_shape"><code class="name">var <span class="ident">activation_rates_shape</span></code></dt>
+<dd>
+<div class="desc"><p>Shape of the activation rates.</p>
+<p>Shape of the activation rate of a single neuron of the network as a
+function of its input. The only valid values are:</p>
+<ul>
+<li><code>'step'</code>. In that case, a neuron's activation rate is a step
+function going from zero to <code><a title="popnet.structures.MicroNetwork.alpha" href="structures.html#popnet.structures.MicroNetwork.alpha">MicroNetwork.alpha</a></code>
+at its threshold <code><a title="popnet.structures.MicroNetwork.theta" href="structures.html#popnet.structures.MicroNetwork.theta">MicroNetwork.theta</a></code>.</li>
+<li><code>'sigmoid'</code>. In that case, a neuron's activation rate is the
+logistic function <code><a title="popnet.structures.Population.F" href="structures.html#popnet.structures.Population.F">Population.F()</a></code> of the population
+to which it belongs.</li>
+</ul>
+<p>It can only be set to one of the above values, and it cannot be
+manually deleted.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After initialization, a change in the value of this property will
+only have an effect after a reset of the simulator with
+<code><a title="popnet.executors.Simulator.reset" href="#popnet.executors.Simulator.reset">Simulator.reset()</a></code>.</p>
+</div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def activation_rates_shape(self):
+    &#34;&#34;&#34;Shape of the activation rates.
+
+    Shape of the activation rate of a single neuron of the network as a
+    function of its input. The only valid values are:
+
+     - `&#39;step&#39;`. In that case, a neuron&#39;s activation rate is a step
+       function going from zero to `popnet.structures.MicroNetwork.alpha`
+       at its threshold `popnet.structures.MicroNetwork.theta`.
+     - `&#39;sigmoid&#39;`. In that case, a neuron&#39;s activation rate is the
+       logistic function `popnet.structures.Population.F` of the population
+       to which it belongs.
+
+    It can only be set to one of the above values, and it cannot be
+    manually deleted.
+
+    !!! note
+        After initialization, a change in the value of this property will
+        only have an effect after a reset of the simulator with
+        `Simulator.reset`.
+    &#34;&#34;&#34;
+    return self._activation_rates_shape</code></pre>
+</details>
+</dd>
 <dt id="popnet.executors.Simulator.micro_states"><code class="name">var <span class="ident">micro_states</span></code></dt>
 <dd>
 <div class="desc"><p>Microscopic state of the network with respect to time.</p>
-<p>Microscopic state of the network at each time step given by
+<p>Microscopic state of the network at each time step in
 <code><a title="popnet.executors.Simulator.transition_times" href="#popnet.executors.Simulator.transition_times">Simulator.transition_times</a></code>. It does not contain any relevant data at
 initialization or right after a reset, but it is updated during a call
 to <code><a title="popnet.executors.Simulator.run" href="#popnet.executors.Executor.run">Executor.run()</a></code>. It cannot be manually set nor deleted.</p></div>
@@ -3697,7 +4029,7 @@ to <code><a title="popnet.executors.Simulator.run" href="#popnet.executors.Execu
 def micro_states(self):
     &#34;&#34;&#34;Microscopic state of the network with respect to time.
 
-    Microscopic state of the network at each time step given by
+    Microscopic state of the network at each time step in
     `Simulator.transition_times`. It does not contain any relevant data at
     initialization or right after a reset, but it is updated during a call
     to `Simulator.run`. It cannot be manually set nor deleted.
@@ -3761,7 +4093,7 @@ initial growth rate.</dd>
 <dt><code>array_like</code></dt>
 <dd>Calcium concentration with respect to time for every requested
 neuron, with neurons along the first axis and time along the second.
-If a single neuron was requested, it will be one-dimensional.</dd>
+If a single neuron was requested, it is one-dimensional.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
@@ -3800,7 +4132,7 @@ network.</dd>
     array_like
         Calcium concentration with respect to time for every requested
         neuron, with neurons along the first axis and time along the second.
-        If a single neuron was requested, it will be one-dimensional.
+        If a single neuron was requested, it is one-dimensional.
 
     Raises
     ------
@@ -3849,8 +4181,8 @@ network.</dd>
 </code></dt>
 <dd>
 <div class="desc"><p>Get the simulation's microscopic output.</p>
-<p>Get the microscopic state of the network with respect to time from the
-last simulation that was performed.</p>
+<p>Get the microscopic state of the network with respect to time after
+a simulation was performed.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>fmt</code></strong> :&ensp;<code>{'binary', 'ternary', 'calcium'}</code>, optional</dt>
@@ -3880,8 +4212,8 @@ the returned output is the default given by
 <pre><code class="python">def micro_output(self, fmt=&#39;ternary&#39;):
     &#34;&#34;&#34;Get the simulation&#39;s microscopic output.
     
-    Get the microscopic state of the network with respect to time from the
-    last simulation that was performed.
+    Get the microscopic state of the network with respect to time after
+    a simulation was performed.
 
     Parameters
     ----------
@@ -3912,20 +4244,35 @@ the returned output is the default given by
         return np.real(self.micro_states)
     if fmt == &#39;calcium&#39;:
         return self.calcium_output()
-    raise ValueError(f&#39;Unknown format {fmt} for microscopic states.&#39;)</code></pre>
+    raise ValueError(f&#39;Unexpected format {fmt} for microscopic states. Valid&#39;
+                     &#39; values are \&#39;ternary\&#39;, \&#39;binary\&#39; and \&#39;calcium\&#39;.&#39;)</code></pre>
 </details>
 </dd>
 <dt id="popnet.executors.Simulator.reset"><code class="name flex">
 <span>def <span class="ident">reset</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Reset the simulator.</p></div>
+<div class="desc"><p>Reset the simulator.</p>
+<p>Reset the simulator to run it again. It extends the base class method
+by also resetting the arrays <code><a title="popnet.executors.Simulator.states" href="#popnet.executors.Executor.states">Simulator.states</a></code>,
+<code><a title="popnet.executors.Simulator.micro_states" href="#popnet.executors.Simulator.micro_states">Simulator.micro_states</a></code> and <code><a title="popnet.executors.Simulator.transition_times" href="#popnet.executors.Simulator.transition_times">Simulator.transition_times</a></code>, by
+resetting the activation rate functions, and by resetting the
+microscopic initial state to be used in the simulation from the
+configuration.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def reset(self):
-    &#34;&#34;&#34;Reset the simulator.&#34;&#34;&#34;
+    &#34;&#34;&#34;Reset the simulator.
+
+    Reset the simulator to run it again. It extends the base class method
+    by also resetting the arrays `Simulator.states`,
+    `Simulator.micro_states` and `Simulator.transition_times`, by
+    resetting the activation rate functions, and by resetting the
+    microscopic initial state to be used in the simulation from the
+    configuration.
+    &#34;&#34;&#34;
     super().reset()
     self._states = None
     self._transition_times = [self.config.initial_time]
@@ -3956,11 +4303,11 @@ or <code><a title="popnet.executors.ChainSimulator.run" href="#popnet.executors.
 <dd>A random number generator.</dd>
 <dt><strong><code>do_step</code></strong> :&ensp;<code>callable</code></dt>
 <dd>Dictates how to do the Monte Carlo step of the Doob&ndash;Gillespie
-algorithm. To be passed to <code>iterate</code>. It expects as inputs, in
-order: <code>rng</code>, the current time <code>t</code>, an array of the next possible
-network states, and an array of the corresponding transition rates.
-It should return the index of the next network state and the time
-interval between <code>t</code> and the next transition.</dd>
+algorithm. It is a function to be passed to <code>iterate</code>. It expects
+as inputs, in order: <code>rng</code>, the current time <code>t</code>, an array of the
+next possible network states, and an array of the corresponding
+transition rates. It should return the index of the next network
+state and the time interval between <code>t</code> and the next transition.</dd>
 <dt><strong><code>iterate</code></strong> :&ensp;<code>callable</code></dt>
 <dd>Dictates how a complete iteration of the simulation is performed.
 This includes the Monte Carlo step as well as all other tasks that
@@ -3973,12 +4320,12 @@ state.</dd>
 <p>From the microscopic point of view, the evolution of the state of the
 whole network is described by a stochastic process. The simulation run
 by this method outputs a possible trajectory of this stochastic process,
-using the Doob&ndash;Gillespie algorithm, popularized by Gillespie in [3] and
-based on results of Doob [1,2]. The idea to pass from a state to another
-is first to find all of the states to which the network can go from the
-current one, with the corresponding transition rates. This information
-is in fact sufficient to determine the distribution of the time at which
-the next transition occur, and which one will occur. </p>
+using the Doob&ndash;Gillespie algorithm, based on results of Doob [1,2] and
+popularized by Gillespie in [3]. To pass from a state to another, the
+idea is first to find all of the states to which the network can go
+from the current one, with the corresponding transition rates. This
+information is in fact sufficient to determine the distribution of the
+time at which the next transition occurs and which one will occur.</p>
 <p>In [3], Gillespie introduces two methods, called the <em>direct</em> and
 <em>first reaction</em> methods respectively, to choose the time interval until
 the next transition and the next state of the system.</p>
@@ -4038,11 +4385,11 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
         A random number generator.
     do_step : callable
         Dictates how to do the Monte Carlo step of the Doob--Gillespie
-        algorithm. To be passed to `iterate`. It expects as inputs, in
-        order: `rng`, the current time `t`, an array of the next possible
-        network states, and an array of the corresponding transition rates.
-        It should return the index of the next network state and the time
-        interval between `t` and the next transition.
+        algorithm. It is a function to be passed to `iterate`. It expects
+        as inputs, in order: `rng`, the current time `t`, an array of the
+        next possible network states, and an array of the corresponding
+        transition rates. It should return the index of the next network
+        state and the time interval between `t` and the next transition.
     iterate : callable
         Dictates how a complete iteration of the simulation is performed.
         This includes the Monte Carlo step as well as all other tasks that
@@ -4056,12 +4403,12 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
     From the microscopic point of view, the evolution of the state of the
     whole network is described by a stochastic process. The simulation run
     by this method outputs a possible trajectory of this stochastic process,
-    using the Doob--Gillespie algorithm, popularized by Gillespie in [3] and
-    based on results of Doob [1,2]. The idea to pass from a state to another
-    is first to find all of the states to which the network can go from the
-    current one, with the corresponding transition rates. This information
-    is in fact sufficient to determine the distribution of the time at which
-    the next transition occur, and which one will occur. 
+    using the Doob--Gillespie algorithm, based on results of Doob [1,2] and
+    popularized by Gillespie in [3]. To pass from a state to another, the
+    idea is first to find all of the states to which the network can go
+    from the current one, with the corresponding transition rates. This
+    information is in fact sufficient to determine the distribution of the
+    time at which the next transition occurs and which one will occur.
 
     In [3], Gillespie introduces two methods, called the *direct* and
     *first reaction* methods respectively, to choose the time interval until
@@ -4152,6 +4499,7 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
 <li>
 <h4><code><a title="popnet.executors.ChainSimulator" href="#popnet.executors.ChainSimulator">ChainSimulator</a></code></h4>
 <ul class="">
+<li><code><a title="popnet.executors.ChainSimulator.reset" href="#popnet.executors.ChainSimulator.reset">reset</a></code></li>
 <li><code><a title="popnet.executors.ChainSimulator.run" href="#popnet.executors.ChainSimulator.run">run</a></code></li>
 <li><code><a title="popnet.executors.ChainSimulator.samples" href="#popnet.executors.ChainSimulator.samples">samples</a></code></li>
 <li><code><a title="popnet.executors.ChainSimulator.save_output" href="#popnet.executors.ChainSimulator.save_output">save_output</a></code></li>
@@ -4188,8 +4536,9 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
 </li>
 <li>
 <h4><code><a title="popnet.executors.Simulator" href="#popnet.executors.Simulator">Simulator</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="popnet.executors.Simulator.activation_rates" href="#popnet.executors.Simulator.activation_rates">activation_rates</a></code></li>
+<li><code><a title="popnet.executors.Simulator.activation_rates_shape" href="#popnet.executors.Simulator.activation_rates_shape">activation_rates_shape</a></code></li>
 <li><code><a title="popnet.executors.Simulator.calcium_output" href="#popnet.executors.Simulator.calcium_output">calcium_output</a></code></li>
 <li><code><a title="popnet.executors.Simulator.close" href="#popnet.executors.Simulator.close">close</a></code></li>
 <li><code><a title="popnet.executors.Simulator.micro_output" href="#popnet.executors.Simulator.micro_output">micro_output</a></code></li>

@@ -8,7 +8,10 @@ classes it defines are briefly described in the
 
 The module also defines a function `figure`, which allows to initialize a
 Matplotlib figure with a format consistent with that used by the module's
-classes.
+classes, and a function `draw` to draw such figures. Finally, it introduces
+functions to load results from numerical experiments performed with the
+`popnet.executors` module, when these have been saved using
+`popnet.executors.Executor.save_output`.
 
 Classes and hierarchy
 ---------------------
@@ -45,27 +48,27 @@ class Graphics:
 
     This class provides basic tools to plot various diagrams related to
     numerical experiments performed by PopNet. It relies heavily on the
-    Matplotlib library. This class is intended to be used mainly through its
-    subclasses, `Result` and `PhasePlane`.
+    [Matplotlib](https://matplotlib.org/) library. This class is intended to be
+    used mainly through its subclasses.
 
     Parameters
     ----------
     config : popnet.structures.Configuration
-        The configuration associated with the plot.
+        Configuration associated with the plot.
     name : str, optional
-        A name to associate with the plot. Defaults to `None`, in which case it
+        Name to associate with the plot. Defaults to `None`, in which case it
         is replaced with `Graphics.default_name`.
 
     Attributes
     ----------
     config : popnet.structures.Configuration
-        The configuration associated with the plot. See `Graphics.config`.
+        Configuration associated with the plot. See `Graphics.config`.
     name : str
-        A name associated with the graphics. See `Graphics.name`.
+        Name associated with the graphics. See `Graphics.name`.
     fig : matplotlib.figure.Figure
         A Matplotlib figure. See `Graphics.fig`.
     ax : matplotlib.axes.Axes
-        The axes of `fig`. See `Graphics.ax`.
+        Axes of `fig`. See `Graphics.ax`.
 
     """
 
@@ -75,7 +78,7 @@ class Graphics:
     def __init__(self, config, name=None):
         if not isinstance(config, structures.Configuration):
             raise TypeError('The configuration used with a \'Graphics\' '
-                            'instance should be a \'Configuration\' instance.')
+                            'instance must be a \'Configuration\' instance.')
         self._config = config
         self.name = self._get_name(name)
         self.fig = None
@@ -98,16 +101,14 @@ class Graphics:
     @name.setter
     def name(self, new_name):
         if not isinstance(new_name, str):
-            raise TypeError(f'The attribute \'name\' of a \'Graphics\' instance'
-                            ' should be a string.')
+            raise TypeError(f'Graphics.name must be a string.')
         self._name = new_name
 
     @property
     def fig(self):
         """A figure on which to draw various plots.
 
-        A [`matplotlib.figure.Figure`](
-        https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html)
+        A [`matplotlib.figure.Figure`](https://31c8.short.gy/mpl-figure-Figure)
         object that can be used to draw plots. This is the figure where
         `Graphics`' methods can plot curves. It is set automatically when
         `Graphics.activate` is called. It cannot be deleted manually.
@@ -119,19 +120,17 @@ class Graphics:
         if new_value is None:
             pass
         elif not isinstance(new_value, mpl.figure.Figure):
-            raise TypeError(f'The attribute \'fig\' of a \'Graphics\' instance '
-                            'should be a \'matplotlib.figure.Figure\' instance.')
+            raise TypeError('Graphics.fig must be a '
+                            '\'matplotlib.figure.Figure\' instance.')
         self._fig = new_value
 
     @property
     def ax(self):
         """Axes of the current figure.
 
-        A [`matplotlib.axes.Axes`](
-        https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-        object correponding to the axes of `Graphics.fig`. It is set
-        automatically when `Graphics.activate` is called. It cannot be
-        deleted manually.
+        A [`matplotlib.axes.Axes`](https://31c8.short.gy/mpl-axes-Axes) object
+        correponding to the axes of `Graphics.fig`. It is set automatically
+        when `Graphics.activate` is called. It cannot be deleted manually.
         """
         return self._ax
 
@@ -140,8 +139,8 @@ class Graphics:
         if new_value is None:
             pass
         elif not isinstance(new_value, mpl.axes.Axes):
-            raise TypeError(f'The attribute \'ax\' of a \'Graphics\' instance '
-                            'should be a \'matplotlib.axes.Axes\' instance.')
+            raise TypeError(f'Graphics.ax must be a '
+                            '\'matplotlib.axes.Axes\' instance.')
         self._ax = new_value
 
     def activate(self, figsize=(5,3.75), dpi=150, tight_layout=True, 
@@ -149,10 +148,9 @@ class Graphics:
         """Activate a figure.
         
         Create a Matplotlib figure to plot diagrams, and set `Graphics.fig` and
-        `Graphics.ax` to refer to the [`matplotlib.figure.Figure`](
-        https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html)
-        and [`matplotlib.axes.Axes`](
-        https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
+        `Graphics.ax` to refer to the
+        [`matplotlib.figure.Figure`](https://31c8.short.gy/mpl-figure-Figure)
+        and [`matplotlib.axes.Axes`](https://31c8.short.gy/mpl-axes-Axes)
         objects corresponding to this figure. The figure is initialized with
         the default formatting defined by `figure`: in fact, if `graphic` is a
         `Graphics` object, the calls
@@ -161,33 +159,33 @@ class Graphics:
         
         and
         
-        >>> graphic.fig, graphic.ax = figure(**kwargs)
+        >>> graphic.fig, graphic.ax = figure(subplots=None, **kwargs)
         
         are equivalent.
 
         Parameters
         ----------
         figsize : tuple of float, optional
-            Width and height of the figure in inches. Defaults to `(5, 3.75)`.
+            Width and height of the figure in inches. Defaults to (5, 3.75).
         dpi : int
             Resolution of the figure in dots per inches. Defaults to 150.
         tight_layout : bool, optional
             Adjust automatically the padding between and aroung subplots using
             [`matplotlib.figure.Figure.tight_layout`](
-            https://tinyurl.com/matplotlib-tight-layout). Defaults to `True`.
+            https://31c8.short.gy/mpl-tight-layout). Defaults to `True`.
         font_family : {'serif', 'sans-serif'}, optional
             Determines if a serif or sans serif font family is used. Defaults
             to `'serif'`.
         usetex : bool, optional
-            Determines if TeX is used in the figure. Defaults to `False`.
+            Determines if LaTeX is used to draw the figure. Defaults to `False`.
         preamble : str, optional
             LaTeX preamble when `usetex` is `True`, in which case it case be
             used to load font packages. It has no effect when `usetex` is
             `False`. Defaults to `None`, in which case a default preamble is
             added.
         **kwargs
-            Keyword arguments to be passed to [`matplotlib.pyplot.figure`](
-            https://tinyurl.com/plt-figure). 
+            Keyword arguments to be passed to
+            [`matplotlib.pyplot.figure`](https://31c8.short.gy/plt-figure).
         """
         if 'subplots' in kwargs:
             raise TypeError('Graphics.activate() got an unexpected keyword '
@@ -201,15 +199,14 @@ class Graphics:
         """Draw the plot.
 
         Draw a figure activated with `Graphics.activate`. If the figure is
-        saved, it will be named *ID - name*, where *ID* is the
-        configuration's ID, *name* is `name`, and will have the file format
-        chosen with `format`.
+        saved, it is named *ID - name*, where *ID* is the configuration's ID,
+        *name* is `name`, and has the file format chosen with `format`.
 
         Parameters
         ----------
         name : str, optional
             Name to give to the figure if saved. Defaults to `None`, in which
-            case the `name` attribute is used.
+            case `Graphics.name` is used.
         show : bool, optional
             Decides if the figure is shown or not. Defaults to `True`.
         savefig : bool, optional
@@ -226,8 +223,9 @@ class Graphics:
             the file format is Matplotlib's `savefig.format` parameter, which
             defaults to 'png'.
         **kwargs
-            Keyword arguments passed to `matplotlib.pyplot.savefig` when
-            `savefig` is `True`.
+            Keyword arguments passed to
+            [`matplotlib.pyplot.savefig`](https://31c8.short.gy/plt-savefig)
+            when `savefig` is `True`.
 
         Raises
         ------
@@ -256,7 +254,7 @@ class Graphics:
         lw : float, optional
             Line width of the legend handles. Defaults to 2.
         fontsize : float, optional
-            Fontsize of the legend's labels. Defaults to 10.
+            Fontsize of the legend labels. Defaults to 10.
         ncol : int, optional
             Number of columns of the legend. Defaults to `None`, in which case
             it is set to the number of populations of the configuration's
@@ -264,10 +262,9 @@ class Graphics:
         handletextpad : float, optional
             Padding of the labels. Defaults to 0.5.
         **kwargs
-            Keyword arguments to be passed to the `legend` method of the `ax`
-            attribute. Recall that `ax` is a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the
+            [`legend`](https://31c8.short.gy/ax-legend) method of
+            `Graphics.ax`, which actually adds the legend on the figure.
 
         Returns
         -------
@@ -286,7 +283,7 @@ class Graphics:
         """Check if the figure is already activated."""
         if self.fig is None or self.ax is None:
             raise PopNetError('The figure must be activated before to be '
-                              'drawn. Call activate() first.')
+                              'drawn. Call Graphics.activate() first.')
 
     @classmethod
     def _get_name(cls, name):
@@ -299,7 +296,7 @@ class Graphics:
 class PhasePlane(Graphics):
     """Draw phase planes for dynamical systems.
 
-    This class is dedicated to easily plot phase planes of dynamical systems
+    This class is dedicated to plot phase planes of dynamical systems
     implemented in `popnet.systems`. It should be emphasized that this class is
     intended to draw phase *planes*, not one- or three-dimensional phase spaces.
 
@@ -308,10 +305,10 @@ class PhasePlane(Graphics):
     system : popnet.systems.DynamicalSystem
         Dynamical system for which to draw a phase plane.
     axes : tuple of int
-        Components of the dynamical system which will be independant variables
+        Components of the dynamical system that will be independant variables
         on the phase plane.
     fixed_axes : array_like
-        Remaining components other than the independent variables
+        Values of the remaining components other than the independent variables
         corresponding to `axes`.
     name : str, optional
         A name associated with the phase plane. Defaults to `None`, in which
@@ -335,8 +332,26 @@ class PhasePlane(Graphics):
         Components chosen as independant variables for the phase plane. See
         `PhasePlane.axes`.
     fixed_axes : array_like
-        Remaining state components other than independent ones. See
-        `PhasePlane.fixed_axes`.
+        Values of the remaining state components other than independent ones.
+        See `PhasePlane.fixed_axes`.
+
+    Raises
+    ------
+    TypeError
+        If `system` is not a `popnet.systems.DynamicalSystem` instance.
+
+    Notes
+    -----
+    The cases where the dynamical system studied is the
+    `popnet.systems.MeanFieldSystem` or the `popnet.systems.WilsonCowanSystem`
+    are internally handled by private subclasses `_PhasePlaneMeanField` and
+    `_PhasePlaneWilsonCowan`, which are automatically instantiated by the class
+    constructor of `PhasePlane` when appropriate. The subclasses mentioned
+    above are responsible to define the methods used to compute nullclines for
+    the corresponding dynamical systems.
+
+    This is considered to be an implementation detail, and should not be useful
+    from a user perspective.
 
     """
 
@@ -344,7 +359,10 @@ class PhasePlane(Graphics):
     """Default name given to instances."""
 
     def __init__(self, system, axes, fixed_axes, name=None):
-        self.system = system
+        if not isinstance(system, systems.DynamicalSystem):
+            raise TypeError('The system associated with a \'PhasePlane\' '
+                            'instance must be a \'DynamicalSystem\' instance.')
+        self._system = system
         super().__init__(system.config, name=name)
         self.axes = axes
         if (n := self.system.dim - 2) == 0:
@@ -364,22 +382,16 @@ class PhasePlane(Graphics):
         """Dynamical system for which to draw a phase plane.
 
         Dynamical system for which a phase plane is to be drawn. It must be
-        a `popnet.systems.DynamicalSystem` instance. It cannot be deleted.
+        a `popnet.systems.DynamicalSystem` instance. It is set at
+        initialization, and afterwards it cannot be manually set nor deleted.
         """
         return self._system
-
-    @system.setter
-    def system(self, new_value):
-        if not isinstance(new_value, systems.DynamicalSystem):
-            raise TypeError('The system associated with a \'PhasePlane\' '
-                            'instance must be a \'DynamicalSystem\' instance.')
-        self._system = new_value
 
     @property
     def axes(self):
         """Components chosen as independant variables for the phase plane.
         
-        It must be a tuple of two integers which refer to valid axes of the
+        It must be a tuple of two integers corresponding to valid axes of the
         dynamical system. It cannot be deleted.
         """
         return self._axes
@@ -401,9 +413,9 @@ class PhasePlane(Graphics):
     def fixed_axes(self):
         """Fixed values for remaining state components.
 
-        Values given to state components other those chosen as independent. It
-        is a one-dimensional array, or `None` if the whole dynamical system is
-        two-dimensional. 
+        Values given to state components other than those chosen as
+        independent. It is a one-dimensional array, or `None` if the whole
+        dynamical system is two-dimensional. 
 
         It can be set as a single float value, in which case this value is
         given to all fixed axes. It cannot be deleted.
@@ -424,14 +436,14 @@ class PhasePlane(Graphics):
         try:
             new_value = np.array(new_value, float)
         except Exception:
-            raise TypeError('The fixed components should be given as an array '
+            raise TypeError('The fixed components must be given as an array '
                             'of floats.')
         if (n := self.system.dim - 2) > 0:
             if new_value.shape == ():
                 new_value = new_value * np.ones(n)
             elif new_value.shape != (n,):
                 raise ValueError('The given fixed components array has shape '
-                                 f'{new_value.shape} but it should have shape '
+                                 f'{new_value.shape} but it must have shape '
                                  f'{(n,)}.')
             self._fixed_axes = new_value
         else:
@@ -446,73 +458,28 @@ class PhasePlane(Graphics):
         """Generate a legend for the figure.
 
         Generate a legend for the figure with default options. Same as the base
-        class method `Graphics.legend`, but changes the default for `ncol` to 1
-        and for `framealpha` to 1.
+        class method `Graphics.legend`, but changes the defaults for `ncol` and
+        `framealpha` to 1.
         """
         return super().legend(lw=lw, fontsize=fontsize, ncol=ncol, 
                               handletextpad=handletextpad,
                               framealpha=framealpha, **kwargs)
 
-    def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
-                   cmap='bone', color=None, density=1.5, **kwargs):
-        """Draw the vector field on the initialized figure.
-
-        Draw the vector field on the figure `PhasePlane.fig`. The field is
-        plotted as streamlines, with [`matplotlib.axes.Axes.streamplot`](
-        https://tinyurl.com/matplotlib-streamplot) on the axes of the
-        `PhasePlane` object.
-
-        Parameters
-        ----------
-        shape : tuple of int
-            Shape of the grid on which to plot the vector field.
-        xlim, ylim : tuple, optional
-            Limits of the horizontal and vertical axis, respectively. Both
-            default to `(0,1)`.
-        colorbar : bool, optional
-            If `True`, a colorbar will be added on the phase plane, where the
-            color will represent the euclidean norm of the derivative. Defaults
-            to `False`.
-        cmap : str, optional
-            Colormap for the vector field when `colorbar` is `True`. See
-            [this page](
-            https://matplotlib.org/stable/gallery/color/colormap_reference.html)
-            of Matplotlib's documentation for a list of accepted values.
-            Defaults to `'bone'`.
-        color : str or tuple, optional
-            Color of the vector field when `colorbar` is `False`. It must be a
-            valid Matplotlib color. Defaults to `None`, in which case a default
-            color is used.
-        density : float, optional
-            Density of the stream lines in the plot. Defaults to 1.5.
-        **kwargs
-            Keyword arguments passed to [`matplotlib.axes.Axes.streamplot`](
-            https://tinyurl.com/matplotlib-streamplot)
-        """
-        self._check_if_activated()
-        X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
-        if colorbar:
-            color = np.sqrt(dX**2 + dY**2)
-        strm = self.ax.streamplot(X, Y, dX, dY, color=color, cmap=cmap, 
-                                  density=density, **kwargs)
-        if colorbar:
-            self.fig.colorbar(strm.lines, ax=self.ax)
-
     def plot_nullclines(self, which='both', num=1000, xcolor=None, ycolor=None,
                         xlim=(0,1), ylim=(0,1), **kwargs):
         """Plot nullclines on the phase plane.
 
-        Plot nullclines for both independent variables on the phase plane. This
+        Plot nullclines for independent variables on the phase plane. This
         method is mostly intended to be used with the Wilson--Cowan system,
         with its extension with refractory state, or with the 'mixed' system
         that makes a transition between the first two. Indeed, with these
         systems nullclines can be computed easily.
 
-        For dynamical systems which include covariances, nullclines are computed
-        numerically using the [`root`](https://tinyurl.com/scipy-optimize-root)
-        function from SciPy's `optimize` module. However, this feature is still
+        For dynamical systems that include covariances, nullclines are computed
+        numerically using [`root`](https://31c8.short.gy/scipy-optimize-root)
+        from SciPy's `optimize` module. However, this feature is still
         experimental, and could lead to unaccurate or unexpected results. A
-        warning will be issued when this method is used in such a case.
+        warning is issued when this method is used in such a case.
 
         Parameters
         ----------
@@ -526,13 +493,12 @@ class PhasePlane(Graphics):
             valid Matplotlib colors. Both default to `None`, in which case
             default colors are used.
         xlim, ylim : tuple, optional
-            Limits of the horizontal and vertical axis, respectively. Default
-            to `(0,1)`.
+            Limits of the horizontal and vertical axis, respectively. Both
+            default to (0,1).
         **kwargs
-            Keyword arguments to be passed to both methods to plot nullclines,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the
+            [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
+            which actually plots the nullclines.
 
         Warns
         -----
@@ -541,10 +507,9 @@ class PhasePlane(Graphics):
             algorithm.
         """
         if which not in (valid_values := ('x', 'y', 'both')):
-            warn(f'Unexpected value {which} for \'which\' in '
-                 f'\'plot_nullclines\'. Valid values are {valid_values}. '
-                 'No nullclines will be plotted.', stacklevel=2,
-                 category=PopNetWarning)
+            warn(f'Unexpected value {which} for \'which\'. Valid values are '
+                 f'{valid_values}. No nullclines will be plotted.',
+                 stacklevel=2, category=PopNetWarning)
         plot = {'x': True if which in ('x', 'both') else False,
                 'y': True if which in ('y', 'both') else False}
         x = np.linspace(xlim[0], xlim[1], num)
@@ -567,10 +532,9 @@ class PhasePlane(Graphics):
         Parameters
         ----------
         **kwargs
-            Keyword arguments passed to the `plot` method of a
-            [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object, which plots the solution.
+            Keyword arguments passed to the
+            [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
+            which actually plots the solution.
         """
         from .executors import get_integrator
         integrator = get_integrator(self.system)
@@ -578,23 +542,30 @@ class PhasePlane(Graphics):
         label = kwargs.pop('label', 'Solution')
         self.ax.plot(solution[0], solution[1], label=label, **kwargs)
 
-    def plot_trajectory(self, **kwargs):
-        """Plot a trajectory of the stochastic process on the phase plane.
+    def plot_trajectory(self, act='step', **kwargs):
+        """Plot a trajectory of a stochastic process on the phase plane.
 
-        Run a simulation of the stochastic process, and plot the resulting
+        Run a simulation of a stochastic process, and plot the resulting
         trajectory on the phase plane. The configuration used with the phase
         plane must have a defined microscopic structure.
 
         Parameters
         ----------
+        act : {'step', 'sigmoid'}, optional
+            Shape of neurons' activation rates for the simulation. If `'step'`,
+            a neuron's activation rate is a step function going from zero to
+            `popnet.structures.MicroNetwork.alpha` at its threshold
+            `popnet.structures.MicroNetwork.theta`. If `'sigmoid'`, a neuron's
+            activation rate is the logistic function
+            `popnet.structures.Population.F` of the population to which it
+            belongs. Defaults to `'step'`.
         **kwargs
-            Keyword arguments passed to the `plot` method of a
-            [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object, which plots the trajectory.
+            Keyword arguments passed to the
+            [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
+            which actually plots the trajectory.
         """
         from .executors import get_simulator
-        simulator = get_simulator(self.config, mode='individual')
+        simulator = get_simulator(self.config, act=act, mode='individual')
         trajectory = self._run_experiment(simulator)
         label = kwargs.pop('label', 'Trajectory')
         self.ax.plot(trajectory[0], trajectory[1], label=label, **kwargs)
@@ -603,9 +574,9 @@ class PhasePlane(Graphics):
         """Draw the vector field on the initialized figure.
 
         Draw the vector field on the figure `PhasePlane.fig`. The field is
-        plotted as a 2D field of arrows, with [`matplotlib.axes.Axes.quiver`](
-        https://tinyurl.com/matplotlib-quiver) on the axes of the `PhasePlane`
-        object.
+        plotted as a 2D field of arrows with
+        [`matplotlib.axes.Axes.quiver`](https://31c8.short.gy/ax-quiver)
+        on the axes `PhasePlane.ax`.
 
         Parameters
         ----------
@@ -613,10 +584,10 @@ class PhasePlane(Graphics):
             Shape of the grid on which to plot the vector field.
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
-            default to `(0,1)`.
+            default to (0,1).
         **kwargs
-            Keyword arguments passed to [`matplotlib.axes.Axes.quiver`](
-            https://tinyurl.com/matplotlib-quiver)
+            Keyword arguments passed to
+            [`matplotlib.axes.Axes.quiver`](https://31c8.short.gy/ax-quiver)
         """
         self._check_if_activated()
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
@@ -625,16 +596,20 @@ class PhasePlane(Graphics):
     def setup(self, xlim=(0,1), ylim=(0,1), fontsize=10, aspect='auto'):
         """Setup the figure.
 
+        Setup the figure `PhasePlane.fig`. Allows to set limits to both axes,
+        to choose a font size for labels, and to set the aspect ratio of the
+        axes.
+
         Parameters
         ----------
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
-            default to `(0,1)`.
+            default to (0,1).
         fontsize : float, optional
             Fontsize of the axes' labels. Defaults to 10.
         aspect : {'auto', 'equal'} or float, optional
-            Aspect ratio of the axis scaling. If `'auto'`, the plot will fill
-            the available area, if `'equal'`, the scaling will be the same for
+            Aspect ratio of the axis scaling. If `'auto'`, the plot fills
+            the available area, if `'equal'`, the scaling is the same for
             both axes, and if a float, a square would be stretched such that
             its height is `aspect` times its width. Defaults to `'auto'`.
         """
@@ -644,6 +619,50 @@ class PhasePlane(Graphics):
         self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
                            rotation=0)
         self.ax.axes.set_aspect(aspect)
+
+    def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
+                   cmap='bone', color=None, density=1.5, **kwargs):
+        """Draw the vector field on the initialized figure.
+
+        Draw the vector field on the figure `PhasePlane.fig`. The field is
+        plotted as streamlines with
+        [`matplotlib.axes.Axes.streamplot`](https://31c8.short.gy/ax-streamplot)
+        on the axes `PhasePlane.ax`.
+
+        Parameters
+        ----------
+        shape : tuple of int
+            Shape of the grid on which to plot the vector field.
+        xlim, ylim : tuple, optional
+            Limits of the horizontal and vertical axis, respectively. Both
+            default to (0,1).
+        colorbar : bool, optional
+            If `True`, a colorbar is added on the phase plane, where the color
+            represents the euclidean norm of the derivative. Defaults to
+            `False`.
+        cmap : str, optional
+            Colormap for the vector field when `colorbar` is `True`. See
+            [this page](https://31c8.short.gy/mpl-colormap)
+            of Matplotlib's documentation for a list of accepted values.
+            Defaults to `'bone'`.
+        color : str or tuple, optional
+            Color of the vector field when `colorbar` is `False`. It must be a
+            valid Matplotlib color. Defaults to `None`, in which case a default
+            color is used.
+        density : float, optional
+            Density of the stream lines in the plot. Defaults to 1.5.
+        **kwargs
+            Keyword arguments passed to [`matplotlib.axes.Axes.streamplot`](
+            https://31c8.short.gy/ax-streamplot)
+        """
+        self._check_if_activated()
+        X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
+        if colorbar:
+            color = np.sqrt(dX**2 + dY**2)
+        strm = self.ax.streamplot(X, Y, dX, dY, color=color, cmap=cmap, 
+                                  density=density, **kwargs)
+        if colorbar:
+            self.fig.colorbar(strm.lines, ax=self.ax)
 
     @staticmethod
     def _check_if_tuple_of_two_int(test_value):
@@ -857,14 +876,13 @@ class Result(Graphics):
     """Results generated using PopNet executors.
 
     The purpose of `Result` is to handle easily the outputs of numerical
-    simulations performed by PopNet functions. The class `Result` has several
-    methods, listed in the [Methods](#result-methods) section below, to easily
-    create and setup a [Matplotlib](https://matplotlib.org/) figure with
-    predefined formatting, allowing to easily produce many figures in a
-    consistent format. 
+    experiments performed by PopNet. The class `Result` has several methods,
+    listed in the [Methods](#result-methods) section below, to create and setup
+    a [Matplotlib](https://matplotlib.org/) figure with predefined formatting,
+    allowing to easily produce many figures in a consistent format. 
 
-    Although limited features would be available with the `Result` class alone,
-    it is not inteded to be used by itself, but rather through its subclasses:
+    Although some features would be available with the `Result` class alone,
+    it is not inteded to be used by itself, but rather through its subclasses
     `Solution`, `ExtendedSolution`, `Trajectory`, `Statistics` and `Spectrum`.
     Each one of these subclasses implements other features specific to a given
     result case.
@@ -872,11 +890,11 @@ class Result(Graphics):
     Parameters
     ----------
     config : popnet.structures.Configuration
-        The configuration used to obtain the result.
+        Configuration used to obtain the result.
     states : array_like
-        The state of the network with respect to time.
+        State of the network with respect to time.
     times : array_like
-        An array representing time.
+        Time.
     name : str, optional
         A name associated with the result. Defaults to `None`, in which case it
         is replaced with `Result.default_name`.
@@ -884,25 +902,25 @@ class Result(Graphics):
     Attributes
     ----------
     config : popnet.structures.Configuration
-        The configuration used to obtain the result. See `Result.config`.
+        Configuration used to obtain the result. See `Result.config`.
     name : str
         Name associated with the result. See `Result.name`.
     fig : matplotlib.figure.Figure
         A Matplotlib figure. See `Result.fig`.
     ax : matplotlib.axes.Axes
-        The axes of `fig`. See `Result.ax`.
+        Axes of `fig`. See `Result.ax`.
     times : array_like
         Time.
     colors : dict
         Colors for each state variable associated with the result. See
         `Result.colors`.
     plot : dict
-        Plotting methods for each state variable associated with the result. See
-        `Result.plot`.
+        Plotting methods for each state variable associated with the result.
+        See `Result.plot`.
     A, R, S : array_like
         Vectors of state variables with respect to time.
     CAA, CRR, CSS, CAR, CAS, CRS : array_like
-        Matrices of covariance between state variables with respect to time, or
+        Covariance matrices between state variables with respect to time, or
         `None` if no such covariances are defined for a `Result` subclass.
 
     Methods {#result-methods}
@@ -923,9 +941,9 @@ class Result(Graphics):
 
     Notes
     -----
-    Some additional remarks should be made regarding the implementation, in the
-    case where `Result` would have to be subclassed. Of course, everything
-    discussed here are implementation details, and should not be useful from a
+    Some additional remarks should be made regarding the implementation, in
+    case `Result` would have to be subclassed. Everything discussed here is
+    considered to be implementation details, and should not be useful from a
     user perspective.
 
     The class `Result` itself is in fact intended to handle directly only the
@@ -933,21 +951,22 @@ class Result(Graphics):
     population. The one population case is internally handled by a private
     subclass `_ResultOne`, which is responsible to modify the state components
     attributes and the methods of the `plot` dictionary, to change them from
-    one-element list to the element itself. The same pattern is followed in
-    `Result` subclasses: each one has a private subclass with the same name but
-    with a suffix 'One'.
+    one-element lists to the elements themselves. The same pattern is followed
+    in `Result` subclasses: each one has a private subclass with the same name
+    but with a suffix 'One'.
 
     When creating a new `Result` instance, the constructor internally checks
     the number of populations of the network, and if this number is one, then
-    the constructor looks in the `graphics` module for a class of the same name
-    suffixed with 'One', and rather instantiates this class if it exists.
+    the constructor looks in the `graphics` module for a private class of the
+    same name suffixed with 'One', and rather instantiates this class if it
+    exists.
 
     """
 
     default_name = 'Result'
     """Default name given to instances."""
     x_units = 'Time'
-    """Units of the horizontal axis."""
+    """Units of the horizontal axis. The default is `'Time'`."""
     _lim_valid_values = {'x': ('time', 'config', 'unbounded'), 
                          'y': ('fractions', 'covariances', 'unbounded')}
 
@@ -961,7 +980,7 @@ class Result(Graphics):
     def __new__(cls, config, states, times, name=None):
         if not isinstance(config, structures.Configuration):
             raise TypeError('The configuration used with a \'Result\' '
-                            'instance should be a \'Configuration\' instance.')
+                            'instance must be a \'Configuration\' instance.')
         if len(config.network.populations) == 1:
             prefix = '' if cls.__name__.startswith('_') else '_'
             suffix = '' if cls.__name__.endswith('One') else 'One'
@@ -985,21 +1004,21 @@ class Result(Graphics):
         Parameters
         ----------
         ID : str
-            The ID of the configuration used to obtain this result. 
+            ID of the configuration used to obtain this result. 
         name : str, optional
-            The name associated with the result. Defaults to `None`, in which
-            case it is replaced with the name of the class.
+            Name associated with the result. Defaults to `None`, in which case
+            it is replaced with the name of the class.
         config : popnet.structures.Configuration, optional
-            Configuration to associate with the result. If given, it should have
-            the ID `ID`. Defaults to `None`, in which case it is loaded. 
+            Configuration to associate with the result. If given, it must have
+            the ID `ID`. Defaults to `None`, in which case it is loaded with
+            `popnet.structures.load_config`, using the same ID.
         times : array_like, optional
             Times array to associate with the result. Defaults to `None`, in
-            which case it is computed from the configuration. This will not work
-            for all `Result` subclasses.
+            which case it is computed from the configuration.
         folder : str, optional
             Folder in which the file is located, which should be placed in the
             current directory. Defaults to `None`, in which case the file is
-            assumed to be located directly in the current directory.
+            assumed to be located in the current directory.
 
         Returns
         -------
@@ -1040,18 +1059,17 @@ class Result(Graphics):
 
     @property
     def colors(self):
-        """Colors associated with the solution's components.
+        """Colors associated with the result's components.
 
         Colors associated with the result's components, to be used in figures.
-        It should be a dictionary whose keys are strings representing possible
+        It is a dictionary whose keys are strings representing possible
         components, and whose values are lists (or lists of lists) of valid
         Matplotlib colors associated with each population (or pair of
-        populations). For example, `solution.colors['A'][J]` is the color
+        populations). For example, `result.colors['A'][J]` is the color
         associated with the activity of the *J*th population of the network for
-        the result `solution`. By default, in the case of a single population,
-        a new color can be assigned as is, and it will be automatically be
-        placed in a list (containing only the given color). It cannot be
-        deleted.
+        the result `result`. By default, in the case of a single population,
+        a new color can be assigned as is, and it is automatically placed in a
+        list (containing only the given color). It cannot be deleted.
         """
         return self._colors
 
@@ -1067,8 +1085,8 @@ class Result(Graphics):
         """Dictionary of methods to plot state variables.
 
         If *X* denotes a state variable (that is, either *A*, *R* or *S*), then
-        `plot['X']` is a list whose *J*th element is a method which plots
-        \\(X^J\\) (or its expectation \\(\\mathcal{X}_J\\), depending on the
+        `plot['X']` is a list whose *J*th element is a method that plots
+        \\(X^J\\) (or its expectation, depending on the
         result) with respect to time. Similarly, if covariances are defined for
         this result, then `plot['CXY'][J][K]` is a method which plots the
         covariances between \\(X^J\\) and \\(Y^K\\) with respect to time. A
@@ -1082,51 +1100,51 @@ class Result(Graphics):
         way, `plot['CRR']` is a method to plot the variance of the refractory
         fraction of the network.
 
-        All methods to plot accept keyword arguments that can be passed to the
-        `plot` method of a [`matplotlib.axes.Axes`](
-        https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-        object. This attribute cannot be set nor deleted.
+        When called, these methods plot the corresponding state components with
+        respect to time on the axes `Result.ax` of the figure `Result.fig`. They
+        all accept keyword arguments that can be passed to the
+        [`plot`](https://31c8.short.gy/ax-plot) method of `Result.ax`. This
+        attribute cannot be set nor deleted.
         """
         return self._plot
 
     @property
     def A(self):
-        """Get the active fractions of populations.
+        """Active fractions of populations.
 
-        Get the list of active fractions of populations (or their expectations,
+        List of active fractions of populations (or their expectations,
         depending on the result) as arrays indexed with respect to time. If
         the network has only one population, it is not a list, but directly the
         array giving the active fraction of the network with respect to time.
 
-        This attribute cannot be set nor deleted.
+        It cannot be set nor deleted.
         """
         return self._states_dict['A']
 
     @property
     def R(self):
-        """Get the refractory fractions of populations.
+        """Refractory fractions of populations.
 
-        Get the list of refractory fractions of populations (or their
-        expectations, depending on the result) as arrays indexed with respect
-        to time. If the network has only one population, it is not a list, but
-        directly the array giving the refractory fraction of the network with
-        respect to time.
+        List of refractory fractions of populations (or their expectations,
+        depending on the result) as arrays indexed with respect to time. If
+        the network has only one population, it is not a list, but directly the
+        array giving the refractory fraction of the network with respect to
+        time.
 
-        This attribute cannot be set nor deleted.
+        It cannot be set nor deleted.
         """
         return self._states_dict['R']
 
     @property
     def S(self):
-        """Get the sensitive fractions of population.
+        """Sensitive fractions of population.
 
-        Get the list of sensitive fractions of populations (or their
-        expectations, depending on the result) as arrays indexed with respect
-        to time. If the network has only one population, it is not a list, but
-        directly the array giving the sensitive fraction of the network with
-        respect to time.
+        List of sensitive fractions of populations (or their expectations,
+        depending on the result) as arrays indexed with respect to time. If
+        the network has only one population, it is not a list, but directly the
+        array giving the sensitive fraction of the network with respect to time.
 
-        This attribute cannot be set nor deleted.
+        It cannot be set nor deleted.
         """
         return self._states_dict['S']
 
@@ -1139,7 +1157,7 @@ class Result(Graphics):
         defined. If the network has only one population, it is not a list of
         lists, but directly the variance of the active fraction of the network.
 
-        This attribute cannot be set nor deleted. 
+        It cannot be set nor deleted. 
         """
         try:
             return self._states_dict['CAA']
@@ -1156,7 +1174,7 @@ class Result(Graphics):
         lists, but directly the variance of the refractory fraction of the
         network.
 
-        This attribute cannot be set nor deleted. 
+        It cannot be set nor deleted. 
         """
         try:
             return self._states_dict['CRR']
@@ -1173,7 +1191,7 @@ class Result(Graphics):
         lists, but directly the variance of the sensitive fraction of the
         network.
 
-        This attribute cannot be set nor deleted. 
+        It cannot be set nor deleted. 
         """
         try:
             return self._states_dict['CSS']
@@ -1190,7 +1208,7 @@ class Result(Graphics):
         list of lists, but directly the covariance between the active and
         refractory fractions of the network.
 
-        This attribute cannot be set nor deleted.
+        It cannot be set nor deleted.
         """
         try:
             return self._states_dict['CAR']
@@ -1207,7 +1225,7 @@ class Result(Graphics):
         list of lists, but directly the covariance between the active and
         sensitive fractions of the network.
 
-        This attribute cannot be set nor deleted.
+        It cannot be set nor deleted.
         """
         try:
             return self._states_dict['CAS']
@@ -1224,7 +1242,7 @@ class Result(Graphics):
         not a list of lists, but directly the covariance between the refractory
         and sensitive fractions of the network.
 
-        This attribute cannot be set nor deleted.
+        It cannot be set nor deleted.
         """
         try:
             return self._states_dict['CRS']
@@ -1240,8 +1258,8 @@ class Result(Graphics):
         keyword arguments listed in the [Other Parameters](#other-parameters)
         section below give a little more control over the curves which are
         plotted, for results with a lot of components. If the figure is saved,
-        it will be under *ID - name.png*, where *ID* and *name* are the
-        corresponding attributes of the result, and it will be placed in the
+        it is under *ID - name.png*, where *ID* and *name* are the
+        corresponding attributes of the result, and it is placed in the
         current directory.
 
         Parameters
@@ -1285,19 +1303,19 @@ class Result(Graphics):
     def get_spectrum(self, name=None):
         """Get the spectrum of this result.
 
-        Get a `Spectrum` instance corresponding to the present instance where
-        each state component is replaced by its real fast Fourier transform.
+        Get a `Spectrum` instance corresponding to `self` where each state
+        component is replaced by its real fast Fourier transform.
 
         Parameters
         ----------
         name : str, optional
             Name to associate with the spectrum. Defaults to `None`, in which
-            case it is replaced with `Spectrum`.
+            case it is replaced with `'Spectrum'`.
 
         Returns
         -------
         Spectrum
-            The spectrum of the result.
+            The spectrum of the result `self`.
         """
         return Spectrum(self.config, self._states_dict, self.times, 
                         self.default_name, name)
@@ -1307,29 +1325,31 @@ class Result(Graphics):
         """Setup a figure.
 
         Setup the figure `Result.fig`. Allows to set an automatic label to the
-        horizontal axis based on `Result.x_units`, and to set limits to both
-        axes.
+        horizontal axis based on `Result.x_units`, to choose a font size for
+        the labels, and to set limits to both axes.
 
         Parameters
         ----------
         set_xlabel : bool, optional
             Decides if the horizontal axis is labelled. Defaults to `True`.
         units : str, optional
-            Time units for the horizontal axis. Defaults to `'ms'`, which
-            assumes that transition rates are given in kHz.
+            Time units for the horizontal axis, indicated in square brackets on
+            the figure. If it is set to the empty string `''`, no extra square
+            brackets are added. Defaults to `'ms'`, which assumes that
+            transition rates are given in kHz.
         fontsize : float, optional
             Font size in points for the horizontal axis' label. Defaults to 10.
         xlim : {'time', 'config', 'unbounded'}, optional
-            Decides how the horizontal axis is bounded. If `'time`', it will be
+            Decides how the horizontal axis is bounded. If `'time`', it is
             bounded by the initial and final values of the times array. If
-            `'config'`, it will be bounded by the initial and final times of
-            the configuration. If `'unbounded'`, it will not be bounded.
+            `'config'`, it is bounded by the initial and final times of
+            the configuration. If `'unbounded'`, it is not bounded.
             Defaults to `'time'`.
         ylim : {'fractions', 'covariances', 'unbounded'}, optional
-            Decides how the vertical axis is bounded. If `'fractions'`, it will
-            be bounded between 0 and 1. If `'covariances'`, it will be bounded
-            between -1/4 and 1. If `'unbounded'`, it will not be bounded.
-            Defaults to `'fractions'`.
+            Decides how the vertical axis is bounded. If `'fractions'`, it is
+            bounded between 0 and 1. If `'covariances'`, it is bounded between
+            between -1/4 and 1. If `'unbounded'`, it is not bounded. Defaults
+            to `'fractions'`.
 
         Raises
         ------
@@ -1405,10 +1425,10 @@ class Result(Graphics):
             return structures.load_config(ID)
         if not isinstance(config, structures.Configuration):
             raise TypeError('The configuration to associate with a loaded '
-                            'result should be a \'Configuration\' instance.')
+                            'result must be a \'Configuration\' instance.')
         if config.ID != ID:
             raise PopNetError('The configuration to associate with a result '
-                              f'loaded from ID {ID} should have the same ID.')
+                              f'loaded from ID {ID} must have the same ID.')
         return config
 
     @classmethod
@@ -1582,7 +1602,8 @@ class Result(Graphics):
     def _set_xlabel(self, set, units, fontsize):
         """Set the label of the horizontal axis of a figure."""
         if set:
-            self.ax.set_xlabel(f'{self.x_units} [{units}]', fontsize=fontsize)
+            units = f' [{units}]' if units != '' else ''
+            self.ax.set_xlabel(f'{self.x_units}{units}', fontsize=fontsize)
 
     def _set_xlim(self, xlim):
         """Set the limits of the horizontal axis of a figure."""
@@ -1742,10 +1763,9 @@ class Solution(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Solution.ax`.
 
         Raises
         ------
@@ -1777,9 +1797,10 @@ class ExtendedSolution(Solution):
     """Represent solutions of extended dynamical systems.
 
     `ExtendedSolution` extends `Solution` for cases where covariances are
-    considered in the integrated dynamical system. It adds methods to the base
-    class to plot variances or non-symmetric covariances of fractions of
-    populations all at once. Other changes are implementation details.
+    considered in the dynamical system that was integrated to obtain the
+    solution. It adds methods to the base class to plot variances or
+    non-symmetric covariances of fractions of populations all at once. Other
+    changes are implementation details.
 
     """
 
@@ -1795,10 +1816,9 @@ class ExtendedSolution(Solution):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `ExtendedSolution.ax`.
 
         Raises
         ------
@@ -1817,10 +1837,9 @@ class ExtendedSolution(Solution):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `ExtendedSolution.ax`.
 
         Raises
         ------
@@ -1886,12 +1905,13 @@ class _ExtendedSolutionOne(_SolutionOne, ExtendedSolution):
 
 
 class Trajectory(Result):
-    """Represent trajectories of the stochastic process.
+    """Represent trajectories of stochastic processes.
 
     `Trajectory` extends `Result` for the case where the result is a possible
-    trajectory of the stochastic process which rules the microscopic dynamics
+    trajectory of a stochastic process that rules the microscopic dynamics
     of the network. It adds a method to the base class to plot the fractions of
-    populations all at once. Other changes are implementation details.
+    populations all at once, and it adapts the loading method. Other changes
+    are implementation details.
 
     """
 
@@ -1917,8 +1937,7 @@ class Trajectory(Result):
             times = np.loadtxt(filename, dtype=float)
         except FileNotFoundError as error:
             raise FileNotFoundError(
-                'It seems that no times array was saved about a result from '
-                f'configuration {ID}.') from error
+                f'No times array found for configuration {ID}') from error
         return super().load(ID, name, config=config, times=times, folder=folder)
         
     def plot_fractions(self):
@@ -1930,10 +1949,9 @@ class Trajectory(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Trajectory.ax`.
 
         Raises
         ------
@@ -1966,18 +1984,19 @@ class Statistics(Result):
     """Represent statistics obtained from sample trajectories.
 
     `Statistics` extends `Result` for the case where the result is a set of
-    statistics obtained from multiple trajectories of the stochastic process
+    statistics obtained from multiple trajectories of a stochastic process
     that rules the microscopic evolution of the network.
 
     The most important extension from the `Result` class is a set of methods to
     plot fills between given bounds around a mean value, and methods to plot the
     minimum and maximum values of a variable at each time step. For details,
     see `Statistics.fill`, `Statistics.plot_max` and `Statistics.plot_min`.
-    Besides these new methods, it also adds other methods to plot state
-    components. Other changes are implementation details.
+    Besides these new methods, it also adds other methods to plot several state
+    components at once, and it adapts the loading method. Other changes are
+    implementation details.
 
     The parameters at initialization are the same as in the base class, except
-    that `states` is now expected to be an three-dimensional array of *samples*
+    that `states` is now expected to be a three-dimensional array of *samples*
     of trajectories of the stochastic process, with time along the first axis,
     state variables along the second, and different simulations along the third.
     Note that this is the format of samples handled by
@@ -2001,7 +2020,7 @@ class Statistics(Result):
         """Compute statistics from loaded sample trajectories.
 
         Compute statistics needed to define a `Statistics` instance from loaded
-        samples. For each component *X*, the samples are supposed to be in a
+        samples. For each component *X*, the samples are assumed to be in a
         file named *ID - sample_name X.txt*, where *ID* and *sample_name* are
         indeed `ID` and `sample_name`. In the file for a component *X*, it is
         assumed that in each column are the values of *X* with respect to time
@@ -2018,13 +2037,13 @@ class Statistics(Result):
             Name associated with the result. Defaults to `None`, in which case
             it is replaced with `'Statistics'`.
         config : popnet.structures.Configuration, optional
-            Configuration to associate with the result. If given, it should have
+            Configuration to associate with the result. If given, it must have
             the ID `ID`. Defaults to `None`, in which case it is loaded from ID
             `ID`.
         folder : str, optional
             Folder in which the files are located, which should be placed in the
             current directory. Defaults to `None`, in which case the files are
-            assumed to be located directly in the current directory.
+            assumed to be located in the current directory.
 
         Returns
         -------
@@ -2050,10 +2069,9 @@ class Statistics(Result):
                             folder, ID, f'{sample_name} {X}')
             try:
                 samples.append(np.loadtxt(filename, dtype=float))
-            except FileNotFoundError as error:
-                raise FileNotFoundError('It seems that no samples have been '
-                                        f'saved yet for the component {X} with '
-                                        f'configuration {ID}.') from error
+            except FileNotFoundError as e:
+                raise FileNotFoundError('No samples found for the component '
+                                        f'{X} with configuration {ID}.') from e
         samples = np.transpose(samples, axes=(1,0,2))
         times = np.linspace(config.initial_time, config.final_time, 
                             1 + config.iterations)
@@ -2074,6 +2092,12 @@ class Statistics(Result):
         replaced with the single element they would contain. For example,
         `fill['A']` is directly a method to add a fill around the mean value of
         the network's activity.
+
+        When called, these methods add fills for the corresponding state
+        components on the axes `Statistics.ax` of the figure `Statistics.fig`.
+        They all accept keyword arguments that can be passed to the
+        [`fill_between`](https://31c8.short.gy/ax-fill-between) method of
+        `Statistics.ax`. This attribute cannot be set nor deleted.
         """
         return self._fill
 
@@ -2097,7 +2121,7 @@ class Statistics(Result):
         """
         return self._plot_min
         
-    def fill_all(self, bound='std', alpha=.25):
+    def fill_all(self, bound='std', alpha=.25, **kwargs):
         """Add fills between given bounds.
 
         Add fills between given bounds around the mean values of all fractions
@@ -2106,14 +2130,18 @@ class Statistics(Result):
         Parameters
         ----------
         bound : {'std', 'extrema'}, optional
-            Described the bounds between which to fill. If `'std'`, the region
-            bounded by one standard deviation around the mean value will be
-            filled. If `'extrema'`, the region bounded by the minimum and
-            maximum values of the component will be filled. Defaults to `'std'`.
+            Describes the bounds between which to fill. If `'std'`, the region
+            bounded by one standard deviation around the mean value is filled.
+            If `'extrema'`, the region bounded by the minimum and maximum
+            values of the component is filled. Defaults to `'std'`.
         alpha : float
             Transparency parameter of the fill. Defaults to 0.25.
+        **kwargs
+            Keyword arguments to be passed to the method that adds the fills,
+            which is the [`fill_between`](https://31c8.short.gy/ax-fill-between)
+            method of `Statistics.ax`.
         """
-        self._fill_all(bound, alpha)
+        self._fill_all(bound, alpha, **kwargs)
 
     def plot_averages(self, **kwargs):
         """Plot all averages of fractions of populations.
@@ -2124,10 +2152,9 @@ class Statistics(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Statistics.ax`.
 
         Raises
         ------
@@ -2146,10 +2173,9 @@ class Statistics(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Statistics.ax`.
 
         Raises
         ------
@@ -2168,10 +2194,9 @@ class Statistics(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Statistics.ax`.
 
         Raises
         ------
@@ -2190,10 +2215,9 @@ class Statistics(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Statistics.ax`.
 
         Raises
         ------
@@ -2209,12 +2233,12 @@ class Statistics(Result):
         super()._default_plots(one=expectations, symmetric=variances, 
                                nonsymmetric=covariances, three=third_moments)
 
-    def _fill_all(self, bound, alpha):
+    def _fill_all(self, bound, alpha, **kwargs):
         """Add fills for all *A*'s, *R*'s and *S*'s."""
         p = len(self.config.network.populations)
         for J in range(p):
             for X in ['A', 'R', 'S']:
-                self.fill[X][J](bound=bound, alpha=alpha)
+                self.fill[X][J](bound=bound, alpha=alpha, **kwargs)
 
     def _fill_dict(self):
         """Return a dictionary of methods to add fills for each population."""
@@ -2229,8 +2253,8 @@ class Statistics(Result):
         Compute a central moment from samples. The axes of `samples` are assumed
         to be ordered in the same way as those handled by `ChainSimulator`, but
         the second axis is assumed to span only the relevant components. Hence,
-        if the second axis has length *k*, the central moment computed will be
-        of order *k*.
+        if the second axis has length *k*, the central moment computed is of
+        order *k*.
         """
         T = len(samples)
         order = len(samples[0])
@@ -2358,7 +2382,7 @@ class Statistics(Result):
     def _make_fill(self, X, J):
         """Define the method to add a fill around the fraction variable `X` for
         the `J`th population."""
-        def f(bound='std', alpha=.25):
+        def f(bound='std', alpha=.25, **kwargs):
             self._check_if_activated()
             if bound == 'std':
                 CXX = f'C{X}{X}'
@@ -2369,8 +2393,8 @@ class Statistics(Result):
             elif bound == 'extrema':
                 low = self._min_dict[X][J]
                 high = self._max_dict[X][J]
-            fill = self.ax.fill_between(self.times, low, high, 
-                                        color=self.colors[X][J], alpha=alpha)
+            fill = self.ax.fill_between(self.times, low, high, alpha=alpha,
+                                        color=self.colors[X][J], **kwargs)
             return fill
         return f
 
@@ -2385,10 +2409,10 @@ class _StatisticsOne(_ResultOne, Statistics):
 
     """
         
-    def _fill_all(self, bound, alpha):
+    def _fill_all(self, bound, alpha, **kwargs):
         """Add fills for all *A*, *R* and *S*."""
         for X in ['A', 'R', 'S']:
-            self.fill[X](bound=bound, alpha=alpha)
+            self.fill[X](bound=bound, alpha=alpha, **kwargs)
 
     def _fill_dict(self):
         """Return a dictionary of methods to add a fill."""
@@ -2422,7 +2446,7 @@ class Spectrum(Result):
     of another result. Specifically, it defines methods to plot the spectra of
     state components, and it extends the options to setup a figure. Its data
     attributes are the same as in the base class, but here `times` is replaced
-    with `freqs`; see `Spectrum.freqs`. Finally, `Spectrum` suppresses
+    with `freqs`; see `Spectrum.freqs`. Finally, `Spectrum` forgets
     `Result`'s `load` and `get_spectrum` methods.
 
     The recommended way of instantiating a `Spectrum` instance is from another
@@ -2432,16 +2456,16 @@ class Spectrum(Result):
     Parameters
     ----------
     config : popnet.structures.Configuration
-        The configuration used to obtain the result.
+        Configuration used to obtain the result.
     states : dict of array_like
-        Dictionary in which to each state component is associated an array. Such
-        an array should give the values, for each combination of populations,
-        of the state component with respect to time. This is the format in which
-        data is kept internally in `Result` classes.
+        Dictionary in which to each state component is associated with an array.
+        Such an array should give the values, for each combination of
+        populations, of the state component with respect to time. This is the
+        format in which data is kept internally in `Result` classes.
     times : array_like
         An array representing time.
     source : str
-        The name of the class from which comes the spectrum.
+        Name of the class from which comes the spectrum.
     name : str, optional
         A name associated with the result. Defaults to `None`, in which case it
         is replaced with `Spectrum.default_name`.
@@ -2462,7 +2486,7 @@ class Spectrum(Result):
     def __init__(self, config, states, times, source, name=None):
         if source not in ('Result', 'Solution', 'Solution (extended)',
                           'Trajectory', 'Statistics'):
-            raise ValueError(f'Unknown source {source} for Spectrum instance.')
+            raise ValueError(f'Unknown source \'{source}\'.')
         self._source = source
         super().__init__(config, states, times, name)
 
@@ -2499,10 +2523,9 @@ class Spectrum(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Spectrum.ax`.
 
         Raises
         ------
@@ -2521,10 +2544,9 @@ class Spectrum(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Spectrum.ax`.
 
         Raises
         ------
@@ -2547,10 +2569,9 @@ class Spectrum(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Spectrum.ax`.
 
         Raises
         ------
@@ -2573,10 +2594,9 @@ class Spectrum(Result):
         Parameters
         ----------
         **kwargs
-            Keyword arguments to be passed to all methods to plot components,
-            which are `plot` methods of a [`matplotlib.axes.Axes`](
-            https://matplotlib.org/3.3.3/api/axes_api.html#matplotlib.axes.Axes)
-            object.
+            Keyword arguments to be passed to the method that plots components,
+            which is the [`plot`](https://31c8.short.gy/ax-plot) method of
+            `Spectrum.ax`.
 
         Raises
         ------
@@ -2593,7 +2613,7 @@ class Spectrum(Result):
               yscale='linear'):
         """Setup a figure.
 
-        Setup the figure `Result.fig`. Extends the base class method by
+        Setup the figure `Spectrum.fig`. Extends the base class method by
         allowing to set the scale of the vertical axis. Also overrides the
         accepted values for `xlim`, and removes the option to bound the
         vertical axis.
@@ -2603,16 +2623,19 @@ class Spectrum(Result):
         set_xlabel : bool, optional
             Decides if the horizontal axis is labelled. Defaults to `True`.
         units : str, optional
-            Frequency units for the horizontal axis, which should be the unit
-            in which the transition rates are given. Defaults to `'kHz'`.
+            Frequency units for the horizontal axis, which should be the units
+            in which the transition rates are given in the configuration. These
+            units are indicated in square brackets on the figure, except if it
+            is set to the empty string `''`, in which case no extra square
+            brackets are added. Defaults to `'kHz'`.
         fontsize : float, optional
             Font size in points for the horizontal axis' label. Defaults to 10.
         xlim : {'freqs', 'config', 'unbounded'}, optional
-            Decides how the horizontal axis is bounded. If `'freqs'`, it will be
-            bounded between 0 and the highest frequency. If `'config'`, it will
-            be bounded between 0 and the highest frequency obtained from the
-            times array given by the configuration. If `'unbounded'`, it will
-            not be bounded. Defaults to `'freqs'`.
+            Decides how the horizontal axis is bounded. If `'freqs'`, it is
+            bounded between 0 and the highest frequency. If `'config'`, it is
+            bounded between 0 and the highest frequency obtained from the times
+            array given by the configuration. If `'unbounded'`, it is not
+            bounded. Defaults to `'freqs'`.
         yscale : {'linear', 'log'}, optional
             Defines the scale of the vertical axis. Defaults to `'linear'`.
 
@@ -2628,7 +2651,7 @@ class Spectrum(Result):
         try:
             self.ax.set_yscale(yscale)
         except AttributeError as error:
-            raise TypeError(f'\'yscale\' should be a string.') from error
+            raise TypeError(f'\'yscale\' must be a string.') from error
 
     def _default_plots(self, expectations=True, variances=True, 
                        covariances=False, third_moments=False):
@@ -2737,7 +2760,7 @@ def draw(name='Figure', show=True, savefig=False, folder=None, format=None,
     """Draw a figure.
 
     Draw a figure previously activated and set up. If the figure is saved, it
-    will be named `name` and will have the file format chosen with `format`.
+    is named `name` and has the file format chosen with `format`.
 
     Parameters
     ----------
@@ -2757,8 +2780,8 @@ def draw(name='Figure', show=True, savefig=False, folder=None, format=None,
         'pdf' and 'svg'. Defaults to `None`, in which case the file format is
         Matplotlib's `savefig.format` parameter, which defaults to 'png'.
     **kwargs
-        Keyword arguments passed to `matplotlib.pyplot.savefig` when `savefig`
-        is `True`.
+        Keyword arguments passed to [`matplotlib.pyplot.savefig`](
+        https://31c8.short.gy/plt-savefig) when `savefig` is `True`.
     """
     if savefig:
         _internals._make_sure_folder_exists(folder)
@@ -2780,40 +2803,41 @@ def figure(subplots=None, figsize=(5,3.75), dpi=150, tight_layout=True,
     Parameters
     ----------
     subplots : list or tuple, optional
-        If given, one subplot will be defined on the figure for each element of
+        If given, one subplot is defined on the figure for each element of
         `subplots`. Each subplot must be specified with an argument understood
-        by the [`add_subplot`](https://tinyurl.com/matplotlib-add-subplot)
-        method of a [`matplotlib.figure.Figure`](
-        https://matplotlib.org/3.3.3/api/_as_gen/matplotlib.figure.Figure.html).
+        by the [`add_subplot`](https://31c8.short.gy/mpl-add-subplot)
+        method of a
+        [`matplotlib.figure.Figure`](https://31c8.short.gy/mpl-figure-Figure).
         Defaults to `None`, in which case a single plot is defined.
     figsize : tuple of float, optional
-        Width and height of the figure in inches. Defaults to `(5, 3.75)`.
+        Width and height of the figure in inches. Defaults to (5, 3.75).
     dpi : int
         Resolution of the figure in dots per inches. Defaults to 150.
     tight_layout : bool, optional
         Adjust automatically the padding between and aroung subplots using
         [`matplotlib.figure.Figure.tight_layout`](
-        https://tinyurl.com/matplotlib-tight-layout). Defaults to `True`.
+        https://31c8.short.gy/mpl-tight-layout). Defaults to `True`.
     font_family : {'serif', 'sans-serif'}, optional
         Determines if a serif or a sans serif font is used. Defaults to
         `'serif'`.
     usetex : bool, optional
-        Determines if LaTeX is used in the figure. Defaults to `False`.
+        Determines if LaTeX is used to draw the figure. Defaults to `False`.
     preamble : str, optional
         LaTeX preamble when `usetex` is `True`, in which case it can be used
         to load font packages. It has no effect when `usetex` is `False`.
         Defaults to `None`, in which case a default preamble is added.
     **kwargs
-        Keyword arguments to be passed to [`matplotlib.pyplot.figure`](
-        https://tinyurl.com/plt-figure). 
+        Keyword arguments to be passed to
+        [`matplotlib.pyplot.figure`](https://31c8.short.gy/plt-figure) when
+        creating the figure.
 
     Returns
     -------
     fig : matplotlib.figure.Figure
         The initialized Matplotlib figure.
     ax : matplotlib.axes.Axes or list of matplotlib.axes.Axes
-        The axes of `fig`, or a list of axes for every subplot of `fig`, if
-        `subplots` was given.
+        The axes of `fig`, or a list of axes for every subplot of `fig` if
+        multiple subplots have been defined on the figure.
 
     Warns
     -----
@@ -2864,7 +2888,8 @@ def load_extended_solution(ID, name=None, config=None, times=None, folder=None):
     """Load a solution from a text file.
 
     Load a solution of an extended dynamical system from a text file. This is
-    an alias for `ExtendedSolution.load`.
+    an alias for the method `ExtendedSolution.load` inherited by
+    `ExtendedSolution`.
     """
     return ExtendedSolution.load(ID, name=name, config=config, times=times,
                                  folder=folder)
@@ -2874,7 +2899,7 @@ def load_solution(ID, name=None, config=None, times=None, folder=None):
     """Load a solution from a text file.
 
     Load a solution of a (non extended) dynamical system from a text file.
-    This is an alias for `Solution.load`.
+    This is an alias for the method `Solution.load` inherited by `Solution`.
     """
     return Solution.load(ID, name=name, config=config, times=times,
                          folder=folder)

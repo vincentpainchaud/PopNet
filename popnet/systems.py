@@ -2,8 +2,9 @@
 
 This modules implements various dynamical systems related to the Wilson--Cowan
 model. It first implements an abstract base class `DynamicalSystem`, from which
-the several other classes are derived. All classes are listed in the
-[Classes And Hierarchy](#classes-and-hierarchy) section below.
+several other classes are derived to represent different dynamical systems.
+These are listed in the [Classes And Hierarchy](#classes-and-hierarchy)
+section below.
 
 Classes and hierarchy
 ---------------------
@@ -12,7 +13,8 @@ The important classes of the module are summarized below. The indentation
 follows the hierarchy.
 
  - `DynamicalSystem` : An abstract base class to represent a dynamical system.
-     - `WilsonCowanSystem` : The classical Wilson--Cowan dynamical system.
+     - `WilsonCowanSystem` : An equivalent to the classical Wilson--Cowan
+       dynamical system.
      - `MeanFieldSystem` : The Wilson--Cowan system with refractory state.
      - `MixedSystem` : An extension of the last case where the refractory state
        is weighted.
@@ -42,8 +44,8 @@ class DynamicalSystem:
     systems in PopNet. Each subclass must implement a vector field, and the
     base class has several methods to study this vector field. For example, a
     method is available to find equilibrium points. A subclass can also
-    implement a jacobian matrix. If this is done, methods are available to
-    find its eigenvalues and eigenvectors.
+    implement a jacobian matrix, in which case methods are available to find
+    its eigenvalues and eigenvectors.
 
     !!! note
         PopNet assumes that any subclass of `DynamicalSystem` implements the
@@ -83,7 +85,7 @@ class DynamicalSystem:
     def config(self, new_value):
         if not isinstance(new_value, structures.Configuration):
             raise TypeError('The configuration used with a dynamical system '
-                            'must be a Configuration instance.')
+                            'must be a \'Configuration\' instance.')
         self._config = new_value
 
     @property
@@ -99,7 +101,7 @@ class DynamicalSystem:
         """Find an equilibrium point near at a given state.
 
         Find an equilibrium point of the dynamical system near the given state.
-        This method uses the [`root`](https://tinyurl.com/scipy-optimize-root)
+        This method uses the [`root`](https://31c8.short.gy/scipy-optimize-root)
         function from SciPy's `optimize` module.
 
         Parameters
@@ -107,10 +109,10 @@ class DynamicalSystem:
         state : array_like
             The initial guess for the equilibrium point.
         verbose : bool, optional
-            If `True`, a warning will be issued if the optimizer fails and no
+            If `True`, a warning is issued if the optimizer fails and no
             equilibrium point is found. Defaults to `True`.
         method : str, optional
-            The solver used to find the find fixed point. It should be one of
+            The solver used to find the find fixed point. It must be one of
             the accepted values for the corresponding argument of `root`.
             Defaults to `'hybr'`.
 
@@ -143,13 +145,13 @@ class DynamicalSystem:
 
         Get the eigenvalues and eigenvectors of the jacobian matrix
         corresponding to the linearization of the dynamical system, evaluated
-        at the given state. If eigenvectors are not needed, `get_eigenvals_at`
-        should be used instead.
+        at the given state. If eigenvectors are not needed,
+        `DynamicalSystem.get_eigenvals_at` should be used instead.
 
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix should be evaluated.
+            The state at which the jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -181,7 +183,7 @@ class DynamicalSystem:
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix should be evaluated.
+            The state at which the jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -210,12 +212,12 @@ class DynamicalSystem:
         Parameters
         ----------
         axes : tuple of int
-            Axes indicating the independant variables which will be the phase
+            Axes indicating the independant variables that will be the phase
             plane's axes.
         fixed_axes : array_like or float, optional
             Determines the values of the remaining axes other than those chosen
-            with `axes`. If it is a float, all other axes will be set to this
-            value. If it is an array, its length should be the dimension of the
+            with `axes`. If it is a float, all other axes are set to this
+            value. If it is an array, its length must be the dimension of the
             dynamical system minus two, and in that case every axis is fixed at
             the value given by `fixed_axes`, in the order of the system,
             skipping the axes chosen by `axes`. It is ignored is the dynamical
@@ -249,7 +251,7 @@ class DynamicalSystem:
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix should be evaluated.
+            The state at which the jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -273,7 +275,7 @@ class DynamicalSystem:
         Parameters
         ----------
         state : array_like
-            The state at which the vector field should be evaluated.
+            The state at which the vector field is to be evaluated.
 
         Returns
         -------
@@ -367,8 +369,8 @@ class MixedSystem(DynamicalSystem):
     The jacobian matrix is implemented for this system.
 
     In this case the system has an additional data attribute `epsilon`, which
-    is a `float` and should have a value between 0 and 1. It defines how much
-    the refractory state is considered. See `MixedSystem.epsilon` for details.
+    is a `float` and has a value between 0 and 1. It defines how much the
+    refractory state is considered. See `MixedSystem.epsilon` for details.
 
     """
 
@@ -386,13 +388,14 @@ class MixedSystem(DynamicalSystem):
         - When `epsilon` is 1 the refractory state is fully considered, and the
         vector field is the same as that of the `MeanFieldSystem` class.
         - When `epsilon` has a value between 0 and 1, the derivative of the
-        refractory state's components is multiply by `1/epsilon`, so these
-        components converge towards their equilibrium solutions faster than
-        they would normally.
+        refractory state's components is the same as in the `MeanFieldSystem`
+        class, but multiplied by `1/epsilon`, so these components converge
+        towards their equilibrium solutions faster than they would normally.
         - The case where `epsilon` is zero would be the case where the
         refractory state is set to its equilibrium solution and the vector
         field is that of Wilson--Cowan's model. However, for this case, the
-        `WilsonCowanSystem` class should be used instead.
+        `WilsonCowanSystem` class must be used instead to avoid divisions by
+        zero.
 
         This property cannot be deleted.
         """
@@ -403,13 +406,13 @@ class MixedSystem(DynamicalSystem):
         try:
             new_value = float(new_value)
         except Exception:
-            raise TypeError('\'epsilon\' should be a float.')
+            raise TypeError('\'epsilon\' must be a float.')
         if not 0 < new_value <= 1:
             if new_value == 0:
-                msg = ('\'epsilon\' can\'t be equal to zero. For this case, use'
+                msg = ('\'epsilon\' can\'t be equal to 0. For this case, use'
                        ' the \'WilsonCowanSystem\' class instead.')
             else:
-                msg = '\'epsilon\' has to be between zero and one.'
+                msg = '\'epsilon\' has to be between 0 and 1.'
             raise ValueError(msg)
         self._epsilon = new_value
 
@@ -562,9 +565,8 @@ class TaylorExtendedSystem(DynamicalSystem):
     The case where the network has only one population is actually handled in a
     separate (private) class `_TaylorExtendedSystemOne`, which uses a simpler
     implementation of the vector field and implements the jacobian matrix. The
-    class constructor of `TaylorExtendedSystem` will automatically instantiate
-    a `_TaylorExtendedSystemOne` instance when the network has only one
-    population.
+    class constructor of `TaylorExtendedSystem` automatically instantiates
+    `_TaylorExtendedSystemOne` when the network has only one population.
 
     This is considered to be an implementation detail. Only the class
     `TaylorExtendedSystem` should be called by a user.
@@ -574,7 +576,7 @@ class TaylorExtendedSystem(DynamicalSystem):
     def __new__(cls, config, **kwargs):
         if not isinstance(config, structures.Configuration):
             raise TypeError('The configuration used with a \'DynamicalSystem\' '
-                            'instance should be a \'Configuration\' instance.')
+                            'instance must be a \'Configuration\' instance.')
         if len(config.network.populations) == 1:
             return super().__new__(_TaylorExtendedSystemOne)
         return super().__new__(cls)
@@ -758,7 +760,7 @@ class ExtendedSystem(DynamicalSystem):
     \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
     variables associated with active or refractory fractions.
 
-    The jacobian matrix is not implemented in this system.
+    The jacobian matrix is not implemented for this system.
 
     """
 
@@ -836,7 +838,8 @@ def get_system(config, system_name, **kwargs):
 
     Define a dynamical system from the parameters in the given configuration.
     The system can be chosen from a given list of systems related to the
-    Wilson--Cowan model.
+    Wilson--Cowan model, or more generally from any system given in
+    `SYSTEM_CLASSES`.
 
     Parameters
     ----------
@@ -844,7 +847,7 @@ def get_system(config, system_name, **kwargs):
         Configuration associated with the dynamical system.
     system_name : str
         Decides which type of dynamical system to return. The following values
-        are accepted.
+        are accepted by default.
 
          - `'mean-field'`: the Wilson--Cowan's model with refractory state.
          - `'wilson-cowan'`: an equivalent to the original Wilson--Cowan model.
@@ -862,8 +865,8 @@ def get_system(config, system_name, **kwargs):
     -------
     DynamicalSystem
         Dynamical system initialized according to the given configuration. It
-        will always be a *subclass* of `DynamicalSystem`, which will depend on
-        the chosen system.
+        is always a *subclass* of `DynamicalSystem` that depends on the chosen
+        system.
 
     Raises
     ------
