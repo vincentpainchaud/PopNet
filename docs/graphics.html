@@ -2057,7 +2057,7 @@ class Trajectory(Result):
                 f&#39;No times array found for configuration {ID}&#39;) from error
         return super().load(ID, name, config=config, times=times, folder=folder)
         
-    def plot_fractions(self):
+    def plot_fractions(self, **kwargs):
         &#34;&#34;&#34;Plot all fractions of populations.
 
         Plot all active, refractory and sensitive fractions of population on
@@ -2076,7 +2076,7 @@ class Trajectory(Result):
             If no figure and axes are bound to `Trajectory.fig` and
             `Trajectory.ax`.
         &#34;&#34;&#34;
-        self._plot_all_one()
+        self._plot_all_one(**kwargs)
 
     def _label_one(self, X, J):
         &#34;&#34;&#34;Label for the fraction `X` of the `J`th population.&#34;&#34;&#34;
@@ -8683,7 +8683,7 @@ are implementation details.</p></div>
                 f&#39;No times array found for configuration {ID}&#39;) from error
         return super().load(ID, name, config=config, times=times, folder=folder)
         
-    def plot_fractions(self):
+    def plot_fractions(self, **kwargs):
         &#34;&#34;&#34;Plot all fractions of populations.
 
         Plot all active, refractory and sensitive fractions of population on
@@ -8702,7 +8702,7 @@ are implementation details.</p></div>
             If no figure and axes are bound to `Trajectory.fig` and
             `Trajectory.ax`.
         &#34;&#34;&#34;
-        self._plot_all_one()
+        self._plot_all_one(**kwargs)
 
     def _label_one(self, X, J):
         &#34;&#34;&#34;Label for the fraction `X` of the `J`th population.&#34;&#34;&#34;
@@ -8761,7 +8761,7 @@ def load(cls, ID, name=None, config=None, folder=None):
 <h3>Methods</h3>
 <dl>
 <dt id="popnet.graphics.Trajectory.plot_fractions"><code class="name flex">
-<span>def <span class="ident">plot_fractions</span></span>(<span>self)</span>
+<span>def <span class="ident">plot_fractions</span></span>(<span>self, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot all fractions of populations.</p>
@@ -8784,7 +8784,7 @@ which is the <a href="https://31c8.short.gy/ax-plot"><code>plot</code></a> metho
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def plot_fractions(self):
+<pre><code class="python">def plot_fractions(self, **kwargs):
     &#34;&#34;&#34;Plot all fractions of populations.
 
     Plot all active, refractory and sensitive fractions of population on
@@ -8803,7 +8803,7 @@ which is the <a href="https://31c8.short.gy/ax-plot"><code>plot</code></a> metho
         If no figure and axes are bound to `Trajectory.fig` and
         `Trajectory.ax`.
     &#34;&#34;&#34;
-    self._plot_all_one()</code></pre>
+    self._plot_all_one(**kwargs)</code></pre>
 </details>
 </dd>
 </dl>

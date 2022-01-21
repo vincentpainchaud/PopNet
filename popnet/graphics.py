@@ -1940,7 +1940,7 @@ class Trajectory(Result):
                 f'No times array found for configuration {ID}') from error
         return super().load(ID, name, config=config, times=times, folder=folder)
         
-    def plot_fractions(self):
+    def plot_fractions(self, **kwargs):
         """Plot all fractions of populations.
 
         Plot all active, refractory and sensitive fractions of population on
@@ -1959,7 +1959,7 @@ class Trajectory(Result):
             If no figure and axes are bound to `Trajectory.fig` and
             `Trajectory.ax`.
         """
-        self._plot_all_one()
+        self._plot_all_one(**kwargs)
 
     def _label_one(self, X, J):
         """Label for the fraction `X` of the `J`th population."""
