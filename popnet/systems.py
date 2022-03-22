@@ -107,7 +107,9 @@ class DynamicalSystem:
         Parameters
         ----------
         state : array_like
-            The initial guess for the equilibrium point.
+            The initial guess for the equilibrium point. If it has more
+            components than the dynamical system, only the first components are
+            used.
         verbose : bool, optional
             If `True`, a warning is issued if the optimizer fails and no
             equilibrium point is found. Defaults to `True`.
@@ -128,15 +130,15 @@ class DynamicalSystem:
         """
         try:
             self.jac(state)
-        except NotImplementError:
+        except NotImplementedError:
             jac = None
         else:
             jac = self.jac
-        sol = root(self.vector_field, state, jac=jac)
+        sol = root(self.vector_field, state[:self.dim], jac=jac)
         if not sol.success:
             if verbose:
-                warn('The optimizer did not succeed.', categoy=PopNetWarning,
-                     stacklevel=2)
+                warn('The optimizer did not succeed.',
+                     category=PopNetWarning, stacklevel=2)
             return None
         return sol.x
 
@@ -351,117 +353,6 @@ class WilsonCowanSystem(DynamicalSystem):
         return len(self.config.network.populations)
 
 
-class MixedSystem(DynamicalSystem):
-    """Dynamical system for the 'mixed' Wilson--Cowan model.
-
-    Specializes `DynamicalSystem` to study the transition between the classical
-    Wilson--Cowan model and its extension with refractory state. This class can
-    be seen as a combination of the `WilsonCowanSystem` and `MeanFieldSystem`
-    classes. Covariances are not considered in this case. For *p* populations,
-    a state of this system has the form
-    \\[
-        (A_1, ..., A_p, R_1, ..., R_p),
-    \\]
-    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
-    active and refractory fractions of the *J*th population, in the order given
-    by the list of populations in the configuration's network.
-
-    The jacobian matrix is implemented for this system.
-
-    In this case the system has an additional data attribute `epsilon`, which
-    is a `float` and has a value between 0 and 1. It defines how much the
-    refractory state is considered. See `MixedSystem.epsilon` for details.
-
-    """
-
-    def __init__(self, config, epsilon=1, **kwargs):
-        self.epsilon = epsilon
-        super().__init__(config, **kwargs)
-
-    @property
-    def epsilon(self):
-        """Transition parameter for the refractory state.
-
-        Float parameter with value between 0 and 1 that determines 'how much'
-        the refractory state is considered.
-
-        - When `epsilon` is 1 the refractory state is fully considered, and the
-        vector field is the same as that of the `MeanFieldSystem` class.
-        - When `epsilon` has a value between 0 and 1, the derivative of the
-        refractory state's components is the same as in the `MeanFieldSystem`
-        class, but multiplied by `1/epsilon`, so these components converge
-        towards their equilibrium solutions faster than they would normally.
-        - The case where `epsilon` is zero would be the case where the
-        refractory state is set to its equilibrium solution and the vector
-        field is that of Wilson--Cowan's model. However, for this case, the
-        `WilsonCowanSystem` class must be used instead to avoid divisions by
-        zero.
-
-        This property cannot be deleted.
-        """
-        return self._epsilon
-
-    @epsilon.setter
-    def epsilon(self, new_value):
-        try:
-            new_value = float(new_value)
-        except Exception:
-            raise TypeError('\'epsilon\' must be a float.')
-        if not 0 < new_value <= 1:
-            if new_value == 0:
-                msg = ('\'epsilon\' can\'t be equal to 0. For this case, use'
-                       ' the \'WilsonCowanSystem\' class instead.')
-            else:
-                msg = '\'epsilon\' has to be between 0 and 1.'
-            raise ValueError(msg)
-        self._epsilon = new_value
-
-    def jac(self, state):
-        """Jacobian matrix of the vector field.
-
-        See `DynamicalSystem.jac` for details.
-        """
-        A = state[: (p := len(self.config.network.populations))]
-        R = state[p : 2*p]
-        S = 1 - A - R
-        B = self.config.Q.copy()
-        for J, K in np.ndindex((p,p)):
-            B[J] += self.config.network.c[J,K] * A[K]
-        j = np.zeros((2*p, 2*p))
-        for J, popJ in enumerate(self.config.network.populations):
-            j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
-                        * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
-            j[J,J+p] = - popJ.alpha*popJ.F(B[J])
-            j[J+p,J] = popJ.beta / self.epsilon
-            j[J+p,J+p] = - popJ.gamma / self.epsilon
-            for K, popK in enumerate(self.config.network.populations):
-                if K != J:
-                    j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
-                                * self.config.network.c[J,K] * S[J])
-        return np.array(j, float)
-
-    def vector_field(self, state):
-        """Vector field of the 'mixed' Wilson--Cowan model. 
-
-        See `DynamicalSystem.vector_field`.
-        """
-        A = state[: (p := len(self.config.network.populations))]
-        R = state[p :]
-        S = 1 - A - R
-        B = self.config.Q.copy()
-        for J, K in np.ndindex((p,p)):
-            B[J] += self.config.network.c[J,K] * A[K]
-        f = np.zeros(2*p)
-        for J, popJ in enumerate(self.config.network.populations):
-            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
-            f[J+p] = 1/self.epsilon * (- popJ.gamma * R[J] + popJ.beta * A[J])
-        return np.array(f, float)
-
-    def _get_dimension(self):
-        """Get the dimension of the dynamical system."""
-        return 2 * len(self.config.network.populations)
-
-
 class MeanFieldSystem(DynamicalSystem):
     """Dynamical system for the Wilson--Cowan model with refractory state.
 
@@ -518,6 +409,153 @@ class MeanFieldSystem(DynamicalSystem):
         for J, popJ in enumerate(self.config.network.populations):
             f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
             f[J+p] = - popJ.gamma * R[J] + popJ.beta * A[J]
+        return np.array(f, float)
+
+    def _get_dimension(self):
+        """Get the dimension of the dynamical system."""
+        return 2 * len(self.config.network.populations)
+
+
+class MixedSystem(DynamicalSystem):
+    """Dynamical system for the 'mixed' Wilson--Cowan model.
+
+    Specializes `DynamicalSystem` to study the transition between the classical
+    Wilson--Cowan model and its extension with refractory state. This class can
+    be seen as a combination of the `WilsonCowanSystem` and `MeanFieldSystem`
+    classes. Covariances are not considered in this case. For *p* populations,
+    a state of this system has the form
+    \\[
+        (A_1, ..., A_p, R_1, ..., R_p),
+    \\]
+    where \\(A_J\\) and \\(R_J\\) are respectively the expectations of the
+    active and refractory fractions of the *J*th population, in the order given
+    by the list of populations in the configuration's network.
+
+    The jacobian matrix is implemented for this system.
+
+    In this case the system has an additional data attribute `epsilon`, which
+    is a `float` and has a value between 0 and 1. It defines how much the
+    refractory state is considered. See `MixedSystem.epsilon` for details.
+
+    """
+
+    def __init__(self, config, epsilon=1):
+        self.epsilon = epsilon
+        super().__init__(config)
+
+    @property
+    def epsilon(self):
+        """Transition parameter for the refractory state.
+
+        Float parameter with value between 0 and 1 that determines 'how much'
+        the refractory state is considered.
+
+        - When `epsilon` is 1 the refractory state is fully considered, and the
+        vector field is the same as that of the `MeanFieldSystem` class.
+        - When `epsilon` has a value between 0 and 1, the derivative of the
+        refractory state's components is the same as in the `MeanFieldSystem`
+        class, but multiplied by `1/epsilon`, so these components converge
+        towards their equilibrium solutions faster than they would normally.
+        - The case where `epsilon` is zero would be the case where the
+        refractory state is set to its equilibrium solution and the vector
+        field is that of Wilson--Cowan's model. However, for this case, the
+        `WilsonCowanSystem` class must be used instead to avoid divisions by
+        zero.
+
+        This property cannot be deleted.
+        """
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, new_value):
+        try:
+            new_value = float(new_value)
+        except Exception:
+            raise TypeError('\'epsilon\' must be a float.')
+        if not 0 < new_value <= 1:
+            if new_value == 0:
+                msg = ('\'epsilon\' can\'t be equal to 0. For this case, use'
+                       ' the \'WilsonCowanSystem\' class instead.')
+            else:
+                msg = '\'epsilon\' has to be between 0 and 1.'
+            raise ValueError(msg)
+        self._epsilon = new_value
+
+    def find_bifurcation_near(self, state, precision):
+        """Find a bifurcation point near a given state.
+
+        Find a value of epsilon where the dynamical system undergoes a
+        bifurcation near a given state. If there is more than one such
+        bifurcation point, only the first value of epsilon is found.
+
+        Parameters
+        ----------
+        state : array_like
+            State near which to find a bifurcation. To find the precise steady
+            state, `MixedSystem.find_equilibrium_near` is called with `state`.
+        precision : int
+            Number of significant digits on the value of epsilon at the
+            bifurcation point.
+
+        Returns
+        -------
+        float
+            Value of epsilon at which the bifurcation occurs, or `None` if no
+            bifurcation is found.
+        array_like
+            Eigenvalues of the jacobian matrix at the bifurcation point, or
+            `None` is no bifurcation is found.
+
+        Warns
+        -----
+        PopNetWarning
+            If no bifurcation is found.
+        """
+        finder = _BifurcationFinder(self, state)
+        e, eigenvals = finder.run(precision)
+        if e is None:
+            warn('No bifurcation found.', category=PopNetWarning, stacklevel=2)
+        return e, eigenvals
+
+    def jac(self, state):
+        """Jacobian matrix of the vector field.
+
+        See `DynamicalSystem.jac` for details.
+        """
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p : 2*p]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        j = np.zeros((2*p, 2*p))
+        for J, popJ in enumerate(self.config.network.populations):
+            j[J,J] = (- popJ.beta - popJ.alpha*popJ.F(B[J]) + popJ.alpha
+                        * popJ.dF(B[J])*self.config.network.c[J,J]*S[J] )
+            j[J,J+p] = - popJ.alpha*popJ.F(B[J])
+            j[J+p,J] = popJ.beta / self.epsilon
+            j[J+p,J+p] = - popJ.gamma / self.epsilon
+            for K, popK in enumerate(self.config.network.populations):
+                if K != J:
+                    j[J,K] = (popJ.alpha*popJ.dF(B[J]) 
+                                * self.config.network.c[J,K] * S[J])
+        return np.array(j, float)
+
+    def vector_field(self, state):
+        """Vector field of the 'mixed' Wilson--Cowan model. 
+
+        See `DynamicalSystem.vector_field`.
+        """
+        A = state[: (p := len(self.config.network.populations))]
+        R = state[p :]
+        S = 1 - A - R
+        B = self.config.Q.copy()
+        for J, K in np.ndindex((p,p)):
+            B[J] += self.config.network.c[J,K] * A[K]
+        f = np.zeros(2*p)
+        for J, popJ in enumerate(self.config.network.populations):
+            f[J] = - popJ.beta * A[J] + popJ.alpha*popJ.F(B[J]) * S[J]
+            f[J+p] = 1/self.epsilon * (- popJ.gamma * R[J] + popJ.beta * A[J])
         return np.array(f, float)
 
     def _get_dimension(self):
@@ -823,6 +861,115 @@ class ExtendedSystem(DynamicalSystem):
         """Get the dimension of the dynamical system."""
         p = len(self.config.network.populations)
         return p * (2*p + 3)
+
+
+class _BifurcationFinder:
+    """Interface to find a bifurcation.
+
+    This class provides an interface to find bifurcations with respect to
+    epsilon in the mixed system that describes the transition between the
+    classical Wilson--Cowan system and its extension with refractory state.
+
+    Parameters
+    ----------
+    system : MixedSystem
+        Dynamical system for which to find a bifurcation.
+    state : array_like
+        Initial guess for the state at which there is a bifurcation.
+
+    Attributes
+    ----------
+    system : MixedSystem
+        Dynamical system for which to find a bifurcation.
+    steady_state : array_like
+        Steady state at which a bifurcation occurs.
+
+    """
+
+    def __init__(self, system, state):
+        self.system = system
+        self.steady_state = self.system.find_equilibrium_near(state)
+
+    def run(self, precision):
+        """Run the bifurcation finder.
+        
+        Parameters
+        ----------
+        precision : int
+            Precision desired on the value of epsilon at the bifurcation, as
+            a number of significant digits.
+
+        Returns
+        -------
+        float
+            Value of epsilon at which the bifurcation occurs, or `None` if no
+            bifurcation is found.
+        array_like
+            Eigenvalues of the jacobian matrix at the bifurcation point, or
+            `None` if no bifurcation is found.
+        """
+        original_epsilon = self.system.epsilon
+        emin, emax = 0, 1
+        self.signs_at_zero = self._get_eigenvals_signs_at_zero()
+        for j in range(precision):
+            emin, emax = self._update_epsilon_bounds(emin, emax)
+            if emin is None:
+                return None, None
+        e = (emax + emin) / 2
+        self.system.epsilon = e
+        eigenvals = self.system.get_eigenvals_at(self.steady_state)
+        self.system.epsilon = original_epsilon
+        return e, eigenvals
+
+    def _have_signs_changed(self, eigenvals):
+        """Compare signs of eigenvalues' real parts to those at epsilon = 0."""
+        for eig, sign in zip(eigenvals, self.signs_at_zero):
+            if np.sign(eig.real) != sign:
+                return True
+        return False
+
+    def _get_eigenvals_signs_at_zero(self):
+        """Get signs of eigenvalues' real parts at `state` for epsilon = 0."""
+        WC_system = WilsonCowanSystem(self.system.config)
+        eigenvals = WC_system.get_eigenvals_at(self.steady_state)
+        A_components_signs = [np.sign(np.real(eig)) for eig in eigenvals]
+        R_components_signs = [-1 for sign in A_components_signs]
+        signs = np.concatenate((A_components_signs, R_components_signs))
+        return signs
+
+    def _update_epsilon_bounds(self, emin, emax):
+        """Update the bounds between which there is a bifurcation.
+
+        Assuming the dynamical system undergoes a bifurcation with respect to
+        epsilon between `emin` and `emax`, increase the precision of these
+        bounds by one significant digit.
+
+        Parameters
+        ----------
+        emin, emax : float
+            Bounds between which the system undergoes a bifurcation with
+            respect to epsilon.
+
+        Returns
+        -------
+        emin, emax : array_like
+            Bounds analogous to those given but with increased precision, or
+            `None` if there is no bifurcation point between the given bounds.
+        """
+        epsilon = np.linspace(emin, emax, 11)
+        p = len(self.system.config.network.populations)
+        for j, e in enumerate(epsilon):
+            if e == 0:
+                continue
+            self.system.epsilon = e
+            eigenvals = self.system.get_eigenvals_at(self.steady_state)
+            if self._have_signs_changed(eigenvals):
+                emin = epsilon[j-1]
+                emax = epsilon[j]
+                break
+        else:
+            return None, None
+        return emin, emax
 
 
 SYSTEM_CLASSES = {'mean-field': MeanFieldSystem,

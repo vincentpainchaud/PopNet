@@ -476,6 +476,169 @@ class Integrator(Executor):
         return self.system.dim
 
 
+class LyapunovExponentsIntegrator(Integrator):
+    """Interface to estimate Lyapunov exponents of dynamical systems.
+
+    This class extends `Integrator` to compute the Lyapunov exponents along the
+    integrated solution when calling `LyapunovExponentsIntegrator.run`. For
+    this to work, the dynamical system must have a jacobian matrix implemented,
+    and an error is raised at initialization if no jacobian matrix is defined.
+
+    The Lyapunov exponents are computed using the discrete QR method described
+    by Dieci et al. in [1].
+
+    References
+    ----------
+     1. Dieci, Luca, Robert D. Russell, and Erik S. Van Vleck. “On the
+        Computation of Lyapunov Exponents for Continuous Dynamical Systems.”
+        *SIAM Journal on Numerical Analysis* **34** (1), 402--423 (1997). doi:
+        [10.1137/S0036142993247311](https://doi.org/10.1137/S0036142993247311)
+
+    """
+
+    def __init__(self, system, **kwargs):
+        super().__init__(system, **kwargs)
+        try:
+            self.system.jac
+        except NotImplementedError as error:
+            raise ValueError('The system must have a jacobian matrix '
+                             'implemented.') from error
+        self._dim = self.system.dim
+
+    @property
+    def exponents(self):
+        """Lyapunov exponents.
+
+        Estimates of the Lyapunov exponents of the dynamical system along the
+        integrated solution, once they have been computed. It is automatically
+        set during a call to `LyapunovExponentsIntegrator.run`. It cannot be
+        manually set nor deleted.
+        """
+        return self._exponents
+
+    def close(self):
+        """Delete all data attributes of the integrator."""
+        super().close()
+        del self._uptri_diag
+        del self._exponents
+
+    def output(self, **kwargs):
+        """Get the output of the integration.
+
+        Return the results of the numerical integration. It extends the base
+        class method by returning the Lyapunov exponents as well as the
+        solution.
+
+        Parameters
+        ----------
+        **kwargs
+            Keyword arguments to be passed to the output's class constructor.
+
+        Returns
+        -------
+        popnet.graphics.Result
+            The output of the integration. The precise output type depends on
+            the dynamical system that has been integrated; see the
+            [summary](graphics.html#classes-and-hierarchy) of all
+            `popnet.graphics.Result` subclasses for a quick reference giving
+            the output type of each case.
+        array_like
+            The Lyapunov exponents.
+
+        Raises
+        ------
+        popnet.exceptions.PopNetError
+            If the numerical integration has not been performed yet.
+        """
+        return super().output(), self.exponents
+
+    def reset(self):
+        """Reset the integrator.
+        
+        Reset the integrator to run it again. It extends the base class method
+        by also resetting `LyapunovExponentsIntegrator.exponents`.
+        """
+        super().reset()
+        self._exponents = None
+        self._uptri_diag = np.zeros((len(self.times), self._state_length()))
+        self._uptri_diag[0] = np.ones(self._state_length())
+
+    def run(self, time='forward', verbose=False, catch_escape=False,
+            backend='vode', **kwargs):
+        """Run a numerical integration.
+
+        This method extends the base class method to be able to compute
+        Lyapunov exponents. The interface is the same as that of the base
+        class method, except that here the integration is only implemented
+        using SciPy's methods.
+
+        See Also
+        --------
+        Integrator.run
+        """
+        super().run('ode', time=time, verbose=verbose,
+                    catch_escape=catch_escape, backend=backend, **kwargs)
+        logs = np.log(np.abs(self._uptri_diag))
+        self._exponents = np.sum(logs, axis=0) / self.times[-1]
+
+    def _field(self, t, Z):
+        """Vector field.
+
+        Vector field of the differential equation used to estimate Lyapunov
+        exponents. See the [Notes](#notes) section below for details.
+
+        Parameters
+        ----------
+        t : float
+            Current time.
+        Z : array_like
+            Current state of the system.
+
+        Returns
+        -------
+        array_like
+            Gradient of the vectori field evaluated at time `t` and state `Z`.
+
+        Notes
+        -----
+        This vector field is defined from the vector field *f* of the dynamical
+        system `LyapunovExponentsIntegrator.system`. Indeed, to estimate the
+        Lyapunov exponents, two differential equations are solved
+        simultaneously, namely *x' = f(x)* and *Y' = Df(x(t))Y*, where *Y*
+        is a square matrix. The present vector field is simply the
+        concatenation of *f* with a flattenned version of its jacobian matrix.
+        """
+        x = Z[:self._dim]
+        Y = np.reshape(Z[self._dim:], (self._dim, self._dim))
+        f = np.zeros(self._dim * (self._dim + 1))
+        f[:self._dim] = self.system.vector_field(x)
+        f[self._dim:] = np.matmul(self.system.jac(x), Y).flatten()
+        return f
+
+    def _run_ode(self, field, jac, progress, has_escaped, backend, **kwargs):
+        """Run a numerical integration with `scipy.integrate.ode`.
+
+        This method overrides the base class method to be able to compute
+        Lyapunov exponents.
+        """
+        initial_value = np.concatenate((self.states[0],
+                                        np.identity(self._dim).flatten()))
+        solver = ode(field)
+        solver.set_integrator(backend, **kwargs)
+        solver.set_initial_value(initial_value, 0)
+        for j in progress(range(len(self.times[:-1]))):
+            state = solver.integrate(solver.t + self.config.delta)
+            if not solver.successful():
+                self._success = False
+                break
+            self.states[j+1] = state[:self._dim]
+            Y = np.reshape(state[self._dim:], (self._dim, self._dim))
+            q, r = np.linalg.qr(Y)
+            self._uptri_diag[j+1] = np.diag(r)
+            initial_value = np.concatenate((state[:self._dim], q.flatten()))
+            solver.set_initial_value(initial_value, self.times[j+1])
+
+
 class Simulator(Executor):
     """Numerical simulator of the stochastic process on a network.
 
@@ -1249,7 +1412,7 @@ OUTPUT_TYPES = {systems.WilsonCowanSystem: graphics.Solution,
 
 
 @singledispatch
-def get_integrator(arg, system_name=None, **kwargs):
+def get_integrator(arg, system_name=None, lyapunov=False, **kwargs):
     """Get a numerical integrator.
 
     Define a numerical integrator, either from a dynamical system or from a
@@ -1275,19 +1438,24 @@ def get_integrator(arg, system_name=None, **kwargs):
            resulting from a second-order Taylor approximation.
          - `'extended'`: the extended Wilson--Cowan model with the closure
            based on sigmoid functions.
+    lyapunov : bool, optional
+        Decides if the integrator is defined to compute Lyapunov exponents
+        while integrating the system. For this to work, the dynamical system
+        must implement a jacobian matrix.
 
     **kwargs
         Keywords arguments passed to the class constructor.
 
     Returns
     -------
-    Integrator
+    Integrator or LyapunovExponentsIntegrator
         Integrator initialized with given parameters.
 
     Raises
     ------
     popnet.exceptions.PopNetError
-        If `system_name` is given a non-valid value.
+        If `system_name` is given a non-valid value or if the requested
+        dynamical system does not implement a jacobian matrix.
     TypeError
         If `arg` is neither a `popnet.structures.Configuration` instance nor a
         `popnet.systems.DynamicalSystem` instance.
@@ -1297,13 +1465,17 @@ def get_integrator(arg, system_name=None, **kwargs):
 
 
 @get_integrator.register(structures.Configuration)
-def _(config, system_name=None, **kwargs):
+def _(config, system_name=None, lyapunov=False, **kwargs):
     system = systems.get_system(config, system_name=system_name)
+    if lyapunov:
+        return LyapunovExponentsIntegrator(system, **kwargs)
     return Integrator(system, **kwargs)
 
 
 @get_integrator.register(systems.DynamicalSystem)
-def _(system, system_name=None, **kwargs):
+def _(system, system_name=None, lyapunov=False, **kwargs):
+    if lyapunov:
+        return LyapunovExponentsIntegrator(system, **kwargs)
     return Integrator(system, **kwargs)
 
 

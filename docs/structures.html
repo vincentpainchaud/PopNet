@@ -1456,16 +1456,7 @@ class Configuration:
 
     @initial_state.setter
     def initial_state(self, new_state):
-        p = len(self.network.populations)
-        diff = p * (2*p + 3) - len(new_state)
-        length = (p := len(self.network.populations)) * (2*p + 3)
-        diff = length - len(new_state)
-        if diff &gt; 0:
-            new_state = np.concatenate((new_state, np.zeros(diff)))
-        elif diff &lt; 0:
-            raise ValueError(f&#39;The initial state must have {p*(2*p+3)} &#39;
-                             f&#39;components for a network of {p} populations.&#39;)
-        self._initial_state = np.array(new_state, float)
+        self._initial_state = self._adapt_state(new_state)
 
     @property
     def Q(self):
@@ -1603,13 +1594,25 @@ class Configuration:
         ball = R * ball / np.linalg.norm(ball)
         perturbation = np.zeros(len(self.initial_state))
         perturbation[np.array(axes)] = ball
-        self.initial_state = self.initial_state + perturbation
+        self.initial_state += perturbation
 
     def add_to_initial_state(self, perturbation):
-        &#34;&#34;&#34;Add a given perturbation to the initial state.&#34;&#34;&#34;
+        &#34;&#34;&#34;Add a perturbation to the initial state.
+        
+        Add a given perturbation to the initial state or to its first
+        components.
+
+        Parameters
+        ----------
+        perturbation : array_like
+            Perturbation to add to the initial state. If it is shorter than the
+            initial state, it is filled with zeros and then added to the
+            initial state.
+        &#34;&#34;&#34;
         if perturbation is None:
-            return 
-        self.initial_state = self.initial_state + np.array(perturbation, float)
+            return
+        perturbation = self._adapt_state(perturbation)
+        self.initial_state += perturbation
 
     def copy(self, new_ID):
         &#34;&#34;&#34;Copy the configuration.
@@ -1789,6 +1792,21 @@ class Configuration:
         state[2*p : p*(p+3)] = bound_cov * rng.random(size=p*(p+1))
         state[p*(p+3) :] = -bound_cov + 2*bound_cov * rng.random(size=p**2)
         self.initial_state = state
+
+    def _adapt_state(self, state):
+        &#34;&#34;&#34;Check a state and fill it with zeros if necessary.&#34;&#34;&#34;
+        try:
+            state = np.array(state, float, ndmin=1)
+        except ValueError as error:
+            raise ValueError(&#39;Can\&#39;t convert the state to an array of floats.&#39;)
+        p = len(self.network.populations)
+        diff = p * (2*p + 3) - len(state)
+        if diff &gt; 0:
+            state = np.concatenate((state, np.zeros(diff)))
+        elif diff &lt; 0:
+            raise ValueError(f&#39;A state cannot have more than {p*(2*p+3)} &#39;
+                             f&#39;components for a network of {p} populations.&#39;)
+        return state
 
     def _check_list_of_sizes(self, sizes):
         &#34;&#34;&#34;Check a list of population sizes.&#34;&#34;&#34;
@@ -3504,16 +3522,7 @@ chain simulations. See <code><a title="popnet.structures.Configuration.iteration
 
     @initial_state.setter
     def initial_state(self, new_state):
-        p = len(self.network.populations)
-        diff = p * (2*p + 3) - len(new_state)
-        length = (p := len(self.network.populations)) * (2*p + 3)
-        diff = length - len(new_state)
-        if diff &gt; 0:
-            new_state = np.concatenate((new_state, np.zeros(diff)))
-        elif diff &lt; 0:
-            raise ValueError(f&#39;The initial state must have {p*(2*p+3)} &#39;
-                             f&#39;components for a network of {p} populations.&#39;)
-        self._initial_state = np.array(new_state, float)
+        self._initial_state = self._adapt_state(new_state)
 
     @property
     def Q(self):
@@ -3651,13 +3660,25 @@ chain simulations. See <code><a title="popnet.structures.Configuration.iteration
         ball = R * ball / np.linalg.norm(ball)
         perturbation = np.zeros(len(self.initial_state))
         perturbation[np.array(axes)] = ball
-        self.initial_state = self.initial_state + perturbation
+        self.initial_state += perturbation
 
     def add_to_initial_state(self, perturbation):
-        &#34;&#34;&#34;Add a given perturbation to the initial state.&#34;&#34;&#34;
+        &#34;&#34;&#34;Add a perturbation to the initial state.
+        
+        Add a given perturbation to the initial state or to its first
+        components.
+
+        Parameters
+        ----------
+        perturbation : array_like
+            Perturbation to add to the initial state. If it is shorter than the
+            initial state, it is filled with zeros and then added to the
+            initial state.
+        &#34;&#34;&#34;
         if perturbation is None:
-            return 
-        self.initial_state = self.initial_state + np.array(perturbation, float)
+            return
+        perturbation = self._adapt_state(perturbation)
+        self.initial_state += perturbation
 
     def copy(self, new_ID):
         &#34;&#34;&#34;Copy the configuration.
@@ -3837,6 +3858,21 @@ chain simulations. See <code><a title="popnet.structures.Configuration.iteration
         state[2*p : p*(p+3)] = bound_cov * rng.random(size=p*(p+1))
         state[p*(p+3) :] = -bound_cov + 2*bound_cov * rng.random(size=p**2)
         self.initial_state = state
+
+    def _adapt_state(self, state):
+        &#34;&#34;&#34;Check a state and fill it with zeros if necessary.&#34;&#34;&#34;
+        try:
+            state = np.array(state, float, ndmin=1)
+        except ValueError as error:
+            raise ValueError(&#39;Can\&#39;t convert the state to an array of floats.&#39;)
+        p = len(self.network.populations)
+        diff = p * (2*p + 3) - len(state)
+        if diff &gt; 0:
+            state = np.concatenate((state, np.zeros(diff)))
+        elif diff &lt; 0:
+            raise ValueError(f&#39;A state cannot have more than {p*(2*p+3)} &#39;
+                             f&#39;components for a network of {p} populations.&#39;)
+        return state
 
     def _check_list_of_sizes(self, sizes):
         &#34;&#34;&#34;Check a list of population sizes.&#34;&#34;&#34;
@@ -4237,23 +4273,44 @@ doi:<a href="https://doi.org/10.1145/377939.377946">10.1145/377939.377946</a>.</
     ball = R * ball / np.linalg.norm(ball)
     perturbation = np.zeros(len(self.initial_state))
     perturbation[np.array(axes)] = ball
-    self.initial_state = self.initial_state + perturbation</code></pre>
+    self.initial_state += perturbation</code></pre>
 </details>
 </dd>
 <dt id="popnet.structures.Configuration.add_to_initial_state"><code class="name flex">
 <span>def <span class="ident">add_to_initial_state</span></span>(<span>self, perturbation)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Add a given perturbation to the initial state.</p></div>
+<div class="desc"><p>Add a perturbation to the initial state.</p>
+<p>Add a given perturbation to the initial state or to its first
+components.</p>
+<h2 id="parameters">Parameters</h2>
+<dl>
+<dt><strong><code>perturbation</code></strong> :&ensp;<code>array_like</code></dt>
+<dd>Perturbation to add to the initial state. If it is shorter than the
+initial state, it is filled with zeros and then added to the
+initial state.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_to_initial_state(self, perturbation):
-    &#34;&#34;&#34;Add a given perturbation to the initial state.&#34;&#34;&#34;
+    &#34;&#34;&#34;Add a perturbation to the initial state.
+    
+    Add a given perturbation to the initial state or to its first
+    components.
+
+    Parameters
+    ----------
+    perturbation : array_like
+        Perturbation to add to the initial state. If it is shorter than the
+        initial state, it is filled with zeros and then added to the
+        initial state.
+    &#34;&#34;&#34;
     if perturbation is None:
-        return 
-    self.initial_state = self.initial_state + np.array(perturbation, float)</code></pre>
+        return
+    perturbation = self._adapt_state(perturbation)
+    self.initial_state += perturbation</code></pre>
 </details>
 </dd>
 <dt id="popnet.structures.Configuration.copy"><code class="name flex">

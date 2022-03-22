@@ -1351,16 +1351,7 @@ class Configuration:
 
     @initial_state.setter
     def initial_state(self, new_state):
-        p = len(self.network.populations)
-        diff = p * (2*p + 3) - len(new_state)
-        length = (p := len(self.network.populations)) * (2*p + 3)
-        diff = length - len(new_state)
-        if diff > 0:
-            new_state = np.concatenate((new_state, np.zeros(diff)))
-        elif diff < 0:
-            raise ValueError(f'The initial state must have {p*(2*p+3)} '
-                             f'components for a network of {p} populations.')
-        self._initial_state = np.array(new_state, float)
+        self._initial_state = self._adapt_state(new_state)
 
     @property
     def Q(self):
@@ -1498,13 +1489,25 @@ class Configuration:
         ball = R * ball / np.linalg.norm(ball)
         perturbation = np.zeros(len(self.initial_state))
         perturbation[np.array(axes)] = ball
-        self.initial_state = self.initial_state + perturbation
+        self.initial_state += perturbation
 
     def add_to_initial_state(self, perturbation):
-        """Add a given perturbation to the initial state."""
+        """Add a perturbation to the initial state.
+        
+        Add a given perturbation to the initial state or to its first
+        components.
+
+        Parameters
+        ----------
+        perturbation : array_like
+            Perturbation to add to the initial state. If it is shorter than the
+            initial state, it is filled with zeros and then added to the
+            initial state.
+        """
         if perturbation is None:
-            return 
-        self.initial_state = self.initial_state + np.array(perturbation, float)
+            return
+        perturbation = self._adapt_state(perturbation)
+        self.initial_state += perturbation
 
     def copy(self, new_ID):
         """Copy the configuration.
@@ -1684,6 +1687,21 @@ class Configuration:
         state[2*p : p*(p+3)] = bound_cov * rng.random(size=p*(p+1))
         state[p*(p+3) :] = -bound_cov + 2*bound_cov * rng.random(size=p**2)
         self.initial_state = state
+
+    def _adapt_state(self, state):
+        """Check a state and fill it with zeros if necessary."""
+        try:
+            state = np.array(state, float, ndmin=1)
+        except ValueError as error:
+            raise ValueError('Can\'t convert the state to an array of floats.')
+        p = len(self.network.populations)
+        diff = p * (2*p + 3) - len(state)
+        if diff > 0:
+            state = np.concatenate((state, np.zeros(diff)))
+        elif diff < 0:
+            raise ValueError(f'A state cannot have more than {p*(2*p+3)} '
+                             f'components for a network of {p} populations.')
+        return state
 
     def _check_list_of_sizes(self, sizes):
         """Check a list of population sizes."""

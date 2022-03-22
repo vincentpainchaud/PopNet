@@ -1490,14 +1490,14 @@ class Result(Graphics):
             states = self._states_dict
         if label_func is None:
             label_func = self._label_one
-        def f(add_label=True, lw=lw, ls=ls, **kwargs):
+        def f(add_label=True, lw=lw, ls=ls, color=None, label=None, **kwargs):
             self._check_if_activated()
-            if add_label:
+            if color is None:
+                color = self.colors[X][J]
+            if add_label and label is None:
                 label = label_func(X, J)
-            else:
-                label = None
             line, = self.ax.plot(self.times, states[X][J], label=label, lw=lw,
-                                 ls=ls, color=self.colors[X][J], **kwargs)
+                                 ls=ls, color=color, **kwargs)
             return line
         return f
 
@@ -1507,12 +1507,15 @@ class Result(Graphics):
         Define a method to plot the covariance `CXY` for the `J`th and `K`th
         population.
         """
-        def f(**kwargs):
+        def f(color=None, label=None, **kwargs):
             self._check_if_activated()
-            label = self._label_two(CXY[1:], J, K)
+            if color is None:
+                color = self.colors[CXY][J][K]
+            if label is None:
+                label = self._label_two(CXY[1:], J, K)
             covariance = self._states_dict[CXY][J][K]
             line, = self.ax.plot(self.times, covariance, label=label,
-                                 color=self.colors[CXY][J][K], **kwargs)
+                                 color=color, **kwargs)
             return line
         return f
 
@@ -1522,7 +1525,7 @@ class Result(Graphics):
         Define a method to plot the third central moment for the state variables
         `X`, `Y` and `Z` for the `J`th, `K`th and `L`th population respectively.
         """
-        def f(verbose=True, **kwargs):
+        def f(verbose=True, color=None, label=None, **kwargs):
             self._check_if_activated()
             try:
                 moment = self._states_dict[XYZ][J][K][L]
@@ -1536,9 +1539,12 @@ class Result(Graphics):
                          'allows to get the same moment in another way.',
                          category=PopNetWarning, stacklevel=2)
                 return None
-            label = self._label_three(XYZ, J, K, L)
+            if color is None:
+                color = self.colors[XYZ][J][K][L]
+            if label is None:
+                label = self._label_three(XYZ, J, K, L)
             line, = self.ax.plot(self.times, moment, label=label, 
-                                 color=self.colors[XYZ][J][K][L], **kwargs)
+                                 color=color, **kwargs)
             return line
         return f
 
@@ -2876,7 +2882,10 @@ def figure(subplots=None, figsize=(5,3.75), dpi=150, tight_layout=True,
         subplots = (111,)
     axes = []
     for subplot in subplots:
-        ax = fig.add_subplot(subplot)
+        if isinstance(subplot, tuple):
+            ax = fig.add_subplot(*subplot)
+        else:
+            ax = fig.add_subplot(subplot)
         ax.tick_params(direction='in', top=True, right=True)
         axes.append(ax)
     if len(axes) == 1:
