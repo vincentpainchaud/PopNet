@@ -583,7 +583,7 @@ class PhasePlane(Graphics):
                               framealpha=framealpha, **kwargs)
 
     def plot_nullclines(self, which=&#39;both&#39;, num=1000, xcolor=None, ycolor=None,
-                        xlim=(0,1), ylim=(0,1), **kwargs):
+                        xlim=(0,1), ylim=(0,1), mask=False, **kwargs):
         &#34;&#34;&#34;Plot nullclines on the phase plane.
 
         Plot nullclines for independent variables on the phase plane. This
@@ -612,6 +612,9 @@ class PhasePlane(Graphics):
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
             default to (0,1).
+        mask : bool, optional
+            If `True`, the nullclines are masked on the domain where the sum of
+            the two variables is greater than 1. Defaults to `False`.
         **kwargs
             Keyword arguments to be passed to the
             [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
@@ -629,16 +632,23 @@ class PhasePlane(Graphics):
                  stacklevel=2, category=PopNetWarning)
         plot = {&#39;x&#39;: True if which in (&#39;x&#39;, &#39;both&#39;) else False,
                 &#39;y&#39;: True if which in (&#39;y&#39;, &#39;both&#39;) else False}
+        def mask_coords(x, y):
+            indices = x + y &lt;= 1
+            return x[indices], y[indices]
         x = np.linspace(xlim[0], xlim[1], num)
         y = np.linspace(ylim[0], ylim[1], num)
         if plot[&#39;x&#39;]:
             x1, y1 = self._nullcline(x, y, self.axes[0], self.axes[1])
+            if mask:
+                x1, y1 = mask_coords(x1, y1)
             self.ax.plot(x1, y1, color=xcolor,
-                         label=self._nullcline_label(self.axes[0]))
+                         label=self._nullcline_label(self.axes[0]), **kwargs)
         if plot[&#39;y&#39;]:
             y2, x2 = self._nullcline(y, x, self.axes[1], self.axes[0])
+            if mask:
+                x2, y2 = mask_coords(x2, y2)
             self.ax.plot(x2, y2, color=ycolor,
-                         label=self._nullcline_label(self.axes[1]))
+                         label=self._nullcline_label(self.axes[1]), **kwargs)
 
     def plot_solution(self, **kwargs):
         &#34;&#34;&#34;Plot a solution of the dynamical system on the phase plane.
@@ -738,7 +748,7 @@ class PhasePlane(Graphics):
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
-                   cmap=&#39;bone&#39;, color=None, density=1.5, **kwargs):
+                   cmap=&#39;bone&#39;, color=None, mask=False, density=1.5, **kwargs):
         &#34;&#34;&#34;Draw the vector field on the initialized figure.
 
         Draw the vector field on the figure `PhasePlane.fig`. The field is
@@ -766,6 +776,10 @@ class PhasePlane(Graphics):
             Color of the vector field when `colorbar` is `False`. It must be a
             valid Matplotlib color. Defaults to `None`, in which case a default
             color is used.
+        mask : bool, optional
+            If `True`, the vector field is masked (in the sense that it is
+            plotted in white) on the domain where the sum of the two variables
+            is greater then 1. Defaults to `False`.
         density : float, optional
             Density of the stream lines in the plot. Defaults to 1.5.
         **kwargs
@@ -776,6 +790,17 @@ class PhasePlane(Graphics):
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
         if colorbar:
             color = np.sqrt(dX**2 + dY**2)
+        if mask:
+            to_mask = X + Y &gt; 1
+            if colorbar:
+                cmap = mpl.cm.get_cmap(cmap, 256)
+                new_colors = cmap(np.linspace(0, 1, 256))
+                new_colors[0] = np.array([1, 1, 1, 1])
+                cmap = mpl.colors.ListedColormap(new_colors)
+                color = np.where(to_mask, 0, color)
+            else:
+                cmap = mpl.colors.ListedColormap([&#39;white&#39;, color])
+                color = 1 - to_mask
         strm = self.ax.streamplot(X, Y, dX, dY, color=color, cmap=cmap, 
                                   density=density, **kwargs)
         if colorbar:
@@ -4466,7 +4491,7 @@ from a user perspective.</p></div>
                               framealpha=framealpha, **kwargs)
 
     def plot_nullclines(self, which=&#39;both&#39;, num=1000, xcolor=None, ycolor=None,
-                        xlim=(0,1), ylim=(0,1), **kwargs):
+                        xlim=(0,1), ylim=(0,1), mask=False, **kwargs):
         &#34;&#34;&#34;Plot nullclines on the phase plane.
 
         Plot nullclines for independent variables on the phase plane. This
@@ -4495,6 +4520,9 @@ from a user perspective.</p></div>
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
             default to (0,1).
+        mask : bool, optional
+            If `True`, the nullclines are masked on the domain where the sum of
+            the two variables is greater than 1. Defaults to `False`.
         **kwargs
             Keyword arguments to be passed to the
             [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
@@ -4512,16 +4540,23 @@ from a user perspective.</p></div>
                  stacklevel=2, category=PopNetWarning)
         plot = {&#39;x&#39;: True if which in (&#39;x&#39;, &#39;both&#39;) else False,
                 &#39;y&#39;: True if which in (&#39;y&#39;, &#39;both&#39;) else False}
+        def mask_coords(x, y):
+            indices = x + y &lt;= 1
+            return x[indices], y[indices]
         x = np.linspace(xlim[0], xlim[1], num)
         y = np.linspace(ylim[0], ylim[1], num)
         if plot[&#39;x&#39;]:
             x1, y1 = self._nullcline(x, y, self.axes[0], self.axes[1])
+            if mask:
+                x1, y1 = mask_coords(x1, y1)
             self.ax.plot(x1, y1, color=xcolor,
-                         label=self._nullcline_label(self.axes[0]))
+                         label=self._nullcline_label(self.axes[0]), **kwargs)
         if plot[&#39;y&#39;]:
             y2, x2 = self._nullcline(y, x, self.axes[1], self.axes[0])
+            if mask:
+                x2, y2 = mask_coords(x2, y2)
             self.ax.plot(x2, y2, color=ycolor,
-                         label=self._nullcline_label(self.axes[1]))
+                         label=self._nullcline_label(self.axes[1]), **kwargs)
 
     def plot_solution(self, **kwargs):
         &#34;&#34;&#34;Plot a solution of the dynamical system on the phase plane.
@@ -4621,7 +4656,7 @@ from a user perspective.</p></div>
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
-                   cmap=&#39;bone&#39;, color=None, density=1.5, **kwargs):
+                   cmap=&#39;bone&#39;, color=None, mask=False, density=1.5, **kwargs):
         &#34;&#34;&#34;Draw the vector field on the initialized figure.
 
         Draw the vector field on the figure `PhasePlane.fig`. The field is
@@ -4649,6 +4684,10 @@ from a user perspective.</p></div>
             Color of the vector field when `colorbar` is `False`. It must be a
             valid Matplotlib color. Defaults to `None`, in which case a default
             color is used.
+        mask : bool, optional
+            If `True`, the vector field is masked (in the sense that it is
+            plotted in white) on the domain where the sum of the two variables
+            is greater then 1. Defaults to `False`.
         density : float, optional
             Density of the stream lines in the plot. Defaults to 1.5.
         **kwargs
@@ -4659,6 +4698,17 @@ from a user perspective.</p></div>
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
         if colorbar:
             color = np.sqrt(dX**2 + dY**2)
+        if mask:
+            to_mask = X + Y &gt; 1
+            if colorbar:
+                cmap = mpl.cm.get_cmap(cmap, 256)
+                new_colors = cmap(np.linspace(0, 1, 256))
+                new_colors[0] = np.array([1, 1, 1, 1])
+                cmap = mpl.colors.ListedColormap(new_colors)
+                color = np.where(to_mask, 0, color)
+            else:
+                cmap = mpl.colors.ListedColormap([&#39;white&#39;, color])
+                color = 1 - to_mask
         strm = self.ax.streamplot(X, Y, dX, dY, color=color, cmap=cmap, 
                                   density=density, **kwargs)
         if colorbar:
@@ -4899,7 +4949,7 @@ class method <code><a title="popnet.graphics.Graphics.legend" href="#popnet.grap
 </details>
 </dd>
 <dt id="popnet.graphics.PhasePlane.plot_nullclines"><code class="name flex">
-<span>def <span class="ident">plot_nullclines</span></span>(<span>self, which='both', num=1000, xcolor=None, ycolor=None, xlim=(0, 1), ylim=(0, 1), **kwargs)</span>
+<span>def <span class="ident">plot_nullclines</span></span>(<span>self, which='both', num=1000, xcolor=None, ycolor=None, xlim=(0, 1), ylim=(0, 1), mask=False, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Plot nullclines on the phase plane.</p>
@@ -4927,6 +4977,9 @@ default colors are used.</dd>
 <dt><strong><code>xlim</code></strong>, <strong><code>ylim</code></strong> :&ensp;<code>tuple</code>, optional</dt>
 <dd>Limits of the horizontal and vertical axis, respectively. Both
 default to (0,1).</dd>
+<dt><strong><code>mask</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the nullclines are masked on the domain where the sum of
+the two variables is greater than 1. Defaults to <code>False</code>.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
 <dd>Keyword arguments to be passed to the
 <a href="https://31c8.short.gy/ax-plot"><code>plot</code></a> method of <code><a title="popnet.graphics.PhasePlane.ax" href="#popnet.graphics.Graphics.ax">PhasePlane.ax</a></code>,
@@ -4943,7 +4996,7 @@ algorithm.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def plot_nullclines(self, which=&#39;both&#39;, num=1000, xcolor=None, ycolor=None,
-                    xlim=(0,1), ylim=(0,1), **kwargs):
+                    xlim=(0,1), ylim=(0,1), mask=False, **kwargs):
     &#34;&#34;&#34;Plot nullclines on the phase plane.
 
     Plot nullclines for independent variables on the phase plane. This
@@ -4972,6 +5025,9 @@ algorithm.</dd>
     xlim, ylim : tuple, optional
         Limits of the horizontal and vertical axis, respectively. Both
         default to (0,1).
+    mask : bool, optional
+        If `True`, the nullclines are masked on the domain where the sum of
+        the two variables is greater than 1. Defaults to `False`.
     **kwargs
         Keyword arguments to be passed to the
         [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
@@ -4989,16 +5045,23 @@ algorithm.</dd>
              stacklevel=2, category=PopNetWarning)
     plot = {&#39;x&#39;: True if which in (&#39;x&#39;, &#39;both&#39;) else False,
             &#39;y&#39;: True if which in (&#39;y&#39;, &#39;both&#39;) else False}
+    def mask_coords(x, y):
+        indices = x + y &lt;= 1
+        return x[indices], y[indices]
     x = np.linspace(xlim[0], xlim[1], num)
     y = np.linspace(ylim[0], ylim[1], num)
     if plot[&#39;x&#39;]:
         x1, y1 = self._nullcline(x, y, self.axes[0], self.axes[1])
+        if mask:
+            x1, y1 = mask_coords(x1, y1)
         self.ax.plot(x1, y1, color=xcolor,
-                     label=self._nullcline_label(self.axes[0]))
+                     label=self._nullcline_label(self.axes[0]), **kwargs)
     if plot[&#39;y&#39;]:
         y2, x2 = self._nullcline(y, x, self.axes[1], self.axes[0])
+        if mask:
+            x2, y2 = mask_coords(x2, y2)
         self.ax.plot(x2, y2, color=ycolor,
-                     label=self._nullcline_label(self.axes[1]))</code></pre>
+                     label=self._nullcline_label(self.axes[1]), **kwargs)</code></pre>
 </details>
 </dd>
 <dt id="popnet.graphics.PhasePlane.plot_solution"><code class="name flex">
@@ -5197,7 +5260,7 @@ its height is <code>aspect</code> times its width. Defaults to <code>'auto'</cod
 </details>
 </dd>
 <dt id="popnet.graphics.PhasePlane.streamplot"><code class="name flex">
-<span>def <span class="ident">streamplot</span></span>(<span>self, shape, xlim=(0, 1), ylim=(0, 1), colorbar=False, cmap='bone', color=None, density=1.5, **kwargs)</span>
+<span>def <span class="ident">streamplot</span></span>(<span>self, shape, xlim=(0, 1), ylim=(0, 1), colorbar=False, cmap='bone', color=None, mask=False, density=1.5, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Draw the vector field on the initialized figure.</p>
@@ -5225,6 +5288,10 @@ Defaults to <code>'bone'</code>.</dd>
 <dd>Color of the vector field when <code>colorbar</code> is <code>False</code>. It must be a
 valid Matplotlib color. Defaults to <code>None</code>, in which case a default
 color is used.</dd>
+<dt><strong><code>mask</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the vector field is masked (in the sense that it is
+plotted in white) on the domain where the sum of the two variables
+is greater then 1. Defaults to <code>False</code>.</dd>
 <dt><strong><code>density</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Density of the stream lines in the plot. Defaults to 1.5.</dd>
 <dt><strong><code>**kwargs</code></strong></dt>
@@ -5235,7 +5302,7 @@ color is used.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
-               cmap=&#39;bone&#39;, color=None, density=1.5, **kwargs):
+               cmap=&#39;bone&#39;, color=None, mask=False, density=1.5, **kwargs):
     &#34;&#34;&#34;Draw the vector field on the initialized figure.
 
     Draw the vector field on the figure `PhasePlane.fig`. The field is
@@ -5263,6 +5330,10 @@ color is used.</dd>
         Color of the vector field when `colorbar` is `False`. It must be a
         valid Matplotlib color. Defaults to `None`, in which case a default
         color is used.
+    mask : bool, optional
+        If `True`, the vector field is masked (in the sense that it is
+        plotted in white) on the domain where the sum of the two variables
+        is greater then 1. Defaults to `False`.
     density : float, optional
         Density of the stream lines in the plot. Defaults to 1.5.
     **kwargs
@@ -5273,6 +5344,17 @@ color is used.</dd>
     X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
     if colorbar:
         color = np.sqrt(dX**2 + dY**2)
+    if mask:
+        to_mask = X + Y &gt; 1
+        if colorbar:
+            cmap = mpl.cm.get_cmap(cmap, 256)
+            new_colors = cmap(np.linspace(0, 1, 256))
+            new_colors[0] = np.array([1, 1, 1, 1])
+            cmap = mpl.colors.ListedColormap(new_colors)
+            color = np.where(to_mask, 0, color)
+        else:
+            cmap = mpl.colors.ListedColormap([&#39;white&#39;, color])
+            color = 1 - to_mask
     strm = self.ax.streamplot(X, Y, dX, dY, color=color, cmap=cmap, 
                               density=density, **kwargs)
     if colorbar:

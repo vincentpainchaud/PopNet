@@ -466,7 +466,7 @@ class PhasePlane(Graphics):
                               framealpha=framealpha, **kwargs)
 
     def plot_nullclines(self, which='both', num=1000, xcolor=None, ycolor=None,
-                        xlim=(0,1), ylim=(0,1), **kwargs):
+                        xlim=(0,1), ylim=(0,1), mask=False, **kwargs):
         """Plot nullclines on the phase plane.
 
         Plot nullclines for independent variables on the phase plane. This
@@ -495,6 +495,9 @@ class PhasePlane(Graphics):
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
             default to (0,1).
+        mask : bool, optional
+            If `True`, the nullclines are masked on the domain where the sum of
+            the two variables is greater than 1. Defaults to `False`.
         **kwargs
             Keyword arguments to be passed to the
             [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
@@ -512,16 +515,23 @@ class PhasePlane(Graphics):
                  stacklevel=2, category=PopNetWarning)
         plot = {'x': True if which in ('x', 'both') else False,
                 'y': True if which in ('y', 'both') else False}
+        def mask_coords(x, y):
+            indices = x + y <= 1
+            return x[indices], y[indices]
         x = np.linspace(xlim[0], xlim[1], num)
         y = np.linspace(ylim[0], ylim[1], num)
         if plot['x']:
             x1, y1 = self._nullcline(x, y, self.axes[0], self.axes[1])
+            if mask:
+                x1, y1 = mask_coords(x1, y1)
             self.ax.plot(x1, y1, color=xcolor,
-                         label=self._nullcline_label(self.axes[0]))
+                         label=self._nullcline_label(self.axes[0]), **kwargs)
         if plot['y']:
             y2, x2 = self._nullcline(y, x, self.axes[1], self.axes[0])
+            if mask:
+                x2, y2 = mask_coords(x2, y2)
             self.ax.plot(x2, y2, color=ycolor,
-                         label=self._nullcline_label(self.axes[1]))
+                         label=self._nullcline_label(self.axes[1]), **kwargs)
 
     def plot_solution(self, **kwargs):
         """Plot a solution of the dynamical system on the phase plane.
@@ -621,7 +631,7 @@ class PhasePlane(Graphics):
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
-                   cmap='bone', color=None, density=1.5, **kwargs):
+                   cmap='bone', color=None, mask=False, density=1.5, **kwargs):
         """Draw the vector field on the initialized figure.
 
         Draw the vector field on the figure `PhasePlane.fig`. The field is
@@ -649,6 +659,10 @@ class PhasePlane(Graphics):
             Color of the vector field when `colorbar` is `False`. It must be a
             valid Matplotlib color. Defaults to `None`, in which case a default
             color is used.
+        mask : bool, optional
+            If `True`, the vector field is masked (in the sense that it is
+            plotted in white) on the domain where the sum of the two variables
+            is greater then 1. Defaults to `False`.
         density : float, optional
             Density of the stream lines in the plot. Defaults to 1.5.
         **kwargs
@@ -659,6 +673,17 @@ class PhasePlane(Graphics):
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
         if colorbar:
             color = np.sqrt(dX**2 + dY**2)
+        if mask:
+            to_mask = X + Y > 1
+            if colorbar:
+                cmap = mpl.cm.get_cmap(cmap, 256)
+                new_colors = cmap(np.linspace(0, 1, 256))
+                new_colors[0] = np.array([1, 1, 1, 1])
+                cmap = mpl.colors.ListedColormap(new_colors)
+                color = np.where(to_mask, 0, color)
+            else:
+                cmap = mpl.colors.ListedColormap(['white', color])
+                color = 1 - to_mask
         strm = self.ax.streamplot(X, Y, dX, dY, color=color, cmap=cmap, 
                                   density=density, **kwargs)
         if colorbar:
