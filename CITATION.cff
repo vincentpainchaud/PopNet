@@ -4,5 +4,6 @@ authors:
   given-names: Vincent
 title: "PopNet"
 version: 1.0.0
-date-released: 2021-08-31
+date-released: 2022-03-27
+doi: 10.5281/zenodo.6388077
 url: "https://github.com/vincentpainchaud/PopNet"
