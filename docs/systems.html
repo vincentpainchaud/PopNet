@@ -153,7 +153,7 @@ class DynamicalSystem:
     systems in PopNet. Each subclass must implement a vector field, and the
     base class has several methods to study this vector field. For example, a
     method is available to find equilibrium points. A subclass can also
-    implement a jacobian matrix, in which case methods are available to find
+    implement a Jacobian matrix, in which case methods are available to find
     its eigenvalues and eigenvectors.
 
     !!! note
@@ -252,9 +252,9 @@ class DynamicalSystem:
         return sol.x
 
     def get_eigs_at(self, state):
-        &#34;&#34;&#34;Get eigenvalues and eigenvectors of the jacobian matrix.
+        &#34;&#34;&#34;Get eigenvalues and eigenvectors of the Jacobian matrix.
 
-        Get the eigenvalues and eigenvectors of the jacobian matrix
+        Get the eigenvalues and eigenvectors of the Jacobian matrix
         corresponding to the linearization of the dynamical system, evaluated
         at the given state. If eigenvectors are not needed,
         `DynamicalSystem.get_eigenvals_at` should be used instead.
@@ -262,7 +262,7 @@ class DynamicalSystem:
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix is to be evaluated.
+            The state at which the Jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -275,7 +275,7 @@ class DynamicalSystem:
         Raises
         ------
         NotImplementedError
-            If the jacobian matrix for this system is not implemented.
+            If the Jacobian matrix for this system is not implemented.
         numpy.LinAlgError
             If the eigenvalue computation does not converge.
         &#34;&#34;&#34;
@@ -286,15 +286,15 @@ class DynamicalSystem:
         return eigenvals, eigenvects
 
     def get_eigenvals_at(self, state):
-        &#34;&#34;&#34;Get eigenvalues of the jacobian matrix at a given state.
+        &#34;&#34;&#34;Get eigenvalues of the Jacobian matrix at a given state.
 
-        Get the eigenvalues of the jacobian matrix corresponding to the
+        Get the eigenvalues of the Jacobian matrix corresponding to the
         linearization of the dynamical system, evaluated at the given state.
 
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix is to be evaluated.
+            The state at which the Jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -305,7 +305,7 @@ class DynamicalSystem:
         Raises
         ------
         NotImplementedError
-            If the jacobian matrix for this system is not implemented.
+            If the Jacobian matrix for this system is not implemented.
         numpy.LinAlgError
             If the eigenvalue computation does not converge.
         &#34;&#34;&#34;
@@ -357,24 +357,24 @@ class DynamicalSystem:
         return graphics.PhasePlane(self, axes=axes, fixed_axes=fix, name=name)
 
     def jac(self, state):
-        &#34;&#34;&#34;Get the jacobian matrix evaluated at a given state.
+        &#34;&#34;&#34;Get the Jacobian matrix evaluated at a given state.
 
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix is to be evaluated.
+            The state at which the Jacobian matrix is to be evaluated.
 
         Returns
         -------
         array
-            The jacobian matrix evaluated at the state.
+            The Jacobian matrix evaluated at the state.
 
         Raises
         ------
         NotImplementedError
-            If the jacobian matrix for this system is not implemented.
+            If the Jacobian matrix for this system is not implemented.
         &#34;&#34;&#34;
-        raise NotImplementedError(&#39;No jacobian matrix implemented for this &#39;
+        raise NotImplementedError(&#39;No Jacobian matrix implemented for this &#39;
                                   &#39;system.&#39;)
 
     def vector_field(self, state):
@@ -414,7 +414,7 @@ class WilsonCowanSystem(DynamicalSystem):
     in the order given by the list of populations in the configuration&#39;s
     network.
 
-    The jacobian matrix is implemented for this system.
+    The Jacobian matrix is implemented for this system.
 
     &#34;&#34;&#34;
 
@@ -475,7 +475,7 @@ class MeanFieldSystem(DynamicalSystem):
     active and refractory fractions of the *J*th population, in the order given
     by the list of populations in the configuration&#39;s network.
 
-    The jacobian matrix is implemented for this system.
+    The Jacobian matrix is implemented for this system.
 
     &#34;&#34;&#34;
 
@@ -540,7 +540,7 @@ class MixedSystem(DynamicalSystem):
     active and refractory fractions of the *J*th population, in the order given
     by the list of populations in the configuration&#39;s network.
 
-    The jacobian matrix is implemented for this system.
+    The Jacobian matrix is implemented for this system.
 
     In this case the system has an additional data attribute `epsilon`, which
     is a `float` and has a value between 0 and 1. It defines how much the
@@ -612,7 +612,7 @@ class MixedSystem(DynamicalSystem):
             Value of epsilon at which the bifurcation occurs, or `None` if no
             bifurcation is found.
         array_like
-            Eigenvalues of the jacobian matrix at the bifurcation point, or
+            Eigenvalues of the Jacobian matrix at the bifurcation point, or
             `None` is no bifurcation is found.
 
         Warns
@@ -704,14 +704,14 @@ class TaylorExtendedSystem(DynamicalSystem):
     \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
     variables associated with active or refractory fractions.
 
-    In this system, the jacobian matrix is implemented only for the case where
+    In this system, the Jacobian matrix is implemented only for the case where
     the network has only one population.
 
     Notes
     -----
     The case where the network has only one population is actually handled in a
     separate (private) class `_TaylorExtendedSystemOne`, which uses a simpler
-    implementation of the vector field and implements the jacobian matrix. The
+    implementation of the vector field and implements the Jacobian matrix. The
     class constructor of `TaylorExtendedSystem` automatically instantiates
     `_TaylorExtendedSystemOne` when the network has only one population.
 
@@ -791,7 +791,7 @@ class _TaylorExtendedSystemOne(TaylorExtendedSystem):
 
     Special case of `TaylorExtendedSystem` to use when the network has a single
     population. It is different from this class only in that it uses a simpler
-    implementation of the vector field, and its implements the jacobian matrix.
+    implementation of the vector field, and its implements the Jacobian matrix.
 
     &#34;&#34;&#34;
 
@@ -907,7 +907,7 @@ class ExtendedSystem(DynamicalSystem):
     \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
     variables associated with active or refractory fractions.
 
-    The jacobian matrix is not implemented for this system.
+    The Jacobian matrix is not implemented for this system.
 
     &#34;&#34;&#34;
 
@@ -1014,7 +1014,7 @@ class _BifurcationFinder:
             Value of epsilon at which the bifurcation occurs, or `None` if no
             bifurcation is found.
         array_like
-            Eigenvalues of the jacobian matrix at the bifurcation point, or
+            Eigenvalues of the Jacobian matrix at the bifurcation point, or
             `None` if no bifurcation is found.
         &#34;&#34;&#34;
         original_epsilon = self.system.epsilon
@@ -1263,7 +1263,7 @@ system.</dd>
 systems in PopNet. Each subclass must implement a vector field, and the
 base class has several methods to study this vector field. For example, a
 method is available to find equilibrium points. A subclass can also
-implement a jacobian matrix, in which case methods are available to find
+implement a Jacobian matrix, in which case methods are available to find
 its eigenvalues and eigenvectors.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1295,7 +1295,7 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
     systems in PopNet. Each subclass must implement a vector field, and the
     base class has several methods to study this vector field. For example, a
     method is available to find equilibrium points. A subclass can also
-    implement a jacobian matrix, in which case methods are available to find
+    implement a Jacobian matrix, in which case methods are available to find
     its eigenvalues and eigenvectors.
 
     !!! note
@@ -1394,9 +1394,9 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         return sol.x
 
     def get_eigs_at(self, state):
-        &#34;&#34;&#34;Get eigenvalues and eigenvectors of the jacobian matrix.
+        &#34;&#34;&#34;Get eigenvalues and eigenvectors of the Jacobian matrix.
 
-        Get the eigenvalues and eigenvectors of the jacobian matrix
+        Get the eigenvalues and eigenvectors of the Jacobian matrix
         corresponding to the linearization of the dynamical system, evaluated
         at the given state. If eigenvectors are not needed,
         `DynamicalSystem.get_eigenvals_at` should be used instead.
@@ -1404,7 +1404,7 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix is to be evaluated.
+            The state at which the Jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -1417,7 +1417,7 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         Raises
         ------
         NotImplementedError
-            If the jacobian matrix for this system is not implemented.
+            If the Jacobian matrix for this system is not implemented.
         numpy.LinAlgError
             If the eigenvalue computation does not converge.
         &#34;&#34;&#34;
@@ -1428,15 +1428,15 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         return eigenvals, eigenvects
 
     def get_eigenvals_at(self, state):
-        &#34;&#34;&#34;Get eigenvalues of the jacobian matrix at a given state.
+        &#34;&#34;&#34;Get eigenvalues of the Jacobian matrix at a given state.
 
-        Get the eigenvalues of the jacobian matrix corresponding to the
+        Get the eigenvalues of the Jacobian matrix corresponding to the
         linearization of the dynamical system, evaluated at the given state.
 
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix is to be evaluated.
+            The state at which the Jacobian matrix is to be evaluated.
 
         Returns
         -------
@@ -1447,7 +1447,7 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         Raises
         ------
         NotImplementedError
-            If the jacobian matrix for this system is not implemented.
+            If the Jacobian matrix for this system is not implemented.
         numpy.LinAlgError
             If the eigenvalue computation does not converge.
         &#34;&#34;&#34;
@@ -1499,24 +1499,24 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         return graphics.PhasePlane(self, axes=axes, fixed_axes=fix, name=name)
 
     def jac(self, state):
-        &#34;&#34;&#34;Get the jacobian matrix evaluated at a given state.
+        &#34;&#34;&#34;Get the Jacobian matrix evaluated at a given state.
 
         Parameters
         ----------
         state : array_like
-            The state at which the jacobian matrix is to be evaluated.
+            The state at which the Jacobian matrix is to be evaluated.
 
         Returns
         -------
         array
-            The jacobian matrix evaluated at the state.
+            The Jacobian matrix evaluated at the state.
 
         Raises
         ------
         NotImplementedError
-            If the jacobian matrix for this system is not implemented.
+            If the Jacobian matrix for this system is not implemented.
         &#34;&#34;&#34;
-        raise NotImplementedError(&#39;No jacobian matrix implemented for this &#39;
+        raise NotImplementedError(&#39;No Jacobian matrix implemented for this &#39;
                                   &#39;system.&#39;)
 
     def vector_field(self, state):
@@ -1681,13 +1681,13 @@ Defaults to <code>'hybr'</code>.</dd>
 <span>def <span class="ident">get_eigenvals_at</span></span>(<span>self, state)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get eigenvalues of the jacobian matrix at a given state.</p>
-<p>Get the eigenvalues of the jacobian matrix corresponding to the
+<div class="desc"><p>Get eigenvalues of the Jacobian matrix at a given state.</p>
+<p>Get the eigenvalues of the Jacobian matrix corresponding to the
 linearization of the dynamical system, evaluated at the given state.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
-<dd>The state at which the jacobian matrix is to be evaluated.</dd>
+<dd>The state at which the Jacobian matrix is to be evaluated.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1698,7 +1698,7 @@ sorted from largest to lowest real part.</dd>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>NotImplementedError</code></dt>
-<dd>If the jacobian matrix for this system is not implemented.</dd>
+<dd>If the Jacobian matrix for this system is not implemented.</dd>
 <dt><code>numpy.LinAlgError</code></dt>
 <dd>If the eigenvalue computation does not converge.</dd>
 </dl></div>
@@ -1707,15 +1707,15 @@ sorted from largest to lowest real part.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_eigenvals_at(self, state):
-    &#34;&#34;&#34;Get eigenvalues of the jacobian matrix at a given state.
+    &#34;&#34;&#34;Get eigenvalues of the Jacobian matrix at a given state.
 
-    Get the eigenvalues of the jacobian matrix corresponding to the
+    Get the eigenvalues of the Jacobian matrix corresponding to the
     linearization of the dynamical system, evaluated at the given state.
 
     Parameters
     ----------
     state : array_like
-        The state at which the jacobian matrix is to be evaluated.
+        The state at which the Jacobian matrix is to be evaluated.
 
     Returns
     -------
@@ -1726,7 +1726,7 @@ sorted from largest to lowest real part.</dd>
     Raises
     ------
     NotImplementedError
-        If the jacobian matrix for this system is not implemented.
+        If the Jacobian matrix for this system is not implemented.
     numpy.LinAlgError
         If the eigenvalue computation does not converge.
     &#34;&#34;&#34;
@@ -1739,15 +1739,15 @@ sorted from largest to lowest real part.</dd>
 <span>def <span class="ident">get_eigs_at</span></span>(<span>self, state)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get eigenvalues and eigenvectors of the jacobian matrix.</p>
-<p>Get the eigenvalues and eigenvectors of the jacobian matrix
+<div class="desc"><p>Get eigenvalues and eigenvectors of the Jacobian matrix.</p>
+<p>Get the eigenvalues and eigenvectors of the Jacobian matrix
 corresponding to the linearization of the dynamical system, evaluated
 at the given state. If eigenvectors are not needed,
 <code><a title="popnet.systems.DynamicalSystem.get_eigenvals_at" href="#popnet.systems.DynamicalSystem.get_eigenvals_at">DynamicalSystem.get_eigenvals_at()</a></code> should be used instead.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
-<dd>The state at which the jacobian matrix is to be evaluated.</dd>
+<dd>The state at which the Jacobian matrix is to be evaluated.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
@@ -1760,7 +1760,7 @@ sorted from largest to lowest real part.</dd>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>NotImplementedError</code></dt>
-<dd>If the jacobian matrix for this system is not implemented.</dd>
+<dd>If the Jacobian matrix for this system is not implemented.</dd>
 <dt><code>numpy.LinAlgError</code></dt>
 <dd>If the eigenvalue computation does not converge.</dd>
 </dl></div>
@@ -1769,9 +1769,9 @@ sorted from largest to lowest real part.</dd>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_eigs_at(self, state):
-    &#34;&#34;&#34;Get eigenvalues and eigenvectors of the jacobian matrix.
+    &#34;&#34;&#34;Get eigenvalues and eigenvectors of the Jacobian matrix.
 
-    Get the eigenvalues and eigenvectors of the jacobian matrix
+    Get the eigenvalues and eigenvectors of the Jacobian matrix
     corresponding to the linearization of the dynamical system, evaluated
     at the given state. If eigenvectors are not needed,
     `DynamicalSystem.get_eigenvals_at` should be used instead.
@@ -1779,7 +1779,7 @@ sorted from largest to lowest real part.</dd>
     Parameters
     ----------
     state : array_like
-        The state at which the jacobian matrix is to be evaluated.
+        The state at which the Jacobian matrix is to be evaluated.
 
     Returns
     -------
@@ -1792,7 +1792,7 @@ sorted from largest to lowest real part.</dd>
     Raises
     ------
     NotImplementedError
-        If the jacobian matrix for this system is not implemented.
+        If the Jacobian matrix for this system is not implemented.
     numpy.LinAlgError
         If the eigenvalue computation does not converge.
     &#34;&#34;&#34;
@@ -1890,45 +1890,45 @@ case it is replaced with <code>'Phase plane'</code>.</dd>
 <span>def <span class="ident">jac</span></span>(<span>self, state)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Get the jacobian matrix evaluated at a given state.</p>
+<div class="desc"><p>Get the Jacobian matrix evaluated at a given state.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>state</code></strong> :&ensp;<code>array_like</code></dt>
-<dd>The state at which the jacobian matrix is to be evaluated.</dd>
+<dd>The state at which the Jacobian matrix is to be evaluated.</dd>
 </dl>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><code>array</code></dt>
-<dd>The jacobian matrix evaluated at the state.</dd>
+<dd>The Jacobian matrix evaluated at the state.</dd>
 </dl>
 <h2 id="raises">Raises</h2>
 <dl>
 <dt><code>NotImplementedError</code></dt>
-<dd>If the jacobian matrix for this system is not implemented.</dd>
+<dd>If the Jacobian matrix for this system is not implemented.</dd>
 </dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def jac(self, state):
-    &#34;&#34;&#34;Get the jacobian matrix evaluated at a given state.
+    &#34;&#34;&#34;Get the Jacobian matrix evaluated at a given state.
 
     Parameters
     ----------
     state : array_like
-        The state at which the jacobian matrix is to be evaluated.
+        The state at which the Jacobian matrix is to be evaluated.
 
     Returns
     -------
     array
-        The jacobian matrix evaluated at the state.
+        The Jacobian matrix evaluated at the state.
 
     Raises
     ------
     NotImplementedError
-        If the jacobian matrix for this system is not implemented.
+        If the Jacobian matrix for this system is not implemented.
     &#34;&#34;&#34;
-    raise NotImplementedError(&#39;No jacobian matrix implemented for this &#39;
+    raise NotImplementedError(&#39;No Jacobian matrix implemented for this &#39;
                               &#39;system.&#39;)</code></pre>
 </details>
 </dd>
@@ -2026,7 +2026,7 @@ by the list of populations in the configuration's network, and
 <span><span class="MathJax_Preview">\mathrm{C}_{XY}^{JK}</span><script type="math/tex">\mathrm{C}_{XY}^{JK}</script></span> is the covariance between the fractions
 <span><span class="MathJax_Preview">X_J</span><script type="math/tex">X_J</script></span> and <span><span class="MathJax_Preview">Y_K</span><script type="math/tex">Y_K</script></span>, where <span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> and <span><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> stand for random
 variables associated with active or refractory fractions.</p>
-<p>The jacobian matrix is not implemented for this system.</p></div>
+<p>The Jacobian matrix is not implemented for this system.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2063,7 +2063,7 @@ variables associated with active or refractory fractions.</p>
     \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
     variables associated with active or refractory fractions.
 
-    The jacobian matrix is not implemented for this system.
+    The Jacobian matrix is not implemented for this system.
 
     &#34;&#34;&#34;
 
@@ -2232,7 +2232,7 @@ For <em>p</em> populations, a state of this system has the form
 where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> and <span><span class="MathJax_Preview">R_J</span><script type="math/tex">R_J</script></span> are respectively the expectations of the
 active and refractory fractions of the <em>J</em>th population, in the order given
 by the list of populations in the configuration's network.</p>
-<p>The jacobian matrix is implemented for this system.</p></div>
+<p>The Jacobian matrix is implemented for this system.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -2250,7 +2250,7 @@ by the list of populations in the configuration's network.</p>
     active and refractory fractions of the *J*th population, in the order given
     by the list of populations in the configuration&#39;s network.
 
-    The jacobian matrix is implemented for this system.
+    The Jacobian matrix is implemented for this system.
 
     &#34;&#34;&#34;
 
@@ -2402,7 +2402,7 @@ a state of this system has the form
 where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> and <span><span class="MathJax_Preview">R_J</span><script type="math/tex">R_J</script></span> are respectively the expectations of the
 active and refractory fractions of the <em>J</em>th population, in the order given
 by the list of populations in the configuration's network.</p>
-<p>The jacobian matrix is implemented for this system.</p>
+<p>The Jacobian matrix is implemented for this system.</p>
 <p>In this case the system has an additional data attribute <code>epsilon</code>, which
 is a <code>float</code> and has a value between 0 and 1. It defines how much the
 refractory state is considered. See <code><a title="popnet.systems.MixedSystem.epsilon" href="#popnet.systems.MixedSystem.epsilon">MixedSystem.epsilon</a></code> for details.</p></div>
@@ -2425,7 +2425,7 @@ refractory state is considered. See <code><a title="popnet.systems.MixedSystem.e
     active and refractory fractions of the *J*th population, in the order given
     by the list of populations in the configuration&#39;s network.
 
-    The jacobian matrix is implemented for this system.
+    The Jacobian matrix is implemented for this system.
 
     In this case the system has an additional data attribute `epsilon`, which
     is a `float` and has a value between 0 and 1. It defines how much the
@@ -2497,7 +2497,7 @@ refractory state is considered. See <code><a title="popnet.systems.MixedSystem.e
             Value of epsilon at which the bifurcation occurs, or `None` if no
             bifurcation is found.
         array_like
-            Eigenvalues of the jacobian matrix at the bifurcation point, or
+            Eigenvalues of the Jacobian matrix at the bifurcation point, or
             `None` is no bifurcation is found.
 
         Warns
@@ -2635,7 +2635,7 @@ bifurcation point.</dd>
 <dd>Value of epsilon at which the bifurcation occurs, or <code>None</code> if no
 bifurcation is found.</dd>
 <dt><code>array_like</code></dt>
-<dd>Eigenvalues of the jacobian matrix at the bifurcation point, or
+<dd>Eigenvalues of the Jacobian matrix at the bifurcation point, or
 <code>None</code> is no bifurcation is found.</dd>
 </dl>
 <h2 id="warns">Warns</h2>
@@ -2669,7 +2669,7 @@ bifurcation is found.</dd>
         Value of epsilon at which the bifurcation occurs, or `None` if no
         bifurcation is found.
     array_like
-        Eigenvalues of the jacobian matrix at the bifurcation point, or
+        Eigenvalues of the Jacobian matrix at the bifurcation point, or
         `None` is no bifurcation is found.
 
     Warns
@@ -2813,12 +2813,12 @@ by the list of populations in the configuration's network, and
 <span><span class="MathJax_Preview">\mathrm{C}_{XY}^{JK}</span><script type="math/tex">\mathrm{C}_{XY}^{JK}</script></span> is the covariance between the fractions
 <span><span class="MathJax_Preview">X_J</span><script type="math/tex">X_J</script></span> and <span><span class="MathJax_Preview">Y_K</span><script type="math/tex">Y_K</script></span>, where <span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span> and <span><span class="MathJax_Preview">Y</span><script type="math/tex">Y</script></span> stand for random
 variables associated with active or refractory fractions.</p>
-<p>In this system, the jacobian matrix is implemented only for the case where
+<p>In this system, the Jacobian matrix is implemented only for the case where
 the network has only one population.</p>
 <h2 id="notes">Notes</h2>
 <p>The case where the network has only one population is actually handled in a
 separate (private) class <code>_TaylorExtendedSystemOne</code>, which uses a simpler
-implementation of the vector field and implements the jacobian matrix. The
+implementation of the vector field and implements the Jacobian matrix. The
 class constructor of <code><a title="popnet.systems.TaylorExtendedSystem" href="#popnet.systems.TaylorExtendedSystem">TaylorExtendedSystem</a></code> automatically instantiates
 <code>_TaylorExtendedSystemOne</code> when the network has only one population.</p>
 <p>This is considered to be an implementation detail. Only the class
@@ -2859,14 +2859,14 @@ class constructor of <code><a title="popnet.systems.TaylorExtendedSystem" href="
     \\(X_J\\) and \\(Y_K\\), where \\(X\\) and \\(Y\\) stand for random
     variables associated with active or refractory fractions.
 
-    In this system, the jacobian matrix is implemented only for the case where
+    In this system, the Jacobian matrix is implemented only for the case where
     the network has only one population.
 
     Notes
     -----
     The case where the network has only one population is actually handled in a
     separate (private) class `_TaylorExtendedSystemOne`, which uses a simpler
-    implementation of the vector field and implements the jacobian matrix. The
+    implementation of the vector field and implements the Jacobian matrix. The
     class constructor of `TaylorExtendedSystem` automatically instantiates
     `_TaylorExtendedSystemOne` when the network has only one population.
 
@@ -3046,7 +3046,7 @@ populations, a state of this system has the form
 where <span><span class="MathJax_Preview">A_J</span><script type="math/tex">A_J</script></span> is the expectation of the activity of the <em>J</em>th population,
 in the order given by the list of populations in the configuration's
 network.</p>
-<p>The jacobian matrix is implemented for this system.</p></div>
+<p>The Jacobian matrix is implemented for this system.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -3064,7 +3064,7 @@ network.</p>
     in the order given by the list of populations in the configuration&#39;s
     network.
 
-    The jacobian matrix is implemented for this system.
+    The Jacobian matrix is implemented for this system.
 
     &#34;&#34;&#34;
 

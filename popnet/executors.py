@@ -481,8 +481,8 @@ class LyapunovExponentsIntegrator(Integrator):
 
     This class extends `Integrator` to compute the Lyapunov exponents along the
     integrated solution when calling `LyapunovExponentsIntegrator.run`. For
-    this to work, the dynamical system must have a jacobian matrix implemented,
-    and an error is raised at initialization if no jacobian matrix is defined.
+    this to work, the dynamical system must have a Jacobian matrix implemented,
+    and an error is raised at initialization if no Jacobian matrix is defined.
 
     The Lyapunov exponents are computed using the discrete QR method described
     by Dieci et al. in [1].
@@ -501,7 +501,7 @@ class LyapunovExponentsIntegrator(Integrator):
         try:
             self.system.jac
         except NotImplementedError as error:
-            raise ValueError('The system must have a jacobian matrix '
+            raise ValueError('The system must have a Jacobian matrix '
                              'implemented.') from error
         self._dim = self.system.dim
 
@@ -606,7 +606,7 @@ class LyapunovExponentsIntegrator(Integrator):
         Lyapunov exponents, two differential equations are solved
         simultaneously, namely *x' = f(x)* and *Y' = Df(x(t))Y*, where *Y*
         is a square matrix. The present vector field is simply the
-        concatenation of *f* with a flattenned version of its jacobian matrix.
+        concatenation of *f* with a flattenned version of its Jacobian matrix.
         """
         x = Z[:self._dim]
         Y = np.reshape(Z[self._dim:], (self._dim, self._dim))
@@ -1441,7 +1441,7 @@ def get_integrator(arg, system_name=None, lyapunov=False, **kwargs):
     lyapunov : bool, optional
         Decides if the integrator is defined to compute Lyapunov exponents
         while integrating the system. For this to work, the dynamical system
-        must implement a jacobian matrix.
+        must implement a Jacobian matrix.
 
     **kwargs
         Keywords arguments passed to the class constructor.
@@ -1455,7 +1455,7 @@ def get_integrator(arg, system_name=None, lyapunov=False, **kwargs):
     ------
     popnet.exceptions.PopNetError
         If `system_name` is given a non-valid value or if the requested
-        dynamical system does not implement a jacobian matrix.
+        dynamical system does not implement a Jacobian matrix.
     TypeError
         If `arg` is neither a `popnet.structures.Configuration` instance nor a
         `popnet.systems.DynamicalSystem` instance.
