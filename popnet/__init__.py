@@ -1,18 +1,19 @@
 """A python package to study the Wilson--Cowan model and some of its extensions.
 
 PopNet is a python package dedicated to the study of the Wilson--Cowan model
-[5], and some of its extensions where the refractory state or covariances
+[6], and some of its extensions where the refractory state or covariances
 between different fractions of populations are explicitely included. It can
 perform various numerical experiments, such as integrations of dynamical
 systems related to Wilson--Cowan's, or simulations of stochastic processes
 whose behavior can be approximated macroscopically by the Wilson--Cowan model.
+It has been used to produce all numerical results and figures in [4].
 
 PopNet provides methods to set, save or load all parameters used for an
 expriment, and others to actually perform experiments. It also has a number of
 methods to display outputs of experiments. The implementation is heavily
 dependent on [NumPy](https://numpy.org/) [2] and
 [Matplotlib](https://matplotlib.org/) [3], and uses some functions of
-[SciPy](https://scipy.org/) [4] and [`tqdm`](https://tqdm.github.io/) [1]
+[SciPy](https://scipy.org/) [5] and [`tqdm`](https://tqdm.github.io/) [1]
 as well.
 
 The features offered by PopNet are discussed briefly in the [Modules](#modules)
@@ -102,7 +103,11 @@ References
  3. John D. Hunter. “Matplotlib: A 2D Graphics Environment.” *Computing in
     Science & Engineering* **9**, 90-95 (2007),
     doi:[10.1109/MCSE.2007.55](https://doi.org/10.1109/MCSE.2007.55)
- 4. Pauli Virtanen, Ralf Gommers, Travis E. Oliphant, Matt Haberland, Tyler
+ 4. Vincent Painchaud, Nicolas Doyon and Patrick Desrosiers. “Beyond
+    Wilson--Cowan dynamics: oscillations and chaos without inhibition.”
+    *arXiv:2204.00583* [physics, q-bio] (2022),
+    doi:[10.48550/arXiv.2204.00583](https://doi.org/10.48550/arXiv.2204.00583)
+ 5. Pauli Virtanen, Ralf Gommers, Travis E. Oliphant, Matt Haberland, Tyler
     Reddy, David Cournapeau, Evgeni Burovski, Pearu Peterson, Warren Weckesser,
     Jonathan Bright, Stéfan J. van der Walt, Matthew Brett, Joshua Wilson, K.
     Jarrod Millman, Nikolay Mayorov, Andrew R. J. Nelson, Eric Jones, Robert
@@ -113,7 +118,7 @@ References
     “SciPy 1.0: Fundamental Algorithms for Scientific Computing in Python.”
     *Nature Methods*, **17** (3), 261-272 (2020).
     doi:[10.1038/s41592-019-0686-2](https://doi.org/10.1038/s41592-019-0686-2)
- 5. Hugh R. Wilson and Jack D. Cowan. “Excitatory and Inhibitory Interactions
+ 6. Hugh R. Wilson and Jack D. Cowan. “Excitatory and Inhibitory Interactions
     in Localized Populations of Model Neurons.” *Biophysical Journal* **12**
     (1): 1–24 (1972). doi:[10.1016/S0006-3495(72)86068-5](
     https://doi.org/10.1016/S0006-3495(72)86068-5).
