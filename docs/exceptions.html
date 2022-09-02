@@ -97,6 +97,11 @@ class FormatError(PopNetError):
     pass
 
 
+class StopSimulation(PopNetError):
+    &#34;&#34;&#34;Exceptions raised when a stochastic simulation has to end.&#34;&#34;&#34;
+    pass
+
+
 class PopNetWarning(Warning):
     &#34;&#34;&#34;Generic class for warnings related to PopNet.&#34;&#34;&#34;
     pass</code></pre>
@@ -154,6 +159,7 @@ class PopNetWarning(Warning):
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="popnet.exceptions.FormatError" href="#popnet.exceptions.FormatError">FormatError</a></li>
+<li><a title="popnet.exceptions.StopSimulation" href="#popnet.exceptions.StopSimulation">StopSimulation</a></li>
 </ul>
 </dd>
 <dt id="popnet.exceptions.PopNetWarning"><code class="flex name class">
@@ -173,6 +179,27 @@ class PopNetWarning(Warning):
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>builtins.Warning</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="popnet.exceptions.StopSimulation"><code class="flex name class">
+<span>class <span class="ident">StopSimulation</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Exceptions raised when a stochastic simulation has to end.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class StopSimulation(PopNetError):
+    &#34;&#34;&#34;Exceptions raised when a stochastic simulation has to end.&#34;&#34;&#34;
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="popnet.exceptions.PopNetError" href="#popnet.exceptions.PopNetError">PopNetError</a></li>
 <li>builtins.Exception</li>
 <li>builtins.BaseException</li>
 </ul>
@@ -201,6 +228,9 @@ class PopNetWarning(Warning):
 </li>
 <li>
 <h4><code><a title="popnet.exceptions.PopNetWarning" href="#popnet.exceptions.PopNetWarning">PopNetWarning</a></code></h4>
+</li>
+<li>
+<h4><code><a title="popnet.exceptions.StopSimulation" href="#popnet.exceptions.StopSimulation">StopSimulation</a></code></h4>
 </li>
 </ul>
 </li>

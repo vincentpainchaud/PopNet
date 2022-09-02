@@ -1592,6 +1592,78 @@ class Configuration:
                 file.write('\n\nAdditional notes:\n')
                 file.write(note)
 
+    def set_covariances_from_expectations(self, sizes):
+        """Set initial covariances from initial expectations.
+
+        Set initial values of covariances from initial values of expectations,
+        assuming that in the initial state, the states of all neurons are
+        independent and taken from ternary distributions on \\(\\{0, 1, i\\}\\)
+        where the probability of being in a given state is the expectation of
+        the associated fraction of population. These covariances are determined
+        by the sizes of the populations of the underlying network. The precise
+        formula giving covariances is provided in the [Notes](#notes) section
+        below.
+
+        Parameters
+        ----------
+        sizes : list or tuple of int
+            Population sizes used to define covariances.
+
+        Raises
+        ------
+        ValueError
+            If the length of `sizes` is not the number of populations of the
+            network.
+
+        Notes
+        -----
+        Here, covariances are computed assuming that in the initial state, the
+        state of each neuron follows a ternary distribution on
+        \\(\\{0, 1, i\\}\\) where the probability of being in a given state is
+        the expectation of the associated fraction of population. Hence, for
+        instance, the probability that a neuron of population *J* is active is
+        given by the expected active fraction of *J*. Assuming that the states
+        of all neurons are independent, this means that
+        \\[
+        \\mathrm{C}_{AA}^{JJ}(0) = \\frac{1}{|J|^2} \\sum_{j\\in J}
+            \\mathrm{Var}\\bigl[ \\mathrm{Re} X_0^j \\bigr]
+            = \\frac{1}{|J|^2} \\sum_{j\\in J}
+            \\mathcal{A}_J(0) \\bigl( 1 - \\mathcal{A}_J(0) \\bigr)
+            = \\frac{\\mathcal{A}_J(0) (1 - \\mathcal{A}_J(0))}{|J|}.
+        \\]
+        The same pattern works for the other two states.
+
+        As the states of different neurons are independent, the covariances of
+        fractions of distinct populations are zero. However, the covariance
+        \\(\\mathrm{C}_{AR}^{JJ}(0)\\) is also determined by the initial
+        expectations, as it is determined by variances. Indeed, since the sum
+        of all three fractions of the same population is 1 at all times,
+        \\[
+        \\mathrm{C}_{AR}^{JJ}(0) = \\frac{1}{2} \\bigl(
+            \\mathrm{C}_{SS}^{JJ}(0)
+                - \\mathrm{C}_{AA}^{JJ}(0)
+                - \\mathrm{C}_{RR}^{JJ}(0)
+        \\bigr) = - \\frac{\\mathcal{A}_J(0)\\mathcal{R}_J(0)}{|J|}.
+        \\]
+        """
+        if len(sizes) != (p := len(self.network.populations)):
+            raise ValueError('A size must be given for each population.')
+        VA = np.zeros(len(sizes))
+        VR = np.zeros(len(sizes))
+        CovAR = np.zeros(len(sizes))
+        for J, size in enumerate(sizes):
+            VA[J] = self.initial_state[J]*(1 - self.initial_state[J]) / size
+            VR[J] = self.initial_state[p+J]*(1 - self.initial_state[p+J]) / size
+            CovAR[J] = - self.initial_state[J] * self.initial_state[p+J] / size
+        CAA = np.diag(VA)
+        CRR = np.diag(VR)
+        CAR = np.diag(CovAR)
+        covariances = np.zeros(p*(2*p + 1))
+        covariances[: round(p*(p+1)/2)] = CAA[np.triu_indices(p)]
+        covariances[round(p*(p+1)/2) : p*(p+1)] = CRR[np.triu_indices(p)]
+        covariances[p*(p+1) :] = CAR.flatten()
+        self.initial_state[2*p :] = covariances
+
     def set_initial_state_from(self, other):
         """Set the initial state from another configuration.
 
@@ -1839,6 +1911,22 @@ class MicroConfiguration(Configuration):
         self._micro_initial_state = np.concatenate(
                 [rng.choice((0.,1.,1j), p=(S[J],A[J],R[J]), size=popJ.size)
                  for J, popJ in enumerate(self.network.populations)])
+
+    def set_covariances_from_expectations(self, sizes=None):
+        """Set initial covariances from initial expectations.
+        
+        Extends the base class method by taking, by default, the populations'
+        sizes to define covariances.
+
+        Parameters
+        ----------
+        sizes : list or tuple of int, optional
+            Population sizes used to define covariances. Defaults to `None`, in
+            which case the populations' sizes are used.
+        """
+        if sizes is None:
+            sizes = [pop.size for pop in self.network.populations]
+        super().set_covariances_from_expectations(sizes)
 
     def _other_params_string(self):
         """Add `executions` to `str(self)`."""

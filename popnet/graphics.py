@@ -603,7 +603,8 @@ class PhasePlane(Graphics):
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
         self.ax.quiver(X, Y, dX, dY, **kwargs)
 
-    def setup(self, xlim=(0,1), ylim=(0,1), fontsize=10, aspect='auto'):
+    def setup(self, xlim=(0,1), ylim=(0,1), set_xlabel=True, set_ylabel=True,
+              fontsize=10, aspect='auto'):
         """Setup the figure.
 
         Setup the figure `PhasePlane.fig`. Allows to set limits to both axes,
@@ -615,6 +616,8 @@ class PhasePlane(Graphics):
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
             default to (0,1).
+        set_xlabel, set_ylabel : bool, optional
+            Decide if the axes are labelled. Both default to `True`.
         fontsize : float, optional
             Fontsize of the axes' labels. Defaults to 10.
         aspect : {'auto', 'equal'} or float, optional
@@ -625,9 +628,11 @@ class PhasePlane(Graphics):
         """
         self.ax.set_xlim(xlim)
         self.ax.set_ylim(ylim)
-        self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
-        self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
-                           rotation=0)
+        if set_xlabel:
+            self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
+        if set_ylabel:
+            self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
+                               rotation=0)
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 

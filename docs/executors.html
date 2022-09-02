@@ -993,7 +993,7 @@ class Simulator(Executor):
         Run a simulation to obtain a possible trajectory of the stochastic
         process which describes the evolution of the network. To obtain this
         trajectory, the Doob--Gillespie algorithm is used either with the
-        direct method or with the first reaction method. See the
+        direct method or with the first-reaction method. See the
         [Notes](#simulator-single-run-notes) section below for more details
         about the algorithm.
 
@@ -1034,7 +1034,7 @@ class Simulator(Executor):
         time at which the next transition occurs and which one will occur.
 
         In [3], Gillespie introduces two methods, called the *direct* and
-        *first reaction* methods respectively, to choose the time interval until
+        *first-reaction* methods respectively, to choose the time interval until
         the next transition and the next state of the system.
 
          - **Direct method.** First, the total transition rate out of the
@@ -1045,7 +1045,7 @@ class Simulator(Executor):
            given other state is proportional to the corresponding transition
            rate.
 
-         - **First reaction method.** For every possible next state, a time at
+         - **First-reaction method.** For every possible next state, a time at
            which the corresponding transition could occur is randomly generated,
            knowing that this time is exponentially distributed with parameter
            equal to the transition rate. The transition that should occur first
@@ -1068,7 +1068,12 @@ class Simulator(Executor):
         t = self.transition_times[0]
         x = self.micro_states[0]
         while t &lt; self.config.final_time:
-            t, x = iterate(do_step, rng, t, x)
+            try:
+                t, x = iterate(do_step, rng, t, x)
+            except StopSimulation:
+                self.transition_times.append(self.config.final_time)
+                self.micro_states.append(x.copy())
+                break
         self._micro_states = np.array(self.micro_states)
         self._transition_times = np.array(self.transition_times)
         self._update_states()
@@ -1084,6 +1089,8 @@ class Simulator(Executor):
     def _direct_method(self, rng, t, next_states, rates):
         &#34;&#34;&#34;Obtain the next state and time from the direct method.&#34;&#34;&#34;
         out_rate = np.sum(rates)
+        if out_rate == 0:
+            raise StopSimulation
         threshold_rate = rng.random() * out_rate
         j = 0
         sum_of_rates = rates[0]
@@ -1093,10 +1100,13 @@ class Simulator(Executor):
         return j, (1 / out_rate) * np.log(1 / rng.random())
 
     def _first_reaction_method(self, rng, t, next_states, rates):
-        &#34;&#34;&#34;Obtain the next state and time from the first reaction method.&#34;&#34;&#34;
+        &#34;&#34;&#34;Obtain the next state and time from the first-reaction method.&#34;&#34;&#34;
         next_times = (1 / rates) * np.log(1 / rng.random(len(rates)))
         j = np.argmin(next_times)
-        return j, next_times[j]
+        next_time = next_times[j]
+        if np.isinf(next_time):
+            raise StopSimulation
+        return j, next_time
 
     def _get_calcium_output(self, j, growth_rate, decay_rate):
         &#34;&#34;&#34;Get the calcium concentration in neuron *j* with respect to time.&#34;&#34;&#34;
@@ -1275,12 +1285,12 @@ class SimpleSimulator(Simulator):
         Run a simulation to obtain a possible trajectory of a stochastic
         process that rules the evolution of the network&#39;s state. To obtain this
         trajectory, we use the Doob--Gillespie algorithm, either with the direct
-        or with the first reaction method. See `Simulator.single_run` for more
+        or with the first-reaction method. See `Simulator.single_run` for more
         details about the Doob--Gillespie algorithm.
 
         Parameters
         ----------
-        method : {&#39;direct&#39;, &#39;first reaction&#39;}, optional
+        method : {&#39;direct&#39;, &#39;first-reaction&#39;}, optional
             Chooses which method is used to perform the Monte Carlo step in the
             Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
         verbose : bool, optional
@@ -1298,11 +1308,11 @@ class SimpleSimulator(Simulator):
         self._check_sizes()
         if method == &#39;direct&#39;:
             def do_step(rng,t,ns,r): return self._direct_method(rng,t,ns,r)
-        elif method == &#39;first reaction&#39;:
+        elif method == &#39;first-reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
             raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
-                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
+                             &#39;\&#39;direct\&#39; and \&#39;first-reaction\&#39;.&#39;)
         if verbose:
             def iterate(do_step, rng, t, x):
                 print(f&#39;t = {t:&lt;.2f}&#39;, end=&#39;\r&#39;)
@@ -1406,13 +1416,13 @@ class ChainSimulator(Simulator):
         possible trajectories. The number of simulations performed is given by
         the `popnet.structures.MicroConfiguration.executions` attribute of the
         configuration. Each individual simulation is performed with the
-        Doob--Gillespie algorithm, either with the direct or the first reaction
+        Doob--Gillespie algorithm, either with the direct or the first-reaction
         method. See `Simulator.single_run` for more details about the
         Doob--Gillespie algorithm.
 
         Parameters
         ----------
-        method : {&#39;direct&#39;, &#39;first reaction&#39;}, optional
+        method : {&#39;direct&#39;, &#39;first-reaction&#39;}, optional
             Chooses which method is used to perform the Monte Carlo step in the
             Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
         initial_state : {&#39;fixed&#39;, &#39;random&#39;}, optional
@@ -1438,11 +1448,11 @@ class ChainSimulator(Simulator):
                             self.config.executions))
         if method == &#39;direct&#39;:
             def do_step(rng,t,ns,r): return self._direct_method(rng,t,ns,r)
-        elif method == &#39;first reaction&#39;:
+        elif method == &#39;first-reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
             raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
-                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
+                             &#39;\&#39;direct\&#39; and \&#39;first-reaction\&#39;.&#39;)
         if initial_state == &#39;fixed&#39;:
             def reset_initial_state(): pass
         elif initial_state == &#39;random&#39;:
@@ -1911,13 +1921,13 @@ simulations of the stochastic process.</p>
         possible trajectories. The number of simulations performed is given by
         the `popnet.structures.MicroConfiguration.executions` attribute of the
         configuration. Each individual simulation is performed with the
-        Doob--Gillespie algorithm, either with the direct or the first reaction
+        Doob--Gillespie algorithm, either with the direct or the first-reaction
         method. See `Simulator.single_run` for more details about the
         Doob--Gillespie algorithm.
 
         Parameters
         ----------
-        method : {&#39;direct&#39;, &#39;first reaction&#39;}, optional
+        method : {&#39;direct&#39;, &#39;first-reaction&#39;}, optional
             Chooses which method is used to perform the Monte Carlo step in the
             Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
         initial_state : {&#39;fixed&#39;, &#39;random&#39;}, optional
@@ -1943,11 +1953,11 @@ simulations of the stochastic process.</p>
                             self.config.executions))
         if method == &#39;direct&#39;:
             def do_step(rng,t,ns,r): return self._direct_method(rng,t,ns,r)
-        elif method == &#39;first reaction&#39;:
+        elif method == &#39;first-reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
             raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
-                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
+                             &#39;\&#39;direct\&#39; and \&#39;first-reaction\&#39;.&#39;)
         if initial_state == &#39;fixed&#39;:
             def reset_initial_state(): pass
         elif initial_state == &#39;random&#39;:
@@ -2083,12 +2093,12 @@ evolution of the network's state in order to obtain a sample of
 possible trajectories. The number of simulations performed is given by
 the <code><a title="popnet.structures.MicroConfiguration.executions" href="structures.html#popnet.structures.MicroConfiguration.executions">MicroConfiguration.executions</a></code> attribute of the
 configuration. Each individual simulation is performed with the
-Doob&ndash;Gillespie algorithm, either with the direct or the first reaction
+Doob&ndash;Gillespie algorithm, either with the direct or the first-reaction
 method. See <code><a title="popnet.executors.Simulator.single_run" href="#popnet.executors.Simulator.single_run">Simulator.single_run()</a></code> for more details about the
 Doob&ndash;Gillespie algorithm.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>method</code></strong> :&ensp;<code>{'direct', 'first reaction'}</code>, optional</dt>
+<dt><strong><code>method</code></strong> :&ensp;<code>{'direct', 'first-reaction'}</code>, optional</dt>
 <dd>Chooses which method is used to perform the Monte Carlo step in the
 Doob&ndash;Gillespie algorithm. Defaults to <code>'direct'</code>.</dd>
 <dt><strong><code>initial_state</code></strong> :&ensp;<code>{'fixed', 'random'}</code>, optional</dt>
@@ -2121,13 +2131,13 @@ the network's size.</dd>
     possible trajectories. The number of simulations performed is given by
     the `popnet.structures.MicroConfiguration.executions` attribute of the
     configuration. Each individual simulation is performed with the
-    Doob--Gillespie algorithm, either with the direct or the first reaction
+    Doob--Gillespie algorithm, either with the direct or the first-reaction
     method. See `Simulator.single_run` for more details about the
     Doob--Gillespie algorithm.
 
     Parameters
     ----------
-    method : {&#39;direct&#39;, &#39;first reaction&#39;}, optional
+    method : {&#39;direct&#39;, &#39;first-reaction&#39;}, optional
         Chooses which method is used to perform the Monte Carlo step in the
         Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
     initial_state : {&#39;fixed&#39;, &#39;random&#39;}, optional
@@ -2153,11 +2163,11 @@ the network's size.</dd>
                         self.config.executions))
     if method == &#39;direct&#39;:
         def do_step(rng,t,ns,r): return self._direct_method(rng,t,ns,r)
-    elif method == &#39;first reaction&#39;:
+    elif method == &#39;first-reaction&#39;:
         def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
     else:
         raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
-                         &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
+                         &#39;\&#39;direct\&#39; and \&#39;first-reaction\&#39;.&#39;)
     if initial_state == &#39;fixed&#39;:
         def reset_initial_state(): pass
     elif initial_state == &#39;random&#39;:
@@ -3685,12 +3695,12 @@ attributes are the same as in the base class.</p>
         Run a simulation to obtain a possible trajectory of a stochastic
         process that rules the evolution of the network&#39;s state. To obtain this
         trajectory, we use the Doob--Gillespie algorithm, either with the direct
-        or with the first reaction method. See `Simulator.single_run` for more
+        or with the first-reaction method. See `Simulator.single_run` for more
         details about the Doob--Gillespie algorithm.
 
         Parameters
         ----------
-        method : {&#39;direct&#39;, &#39;first reaction&#39;}, optional
+        method : {&#39;direct&#39;, &#39;first-reaction&#39;}, optional
             Chooses which method is used to perform the Monte Carlo step in the
             Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
         verbose : bool, optional
@@ -3708,11 +3718,11 @@ attributes are the same as in the base class.</p>
         self._check_sizes()
         if method == &#39;direct&#39;:
             def do_step(rng,t,ns,r): return self._direct_method(rng,t,ns,r)
-        elif method == &#39;first reaction&#39;:
+        elif method == &#39;first-reaction&#39;:
             def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
         else:
             raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
-                             &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
+                             &#39;\&#39;direct\&#39; and \&#39;first-reaction\&#39;.&#39;)
         if verbose:
             def iterate(do_step, rng, t, x):
                 print(f&#39;t = {t:&lt;.2f}&#39;, end=&#39;\r&#39;)
@@ -3780,11 +3790,11 @@ attributes are the same as in the base class.</p>
 <p>Run a simulation to obtain a possible trajectory of a stochastic
 process that rules the evolution of the network's state. To obtain this
 trajectory, we use the Doob&ndash;Gillespie algorithm, either with the direct
-or with the first reaction method. See <code><a title="popnet.executors.Simulator.single_run" href="#popnet.executors.Simulator.single_run">Simulator.single_run()</a></code> for more
+or with the first-reaction method. See <code><a title="popnet.executors.Simulator.single_run" href="#popnet.executors.Simulator.single_run">Simulator.single_run()</a></code> for more
 details about the Doob&ndash;Gillespie algorithm.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>method</code></strong> :&ensp;<code>{'direct', 'first reaction'}</code>, optional</dt>
+<dt><strong><code>method</code></strong> :&ensp;<code>{'direct', 'first-reaction'}</code>, optional</dt>
 <dd>Chooses which method is used to perform the Monte Carlo step in the
 Doob&ndash;Gillespie algorithm. Defaults to <code>'direct'</code>.</dd>
 <dt><strong><code>verbose</code></strong> :&ensp;<code>bool</code>, optional</dt>
@@ -3809,12 +3819,12 @@ the network's size.</dd>
     Run a simulation to obtain a possible trajectory of a stochastic
     process that rules the evolution of the network&#39;s state. To obtain this
     trajectory, we use the Doob--Gillespie algorithm, either with the direct
-    or with the first reaction method. See `Simulator.single_run` for more
+    or with the first-reaction method. See `Simulator.single_run` for more
     details about the Doob--Gillespie algorithm.
 
     Parameters
     ----------
-    method : {&#39;direct&#39;, &#39;first reaction&#39;}, optional
+    method : {&#39;direct&#39;, &#39;first-reaction&#39;}, optional
         Chooses which method is used to perform the Monte Carlo step in the
         Doob--Gillespie algorithm. Defaults to `&#39;direct&#39;`.
     verbose : bool, optional
@@ -3832,11 +3842,11 @@ the network's size.</dd>
     self._check_sizes()
     if method == &#39;direct&#39;:
         def do_step(rng,t,ns,r): return self._direct_method(rng,t,ns,r)
-    elif method == &#39;first reaction&#39;:
+    elif method == &#39;first-reaction&#39;:
         def do_step(rng,t,ns,r): return self._first_reaction_method(rng,t,ns,r)
     else:
         raise ValueError(f&#39;Unexpected method {method}. Valid values are &#39;
-                         &#39;\&#39;direct\&#39; and \&#39;first reaction\&#39;.&#39;)
+                         &#39;\&#39;direct\&#39; and \&#39;first-reaction\&#39;.&#39;)
     if verbose:
         def iterate(do_step, rng, t, x):
             print(f&#39;t = {t:&lt;.2f}&#39;, end=&#39;\r&#39;)
@@ -4223,7 +4233,7 @@ See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#po
         Run a simulation to obtain a possible trajectory of the stochastic
         process which describes the evolution of the network. To obtain this
         trajectory, the Doob--Gillespie algorithm is used either with the
-        direct method or with the first reaction method. See the
+        direct method or with the first-reaction method. See the
         [Notes](#simulator-single-run-notes) section below for more details
         about the algorithm.
 
@@ -4264,7 +4274,7 @@ See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#po
         time at which the next transition occurs and which one will occur.
 
         In [3], Gillespie introduces two methods, called the *direct* and
-        *first reaction* methods respectively, to choose the time interval until
+        *first-reaction* methods respectively, to choose the time interval until
         the next transition and the next state of the system.
 
          - **Direct method.** First, the total transition rate out of the
@@ -4275,7 +4285,7 @@ See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#po
            given other state is proportional to the corresponding transition
            rate.
 
-         - **First reaction method.** For every possible next state, a time at
+         - **First-reaction method.** For every possible next state, a time at
            which the corresponding transition could occur is randomly generated,
            knowing that this time is exponentially distributed with parameter
            equal to the transition rate. The transition that should occur first
@@ -4298,7 +4308,12 @@ See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#po
         t = self.transition_times[0]
         x = self.micro_states[0]
         while t &lt; self.config.final_time:
-            t, x = iterate(do_step, rng, t, x)
+            try:
+                t, x = iterate(do_step, rng, t, x)
+            except StopSimulation:
+                self.transition_times.append(self.config.final_time)
+                self.micro_states.append(x.copy())
+                break
         self._micro_states = np.array(self.micro_states)
         self._transition_times = np.array(self.transition_times)
         self._update_states()
@@ -4314,6 +4329,8 @@ See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#po
     def _direct_method(self, rng, t, next_states, rates):
         &#34;&#34;&#34;Obtain the next state and time from the direct method.&#34;&#34;&#34;
         out_rate = np.sum(rates)
+        if out_rate == 0:
+            raise StopSimulation
         threshold_rate = rng.random() * out_rate
         j = 0
         sum_of_rates = rates[0]
@@ -4323,10 +4340,13 @@ See <code><a title="popnet.executors.Simulator.activation_rates_shape" href="#po
         return j, (1 / out_rate) * np.log(1 / rng.random())
 
     def _first_reaction_method(self, rng, t, next_states, rates):
-        &#34;&#34;&#34;Obtain the next state and time from the first reaction method.&#34;&#34;&#34;
+        &#34;&#34;&#34;Obtain the next state and time from the first-reaction method.&#34;&#34;&#34;
         next_times = (1 / rates) * np.log(1 / rng.random(len(rates)))
         j = np.argmin(next_times)
-        return j, next_times[j]
+        next_time = next_times[j]
+        if np.isinf(next_time):
+            raise StopSimulation
+        return j, next_time
 
     def _get_calcium_output(self, j, growth_rate, decay_rate):
         &#34;&#34;&#34;Get the calcium concentration in neuron *j* with respect to time.&#34;&#34;&#34;
@@ -4844,7 +4864,7 @@ configuration.</p></div>
 <p>Run a simulation to obtain a possible trajectory of the stochastic
 process which describes the evolution of the network. To obtain this
 trajectory, the Doob&ndash;Gillespie algorithm is used either with the
-direct method or with the first reaction method. See the
+direct method or with the first-reaction method. See the
 <a href="#simulator-single-run-notes">Notes</a> section below for more details
 about the algorithm.</p>
 <div class="admonition note">
@@ -4883,7 +4903,7 @@ from the current one, with the corresponding transition rates. This
 information is in fact sufficient to determine the distribution of the
 time at which the next transition occurs and which one will occur.</p>
 <p>In [3], Gillespie introduces two methods, called the <em>direct</em> and
-<em>first reaction</em> methods respectively, to choose the time interval until
+<em>first-reaction</em> methods respectively, to choose the time interval until
 the next transition and the next state of the system.</p>
 <ul>
 <li>
@@ -4896,7 +4916,7 @@ given other state is proportional to the corresponding transition
 rate.</p>
 </li>
 <li>
-<p><strong>First reaction method.</strong> For every possible next state, a time at
+<p><strong>First-reaction method.</strong> For every possible next state, a time at
 which the corresponding transition could occur is randomly generated,
 knowing that this time is exponentially distributed with parameter
 equal to the transition rate. The transition that should occur first
@@ -4926,7 +4946,7 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
     Run a simulation to obtain a possible trajectory of the stochastic
     process which describes the evolution of the network. To obtain this
     trajectory, the Doob--Gillespie algorithm is used either with the
-    direct method or with the first reaction method. See the
+    direct method or with the first-reaction method. See the
     [Notes](#simulator-single-run-notes) section below for more details
     about the algorithm.
 
@@ -4967,7 +4987,7 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
     time at which the next transition occurs and which one will occur.
 
     In [3], Gillespie introduces two methods, called the *direct* and
-    *first reaction* methods respectively, to choose the time interval until
+    *first-reaction* methods respectively, to choose the time interval until
     the next transition and the next state of the system.
 
      - **Direct method.** First, the total transition rate out of the
@@ -4978,7 +4998,7 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
        given other state is proportional to the corresponding transition
        rate.
 
-     - **First reaction method.** For every possible next state, a time at
+     - **First-reaction method.** For every possible next state, a time at
        which the corresponding transition could occur is randomly generated,
        knowing that this time is exponentially distributed with parameter
        equal to the transition rate. The transition that should occur first
@@ -5001,7 +5021,12 @@ of Computational Physics</em> <strong>22</strong>, 403&ndash;434 (1976). doi:
     t = self.transition_times[0]
     x = self.micro_states[0]
     while t &lt; self.config.final_time:
-        t, x = iterate(do_step, rng, t, x)
+        try:
+            t, x = iterate(do_step, rng, t, x)
+        except StopSimulation:
+            self.transition_times.append(self.config.final_time)
+            self.micro_states.append(x.copy())
+            break
     self._micro_states = np.array(self.micro_states)
     self._transition_times = np.array(self.transition_times)
     self._update_states()</code></pre>

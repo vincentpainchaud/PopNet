@@ -720,7 +720,8 @@ class PhasePlane(Graphics):
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
         self.ax.quiver(X, Y, dX, dY, **kwargs)
 
-    def setup(self, xlim=(0,1), ylim=(0,1), fontsize=10, aspect=&#39;auto&#39;):
+    def setup(self, xlim=(0,1), ylim=(0,1), set_xlabel=True, set_ylabel=True,
+              fontsize=10, aspect=&#39;auto&#39;):
         &#34;&#34;&#34;Setup the figure.
 
         Setup the figure `PhasePlane.fig`. Allows to set limits to both axes,
@@ -732,6 +733,8 @@ class PhasePlane(Graphics):
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
             default to (0,1).
+        set_xlabel, set_ylabel : bool, optional
+            Decide if the axes are labelled. Both default to `True`.
         fontsize : float, optional
             Fontsize of the axes&#39; labels. Defaults to 10.
         aspect : {&#39;auto&#39;, &#39;equal&#39;} or float, optional
@@ -742,9 +745,11 @@ class PhasePlane(Graphics):
         &#34;&#34;&#34;
         self.ax.set_xlim(xlim)
         self.ax.set_ylim(ylim)
-        self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
-        self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
-                           rotation=0)
+        if set_xlabel:
+            self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
+        if set_ylabel:
+            self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
+                               rotation=0)
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
@@ -4628,7 +4633,8 @@ from a user perspective.</p></div>
         X, Y, dX, dY = self._get_arrows(xlim, ylim, shape)
         self.ax.quiver(X, Y, dX, dY, **kwargs)
 
-    def setup(self, xlim=(0,1), ylim=(0,1), fontsize=10, aspect=&#39;auto&#39;):
+    def setup(self, xlim=(0,1), ylim=(0,1), set_xlabel=True, set_ylabel=True,
+              fontsize=10, aspect=&#39;auto&#39;):
         &#34;&#34;&#34;Setup the figure.
 
         Setup the figure `PhasePlane.fig`. Allows to set limits to both axes,
@@ -4640,6 +4646,8 @@ from a user perspective.</p></div>
         xlim, ylim : tuple, optional
             Limits of the horizontal and vertical axis, respectively. Both
             default to (0,1).
+        set_xlabel, set_ylabel : bool, optional
+            Decide if the axes are labelled. Both default to `True`.
         fontsize : float, optional
             Fontsize of the axes&#39; labels. Defaults to 10.
         aspect : {&#39;auto&#39;, &#39;equal&#39;} or float, optional
@@ -4650,9 +4658,11 @@ from a user perspective.</p></div>
         &#34;&#34;&#34;
         self.ax.set_xlim(xlim)
         self.ax.set_ylim(ylim)
-        self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
-        self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
-                           rotation=0)
+        if set_xlabel:
+            self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
+        if set_ylabel:
+            self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
+                               rotation=0)
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
@@ -5207,7 +5217,7 @@ default to (0,1).</dd>
 </details>
 </dd>
 <dt id="popnet.graphics.PhasePlane.setup"><code class="name flex">
-<span>def <span class="ident">setup</span></span>(<span>self, xlim=(0, 1), ylim=(0, 1), fontsize=10, aspect='auto')</span>
+<span>def <span class="ident">setup</span></span>(<span>self, xlim=(0, 1), ylim=(0, 1), set_xlabel=True, set_ylabel=True, fontsize=10, aspect='auto')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Setup the figure.</p>
@@ -5219,6 +5229,8 @@ axes.</p>
 <dt><strong><code>xlim</code></strong>, <strong><code>ylim</code></strong> :&ensp;<code>tuple</code>, optional</dt>
 <dd>Limits of the horizontal and vertical axis, respectively. Both
 default to (0,1).</dd>
+<dt><strong><code>set_xlabel</code></strong>, <strong><code>set_ylabel</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>Decide if the axes are labelled. Both default to <code>True</code>.</dd>
 <dt><strong><code>fontsize</code></strong> :&ensp;<code>float</code>, optional</dt>
 <dd>Fontsize of the axes' labels. Defaults to 10.</dd>
 <dt><strong><code>aspect</code></strong> :&ensp;<code>{'auto', 'equal'}</code> or <code>float</code>, optional</dt>
@@ -5231,7 +5243,8 @@ its height is <code>aspect</code> times its width. Defaults to <code>'auto'</cod
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def setup(self, xlim=(0,1), ylim=(0,1), fontsize=10, aspect=&#39;auto&#39;):
+<pre><code class="python">def setup(self, xlim=(0,1), ylim=(0,1), set_xlabel=True, set_ylabel=True,
+          fontsize=10, aspect=&#39;auto&#39;):
     &#34;&#34;&#34;Setup the figure.
 
     Setup the figure `PhasePlane.fig`. Allows to set limits to both axes,
@@ -5243,6 +5256,8 @@ its height is <code>aspect</code> times its width. Defaults to <code>'auto'</cod
     xlim, ylim : tuple, optional
         Limits of the horizontal and vertical axis, respectively. Both
         default to (0,1).
+    set_xlabel, set_ylabel : bool, optional
+        Decide if the axes are labelled. Both default to `True`.
     fontsize : float, optional
         Fontsize of the axes&#39; labels. Defaults to 10.
     aspect : {&#39;auto&#39;, &#39;equal&#39;} or float, optional
@@ -5253,9 +5268,11 @@ its height is <code>aspect</code> times its width. Defaults to <code>'auto'</cod
     &#34;&#34;&#34;
     self.ax.set_xlim(xlim)
     self.ax.set_ylim(ylim)
-    self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
-    self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
-                       rotation=0)
+    if set_xlabel:
+        self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
+    if set_ylabel:
+        self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
+                           rotation=0)
     self.ax.axes.set_aspect(aspect)</code></pre>
 </details>
 </dd>

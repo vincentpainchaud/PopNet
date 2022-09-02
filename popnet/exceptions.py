@@ -12,6 +12,11 @@ class FormatError(PopNetError):
     pass
 
 
+class StopSimulation(PopNetError):
+    """Exceptions raised when a stochastic simulation has to end."""
+    pass
+
+
 class PopNetWarning(Warning):
     """Generic class for warnings related to PopNet."""
     pass
