@@ -9,6 +9,10 @@ can perform various numerical experiments, such as integrations of dynamical
 systems related to Wilson--Cowan's, or simulations of stochastic processes
 whose behavior can be approximated macroscopically by the Wilson--Cowan model.
 It has been used to produce all numerical results and figures in [4] and [5].
+Several examples of usage of PopNet are provided in the [examples](
+https://github.com/vincentpainchaud/PopNet/tree/main/examples) folder of the
+GitHub repository. Most figures presented in [5] are reproduced in these
+examples.
 
 PopNet provides methods to set, save or load all parameters used for an
 expriment, and others to actually perform experiments. It also has a number of
@@ -110,8 +114,8 @@ References
     Laval (2021).
  5. Vincent Painchaud, Nicolas Doyon and Patrick Desrosiers. “Beyond
     Wilson--Cowan dynamics: oscillations and chaos without inhibition.”
-    *arXiv:2204.00583* [physics, q-bio] (2022).
-    doi:[10.48550/arXiv.2204.00583](https://doi.org/10.48550/arXiv.2204.00583)
+    *Biological Cybernetics* (2022).
+    doi:[10.1007/s00422-022-00941-w](https://doi.org/10.1007/s00422-022-00941-w)
  6. Pauli Virtanen, Ralf Gommers, Travis E. Oliphant, Matt Haberland, Tyler
     Reddy, David Cournapeau, Evgeni Burovski, Pearu Peterson, Warren Weckesser,
     Jonathan Bright, Stéfan J. van der Walt, Matthew Brett, Joshua Wilson, K.

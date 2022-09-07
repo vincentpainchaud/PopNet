@@ -15,13 +15,13 @@ This package is part of work supervised by Nicolas Doyon and [Patrick Desrosiers
 
 ## Installation ##
 
-1. Download the `popnet` folder. 
+1. Download the [`popnet`](https://github.com/vincentpainchaud/PopNet/tree/main/popnet) folder. 
 2. Place it in a directory specified in your `PYTHONPATH` environment variable.
 3. Import it in other files and have fun!
 
 ## Usage ##
 
-The following example gives the idea of the general usage of the package. 
+The following example gives the idea of the general usage of the package. Other examples are available in the [`examples`](https://github.com/vincentpainchaud/PopNet/tree/main/examples) folder. For all details, see the [documentation](https://vincentpainchaud.github.io/PopNet/).
 
 ```python
 import popnet as pn
@@ -52,5 +52,5 @@ Vincent Painchaud
 <a id="1">[1]</a>
     Vincent Painchaud, Nicolas Doyon and Patrick Desrosiers.
     “Beyond Wilson&ndash;Cowan dynamics: oscillations and chaos without inhibition.”
-    *arXiv:2204.00583* [physics, q-bio] (2022),
-    doi:[10.48550/arXiv.2204.00583](https://doi.org/10.48550/arXiv.2204.00583)
+    *Biological Cybernetics* (2022).
+    doi:[10.1007/s00422-022-00941-w](https://doi.org/10.1007/s00422-022-00941-w)
