@@ -237,6 +237,7 @@ class DynamicalSystem:
         popnet.exceptions.PopNetWarning
             If `verbose` is `True` and the optimizer did not succeed.
         &#34;&#34;&#34;
+        state = np.array(state, float)
         try:
             self.jac(state)
         except NotImplementedError:
@@ -1379,6 +1380,7 @@ method <code><a title="popnet.systems.DynamicalSystem.vector_field" href="#popne
         popnet.exceptions.PopNetWarning
             If `verbose` is `True` and the optimizer did not succeed.
         &#34;&#34;&#34;
+        state = np.array(state, float)
         try:
             self.jac(state)
         except NotImplementedError:
@@ -1662,6 +1664,7 @@ Defaults to <code>'hybr'</code>.</dd>
     popnet.exceptions.PopNetWarning
         If `verbose` is `True` and the optimizer did not succeed.
     &#34;&#34;&#34;
+    state = np.array(state, float)
     try:
         self.jac(state)
     except NotImplementedError:

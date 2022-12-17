@@ -638,14 +638,14 @@ class PhasePlane(Graphics):
             the available area, if `'equal'`, the scaling is the same for
             both axes, and if a float, a square would be stretched such that
             its height is `aspect` times its width. Defaults to `'auto'`.
-        xlabel_kwargs : dict
+        xlabel_kwargs : dict, optional
             Keyword arguments passed to [`matplotlib.axes.Axes.set_xlabel`](
             https://31c8.short.gy/ax-set-xlabel), the function which adds the
-            label of the horizontal axis.
-        ylabel_kwargs : dict
+            label of the horizontal axis. Defaults to `{}`.
+        ylabel_kwargs : dict, optional
             Keyword arguments passed to [`matplotlib.axes.Axes.set_ylabel`](
             https://31c8.short.gy/ax-set-ylabel), the function which adds the
-            label of the vertical axis.
+            label of the vertical axis. Defaults to `{}`.
         """
         self.ax.set_xlim(xlim)
         self.ax.set_ylim(ylim)
