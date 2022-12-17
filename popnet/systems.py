@@ -128,6 +128,7 @@ class DynamicalSystem:
         popnet.exceptions.PopNetWarning
             If `verbose` is `True` and the optimizer did not succeed.
         """
+        state = np.array(state, float)
         try:
             self.jac(state)
         except NotImplementedError:

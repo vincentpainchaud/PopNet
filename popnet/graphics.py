@@ -552,7 +552,7 @@ class PhasePlane(Graphics):
         label = kwargs.pop('label', 'Solution')
         self.ax.plot(solution[0], solution[1], label=label, **kwargs)
 
-    def plot_trajectory(self, act='step', **kwargs):
+    def plot_trajectory(self, act='step', cut=1, **kwargs):
         """Plot a trajectory of a stochastic process on the phase plane.
 
         Run a simulation of a stochastic process, and plot the resulting
@@ -569,6 +569,11 @@ class PhasePlane(Graphics):
             activation rate is the logistic function
             `popnet.structures.Population.F` of the population to which it
             belongs. Defaults to `'step'`.
+        cut : float, optional
+            A number between 0 and 1 that indicates the amount of the
+            trajectory to actually plot on the phase plane. Before being
+            plotted, the trajectory is cut at `cut` of the time interval.
+            Defaults to 1.
         **kwargs
             Keyword arguments passed to the
             [`plot`](https://31c8.short.gy/ax-plot) method of `PhasePlane.ax`,
@@ -578,6 +583,14 @@ class PhasePlane(Graphics):
         simulator = get_simulator(self.config, act=act, mode='individual')
         trajectory = self._run_experiment(simulator)
         label = kwargs.pop('label', 'Trajectory')
+        try:
+            cut = float(cut)
+        except TypeError as error:
+            raise TypeError('\'cut\' must be a float') from error
+        if not 0 <= cut <= 1:
+            raise ValueError('\'cut\' must be between 0 and 1')
+        slice = round(cut * len(trajectory[0]))
+        trajectory = trajectory[:,:slice]
         self.ax.plot(trajectory[0], trajectory[1], label=label, **kwargs)
 
     def quiver(self, shape, xlim=(0,1), ylim=(0,1), **kwargs):
@@ -604,7 +617,7 @@ class PhasePlane(Graphics):
         self.ax.quiver(X, Y, dX, dY, **kwargs)
 
     def setup(self, xlim=(0,1), ylim=(0,1), set_xlabel=True, set_ylabel=True,
-              fontsize=10, aspect='auto'):
+              fontsize=10, aspect='auto', xlabel_kwargs={}, ylabel_kwargs={}):
         """Setup the figure.
 
         Setup the figure `PhasePlane.fig`. Allows to set limits to both axes,
@@ -625,14 +638,23 @@ class PhasePlane(Graphics):
             the available area, if `'equal'`, the scaling is the same for
             both axes, and if a float, a square would be stretched such that
             its height is `aspect` times its width. Defaults to `'auto'`.
+        xlabel_kwargs : dict
+            Keyword arguments passed to [`matplotlib.axes.Axes.set_xlabel`](
+            https://31c8.short.gy/ax-set-xlabel), the function which adds the
+            label of the horizontal axis.
+        ylabel_kwargs : dict
+            Keyword arguments passed to [`matplotlib.axes.Axes.set_ylabel`](
+            https://31c8.short.gy/ax-set-ylabel), the function which adds the
+            label of the vertical axis.
         """
         self.ax.set_xlim(xlim)
         self.ax.set_ylim(ylim)
         if set_xlabel:
-            self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize)
+            self.ax.set_xlabel(self._label(self.axes[0]), fontsize=fontsize,
+                               **xlabel_kwargs)
         if set_ylabel:
             self.ax.set_ylabel(self._label(self.axes[1]), fontsize=fontsize, 
-                               rotation=0)
+                               rotation=0, **ylabel_kwargs)
         self.ax.axes.set_aspect(aspect)
 
     def streamplot(self, shape, xlim=(0,1), ylim=(0,1), colorbar=False, 
@@ -1041,7 +1063,8 @@ class Result(Graphics):
         config : popnet.structures.Configuration, optional
             Configuration to associate with the result. If given, it must have
             the ID `ID`. Defaults to `None`, in which case it is loaded with
-            `popnet.structures.load_config`, using the same ID.
+            `popnet.structures.load_config`, using the same ID and assuming the
+            file is in the same folder as the result.
         times : array_like, optional
             Times array to associate with the result. Defaults to `None`, in
             which case it is computed from the configuration.
@@ -1065,7 +1088,7 @@ class Result(Graphics):
         FileNotFoundError
             If no file is found with the expected name.
         """
-        config = cls._check_config(config, ID)
+        config = cls._check_config(config, ID, folder)
         if times is None:
             times = np.linspace(config.initial_time, config.final_time,
                                 1 + config.iterations)
@@ -1351,7 +1374,7 @@ class Result(Graphics):
                         self.default_name, name)
 
     def setup(self, set_xlabel=True, units='ms', fontsize=10, xlim='time',
-              ylim='fractions'):
+              ylim='fractions', **kwargs):
         """Setup a figure.
 
         Setup the figure `Result.fig`. Allows to set an automatic label to the
@@ -1380,6 +1403,10 @@ class Result(Graphics):
             bounded between 0 and 1. If `'covariances'`, it is bounded between
             between -1/4 and 1. If `'unbounded'`, it is not bounded. Defaults
             to `'fractions'`.
+        **kwargs
+            Keyword arguments passed to [`matplotlib.axes.Axes.set_xlabel`](
+            https://31c8.short.gy/ax-set-xlabel), the function which adds the
+            label of the horizontal axis.
 
         Raises
         ------
@@ -1389,7 +1416,7 @@ class Result(Graphics):
             If `xlim` or `ylim` is given a non-valid value.
         """
         self._check_if_activated()
-        self._set_xlabel(set_xlabel, units, fontsize)
+        self._set_xlabel(set_xlabel, units, fontsize, **kwargs)
         self._check_lim_value('x', xlim)
         self._check_lim_value('y', ylim)
         self._set_xlim(xlim)
@@ -1423,12 +1450,12 @@ class Result(Graphics):
             self.colors[key] = [[None for p1 in self.config.network.populations]
                                       for p2 in self.config.network.populations]
         if (p := len(self.config.network.populations)) == 1:
-            self.colors['CAA'][0][0] = 'salmon'
-            self.colors['CRR'][0][0] = 'skyblue'
+            self.colors['CAA'][0][0] = 'crimson'
+            self.colors['CRR'][0][0] = 'royalblue'
             self.colors['CSS'][0][0] = 'gold'
-            self.colors['CAR'][0][0] = 'violet'
-            self.colors['CAS'][0][0] = (255/255,180/255,0)
-            self.colors['CRS'][0][0] = 'springgreen'
+            self.colors['CAR'][0][0] = 'mediumorchid'
+            self.colors['CAS'][0][0] = 'orange'
+            self.colors['CRS'][0][0] = 'mediumseagreen'
         elif p == 2:
             self.colors['CAA'] = [['seagreen', None], [None, 'blueviolet']]
             self.colors['CRR'] = [['mediumseagreen', None], 
@@ -1449,10 +1476,10 @@ class Result(Graphics):
                                      for p3 in self.config.network.populations]
 
     @staticmethod
-    def _check_config(config, ID):
+    def _check_config(config, ID, folder):
         """Check if `config` is a valid configuration when loading a result."""
         if config is None:
-            return structures.load_config(ID)
+            return structures.load_config(ID, folder=folder)
         if not isinstance(config, structures.Configuration):
             raise TypeError('The configuration to associate with a loaded '
                             'result must be a \'Configuration\' instance.')
@@ -1635,11 +1662,12 @@ class Result(Graphics):
                 for XYZ in ['AAA', 'AAR', 'AAS', 'ARR', 'ARS',
                             'ASS', 'RRR', 'RRS', 'RSS', 'SSS']}
 
-    def _set_xlabel(self, set, units, fontsize):
+    def _set_xlabel(self, set, units, fontsize, **kwargs):
         """Set the label of the horizontal axis of a figure."""
         if set:
             units = f' [{units}]' if units != '' else ''
-            self.ax.set_xlabel(f'{self.x_units}{units}', fontsize=fontsize)
+            self.ax.set_xlabel(f'{self.x_units}{units}', fontsize=fontsize,
+                               **kwargs)
 
     def _set_xlim(self, xlim):
         """Set the limits of the horizontal axis of a figure."""
@@ -2075,7 +2103,7 @@ class Statistics(Result):
         config : popnet.structures.Configuration, optional
             Configuration to associate with the result. If given, it must have
             the ID `ID`. Defaults to `None`, in which case it is loaded from ID
-            `ID`.
+            `ID`, assuming the file is in the same folder as the result.
         folder : str, optional
             Folder in which the files are located, which should be placed in the
             current directory. Defaults to `None`, in which case the files are
@@ -2096,7 +2124,7 @@ class Statistics(Result):
         FileNotFoundError
             If no file is found with the expected name for a component.
         """
-        config = cls._check_config(config, ID)
+        config = cls._check_config(config, ID, folder)
         sample_name = cls._get_sample_name(sample_name)
         samples = []
         p = len(config.network.populations)
@@ -2157,7 +2185,7 @@ class Statistics(Result):
         """
         return self._plot_min
         
-    def fill_all(self, bound='std', alpha=.25, **kwargs):
+    def fill_all(self, bound='std', color=None, alpha=.25, **kwargs):
         """Add fills between given bounds.
 
         Add fills between given bounds around the mean values of all fractions
@@ -2170,6 +2198,9 @@ class Statistics(Result):
             bounded by one standard deviation around the mean value is filled.
             If `'extrema'`, the region bounded by the minimum and maximum
             values of the component is filled. Defaults to `'std'`.
+        color : str, optional
+            Color of the fill. Defaults to `None`, in which case it is replaced
+            with a default color.
         alpha : float
             Transparency parameter of the fill. Defaults to 0.25.
         **kwargs
@@ -2177,7 +2208,7 @@ class Statistics(Result):
             which is the [`fill_between`](https://31c8.short.gy/ax-fill-between)
             method of `Statistics.ax`.
         """
-        self._fill_all(bound, alpha, **kwargs)
+        self._fill_all(bound, color, alpha, **kwargs)
 
     def plot_averages(self, **kwargs):
         """Plot all averages of fractions of populations.
@@ -2269,12 +2300,12 @@ class Statistics(Result):
         super()._default_plots(one=expectations, symmetric=variances, 
                                nonsymmetric=covariances, three=third_moments)
 
-    def _fill_all(self, bound, alpha, **kwargs):
+    def _fill_all(self, bound, color, alpha, **kwargs):
         """Add fills for all *A*'s, *R*'s and *S*'s."""
         p = len(self.config.network.populations)
         for J in range(p):
             for X in ['A', 'R', 'S']:
-                self.fill[X][J](bound=bound, alpha=alpha, **kwargs)
+                self.fill[X][J](bound=bound, color=color, alpha=alpha, **kwargs)
 
     def _fill_dict(self):
         """Return a dictionary of methods to add fills for each population."""
@@ -2418,7 +2449,7 @@ class Statistics(Result):
     def _make_fill(self, X, J):
         """Define the method to add a fill around the fraction variable `X` for
         the `J`th population."""
-        def f(bound='std', alpha=.25, **kwargs):
+        def f(bound='std', color=None, alpha=.25, **kwargs):
             self._check_if_activated()
             if bound == 'std':
                 CXX = f'C{X}{X}'
@@ -2429,8 +2460,10 @@ class Statistics(Result):
             elif bound == 'extrema':
                 low = self._min_dict[X][J]
                 high = self._max_dict[X][J]
-            fill = self.ax.fill_between(self.times, low, high, alpha=alpha,
-                                        color=self.colors[X][J], **kwargs)
+            if color is None:
+                color = self.colors[X][J]
+            fill = self.ax.fill_between(self.times, low, high, color=color,
+                                        alpha=alpha, **kwargs)
             return fill
         return f
 
@@ -2445,10 +2478,10 @@ class _StatisticsOne(_ResultOne, Statistics):
 
     """
         
-    def _fill_all(self, bound, alpha, **kwargs):
+    def _fill_all(self, bound, color, alpha, **kwargs):
         """Add fills for all *A*, *R* and *S*."""
         for X in ['A', 'R', 'S']:
-            self.fill[X](bound=bound, alpha=alpha, **kwargs)
+            self.fill[X](bound=bound, color=color, alpha=alpha, **kwargs)
 
     def _fill_dict(self):
         """Return a dictionary of methods to add a fill."""
@@ -2646,7 +2679,7 @@ class Spectrum(Result):
         raise PopNetError('No third central moments defined for this result.')
 
     def setup(self, set_xlabel=True, units='kHz', fontsize=10, xlim='freqs',
-              yscale='linear'):
+              yscale='linear', **kwargs):
         """Setup a figure.
 
         Setup the figure `Spectrum.fig`. Extends the base class method by
@@ -2674,6 +2707,10 @@ class Spectrum(Result):
             bounded. Defaults to `'freqs'`.
         yscale : {'linear', 'log'}, optional
             Defines the scale of the vertical axis. Defaults to `'linear'`.
+        **kwargs
+            Keyword arguments passed to [`matplotlib.axes.Axes.set_xlabel`](
+            https://31c8.short.gy/ax-set-xlabel), the function which adds the
+            label of the horizontal axis.
 
         Raises
         ------
@@ -2683,7 +2720,7 @@ class Spectrum(Result):
             If `xlim` is given a non-valid value.
         """
         super().setup(set_xlabel=set_xlabel, units=units, fontsize=fontsize,
-                      xlim=xlim, ylim='unbounded')
+                      xlim=xlim, ylim='unbounded', **kwargs)
         try:
             self.ax.set_yscale(yscale)
         except AttributeError as error:
