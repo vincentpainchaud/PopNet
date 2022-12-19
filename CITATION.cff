@@ -3,7 +3,7 @@ authors:
 - family-names: Painchaud
   given-names: Vincent
 title: "PopNet"
-version: 1.0.0
-date-released: 2022-03-27
-doi: 10.5281/zenodo.6388077
+version: 1.1.0
+date-released: 2022-12-19
+doi: 10.5281/zenodo.7458680
 url: "https://github.com/vincentpainchaud/PopNet"
