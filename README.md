@@ -4,7 +4,7 @@
 
 PopNet is a python package dedicated to the study of the Wilson&ndash;Cowan model, some of its extensions, and its underlying stochastic dynamics. It defines classes intended to easily define the parameters of the model, to integrate dynamical systems related to the model or to simulate the microscopic dynamics, and to interpret the solutions.
 
-This package is part of work supervised by Nicolas Doyon and [Patrick Desrosiers](https://github.com/pdesrosiers). It has been used to produce the numerical results and figures in [[1]](#1).
+This package is part of work supervised by Nicolas Doyon and [Patrick Desrosiers](https://github.com/pdesrosiers). It has been used to produce the numerical results and figures in [[1]](#1) and [[2]](#2).
 
 ## Requirements ##
 
@@ -52,5 +52,11 @@ Vincent Painchaud
 <a id="1">[1]</a>
     Vincent Painchaud, Nicolas Doyon and Patrick Desrosiers.
     “Beyond Wilson&ndash;Cowan dynamics: oscillations and chaos without inhibition.”
-    *Biological Cybernetics* (2022).
+    *Biological Cybernetics*, **116** (5), 527&ndash;543 (2022).
     doi:[10.1007/s00422-022-00941-w](https://doi.org/10.1007/s00422-022-00941-w)
+
+<a id="2">[2]</a>
+    Vincent Painchaud, Patrick Desrosiers and Nicolas Doyon.
+    “The determining role of covariances in large networks of stochastic neurons.”
+    *arXiv:2212.09705* [q-bio.NC] (2022).
+    doi:[10.48550/arXiv.2212.09705](https://doi.org/10.48550/arXiv.2212.09705)
