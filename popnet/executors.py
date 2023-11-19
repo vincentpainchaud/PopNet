@@ -1296,7 +1296,8 @@ class ChainSimulator(Simulator):
         super().reset()
         self._samples = None
 
-    def run(self, method='direct', initial_state='fixed', verbose=False):
+    def run(self, method='direct', initial_state='fixed', distinct_states=None,
+            verbose=False):
         """Run multiple simulations.
 
         Run multiple simulations of a stochastic process that describes the
@@ -1319,6 +1320,11 @@ class ChainSimulator(Simulator):
             randomly with
             `popnet.structures.MicroConfiguration.reset_micro_initial_state`
             between each simulation. Defaults to `'fixed'`.
+        distinct_states : int or list or tuple of int, optional
+            Parameter to pass to
+            `popnet.structures.MicroConfiguration.reset_micro_initial_state`
+            if `initial_state` is set to `'random'`. Not used for other values
+            of `initial_state`.
         verbose : bool, optional
             If `True`, a progression bar is printed to show how much of the
             simulations have been performed. Defaults to `False`.
@@ -1342,9 +1348,10 @@ class ChainSimulator(Simulator):
             raise ValueError(f'Unexpected method {method}. Valid values are '
                              '\'direct\' and \'first-reaction\'.')
         if initial_state == 'fixed':
-            def reset_initial_state(): pass
+            def reset_initial_state(distinct_states): pass
         elif initial_state == 'random':
-            def reset_initial_state(): self.config.reset_micro_initial_state()
+            def reset_initial_state(distinct_states):
+                self.config.reset_micro_initial_state(distinct_states)
         else:
             raise ValueError(f'Unexpected keyword {initial_state} to choose the'
                              ' initial state. Valid values are \'fixed\' and '
@@ -1359,7 +1366,7 @@ class ChainSimulator(Simulator):
             for J in range(self._state_length()):
                 samples[:,J,j] = np.interp(self.times, self.transition_times, 
                                            self.states.T[J])
-            reset_initial_state()
+            reset_initial_state(distinct_states)
             self.reset()
         self._samples = samples
         self._success = True

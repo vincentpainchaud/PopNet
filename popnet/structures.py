@@ -1592,31 +1592,31 @@ class Configuration:
                 file.write('\n\nAdditional notes:\n')
                 file.write(note)
 
-    def set_covariances_from_expectations(self, sizes):
+    def set_covariances_from_expectations(self, distinct_states):
         """Set initial covariances from initial expectations.
 
         Set initial values of covariances from initial values of expectations,
         assuming that in the initial state, the states of all neurons are
-        independent and taken from ternary distributions on \\(\\{0, 1, i\\}\\)
-        where the probability of being in a given state is the expectation of
-        the associated fraction of population. These covariances are determined
-        by the sizes of the populations of the underlying network. The precise
-        formula giving covariances is provided in the [Notes](#notes) section
-        below.
+        taken from ternary distributions on \\(\\{0, 1, i\\}\\) where the
+        probability of being in a given state is the expectation of the
+        associated fraction of population. Assuming that each population is
+        split into *k* subpopulations of the same size and that the neurons of
+        a subpopulation are given the same state independently of the states of
+        the other subpopulations, then the covariances are determined by the
+        number of subpopulations in each population. The precise formula giving
+        covariances is provided in the [Notes](#notes) section below.
 
         Parameters
         ----------
-        sizes : list or tuple of int
-            Population sizes used to define covariances.
-
-        Raises
-        ------
-        ValueError
-            If the length of `sizes` is not the number of populations of the
-            network.
+        distinct_states : int or list or tuple of int
+            A number of distinct states to draw for each population, given in
+            the order prescribed by the network's list of populations.
 
         Notes
         -----
+        We start by the case where each neuron of a population is its own
+        subpopulation, so that the states of all neurons are independent.
+
         Here, covariances are computed assuming that in the initial state, the
         state of each neuron follows a ternary distribution on
         \\(\\{0, 1, i\\}\\) where the probability of being in a given state is
@@ -1645,16 +1645,33 @@ class Configuration:
                 - \\mathrm{C}_{RR}^{JJ}(0)
         \\bigr) = - \\frac{\\mathcal{A}_J(0)\\mathcal{R}_J(0)}{|J|}.
         \\]
+
+        In general, a population *J* is split into *N* subpopulations where *N*
+        divides |*J*|. Then a subpopulation *k* is given a state \\(Z_0^k\\),
+        and each neuron *j* of this subpopulation is given this state as well.
+        Therefore, the random variables \\(A_0^J\\) and \\(R_0^J\\) are the
+        real and imaginary parts of the random variable
+        \\[
+        \\frac{1}{|J|} \\sum_{j\\in J} X_0^j
+            = \\frac{1}{|J|} \\sum_{k=1}^N \\frac{|J|}{N} Z_0^k
+            = \\frac{1}{N} \\sum_{k=1}^N Z_0^k.
+        \\]
+        Taking the subpopulation states \\(Z_0^k\\) independently, this means
+        that the state of *J* has the same distribution as the state of a
+        population of *N* neurons with independent states. Thus, all
+        covariances can be obtained from the method described above, replacing
+        the size of *J* with its number *N* of distinct states.
         """
-        if len(sizes) != (p := len(self.network.populations)):
-            raise ValueError('A size must be given for each population.')
-        VA = np.zeros(len(sizes))
-        VR = np.zeros(len(sizes))
-        CovAR = np.zeros(len(sizes))
-        for J, size in enumerate(sizes):
-            VA[J] = self.initial_state[J]*(1 - self.initial_state[J]) / size
-            VR[J] = self.initial_state[p+J]*(1 - self.initial_state[p+J]) / size
-            CovAR[J] = - self.initial_state[J] * self.initial_state[p+J] / size
+        distinct_states = self._check_list_of_sizes(distinct_states,
+                                                    name='distinct states')
+        p = len(self.network.populations)
+        VA = np.zeros(len(distinct_states))
+        VR = np.zeros(len(distinct_states))
+        CovAR = np.zeros(len(distinct_states))
+        for J, nJ in enumerate(distinct_states):
+            VA[J] = self.initial_state[J]*(1 - self.initial_state[J]) / nJ
+            VR[J] = self.initial_state[p+J]*(1 - self.initial_state[p+J]) / nJ
+            CovAR[J] = - self.initial_state[J] * self.initial_state[p+J] / nJ
         CAA = np.diag(VA)
         CRR = np.diag(VR)
         CAR = np.diag(CovAR)
@@ -1775,18 +1792,18 @@ class Configuration:
                              f'components for a network of {p} populations.')
         return state
 
-    def _check_list_of_sizes(self, sizes):
-        """Check a list of population sizes."""
+    def _check_list_of_sizes(self, sizes, name='sizes'):
+        """Check a list of population sizes or similar."""
         if isinstance(sizes, int):
             sizes = [sizes]
         try:
             sizes = list(sizes)
         except TypeError as error:
-            raise TypeError('The given sizes could not be converted to a '
+            raise TypeError(f'The given {name} could not be converted to a '
                             'list.') from error
         if len(sizes) != len(self.network.populations):
-            raise ValueError('The list of sizes must have the same length as '
-                             'the list of populations of the network.')
+            raise ValueError(f'The list of {name} must have the same length as '
+                            'the list of populations of the network.')
         return sizes
 
     def _other_params_string(self):
@@ -1895,38 +1912,75 @@ class MicroConfiguration(Configuration):
         self.network.reset_parameters()
         self.reset_micro_initial_state()
         
-    def reset_micro_initial_state(self):
+    def reset_micro_initial_state(self, distinct_states=None):
         """Randomly generate a microscopic initial state.
         
-        Create a microscopic initial state for the network, consistent with its
-        macroscopic initial state. If *J* is a population of the network, the
-        state of each neuron of *J* is chosen randomly between the values `1`
-        (active), `1j` (refractory) and `0` (sensitive), with probabilities
-        corresponding to the active, refractory and sensitive fractions of *J*.
+        Create for the network a microscopic initial state consistent with its
+        macroscopic initial state. By default, if *J* is a population of the
+        network, the state of each neuron of *J* is chosen randomly between the
+        values `1` (active), `1j` (refractory) and `0` (sensitive), with
+        probabilities corresponding to the active, refractory and sensitive
+        fractions of *J*. The parameter `distinct_states` can be used to force
+        subpopulation of neurons to have the exact same state: the whole
+        population will be split into as much subpopulations as distinct states
+        are drawn, and then all neurons within a subpopulation will be given
+        the same state.
+
+        Parameters
+        ----------
+        distinct_states : int or list or tuple of int, optional
+            A number of distinct states for each population, given in the order
+            prescribed by the network's list of populations. It is assumed that
+            the number of distinct states for each population divides its size.
+            Defaults to `None`, in which case it is replaced by the list of
+            population sizes and each neuron will be given a distinct state.
+
+        Raises
+        ------
+        ValueError
+            If the provided numbers of distinct states do not divide the
+            population sizes.
         """
+        if distinct_states is None:
+            distinct_states = [pop.size for pop in self.network.populations]
+        else:
+            distinct_states = self._check_list_of_sizes(distinct_states,
+                                                        name='distinct states')
+            for J, popJ in enumerate(self.network.populations):
+                distinct_states[J] = int(distinct_states[J])
+                if popJ.size % distinct_states[J] != 0:
+                    raise ValueError('The number of distinct states taken for '
+                                     f'population {J+1} should divide its size')
         A = self.initial_state[: (p := len(self.network.populations))]
         R = self.initial_state[p : 2*p]
         S = 1 - A - R
         rng = np.random.default_rng()
+        generated_micro_state = np.concatenate(
+            [rng.choice((0., 1., 1j), p=(S[J], A[J], R[J]), size=n_states)
+             for J, n_states in enumerate(distinct_states)])
+        repetitions = np.concatenate(
+            [[pop.size // n_states for j in range(n_states)]
+             for pop, n_states in zip(self.network.populations, distinct_states)])
         self._micro_initial_state = np.concatenate(
-                [rng.choice((0.,1.,1j), p=(S[J],A[J],R[J]), size=popJ.size)
-                 for J, popJ in enumerate(self.network.populations)])
+            [[state for j in range(rep)]
+             for state, rep in zip(generated_micro_state, repetitions)])
 
-    def set_covariances_from_expectations(self, sizes=None):
+    def set_covariances_from_expectations(self, distinct_states=None):
         """Set initial covariances from initial expectations.
         
         Extends the base class method by taking, by default, the populations'
-        sizes to define covariances.
+        sizes as the numbers of distinct states to define covariances.
 
         Parameters
         ----------
-        sizes : list or tuple of int, optional
-            Population sizes used to define covariances. Defaults to `None`, in
-            which case the populations' sizes are used.
+        distinct_states : int or list or tuple of int, optional
+            A number of distinct states to draw for each population, given in
+            the order prescribed by the network's list of populations. Defaults
+            to `None`, in which case the populations' sizes are used.
         """
-        if sizes is None:
-            sizes = [pop.size for pop in self.network.populations]
-        super().set_covariances_from_expectations(sizes)
+        if distinct_states is None:
+            distinct_states = [pop.size for pop in self.network.populations]
+        super().set_covariances_from_expectations(distinct_states)
 
     def _other_params_string(self):
         """Add `executions` to `str(self)`."""
